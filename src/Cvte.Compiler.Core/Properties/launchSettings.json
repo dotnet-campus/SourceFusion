@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Cvte.Compiler.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "-p ..\\..\\tests\\Cvte.Compiler.Tests -c Sample.cs",
+      "workingDirectory": "."
+    }
+  }
+}
