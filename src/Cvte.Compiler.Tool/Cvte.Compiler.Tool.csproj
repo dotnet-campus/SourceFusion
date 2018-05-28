@@ -1,11 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>0.1.0-alpha</Version>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>transform</AssemblyName>
-    <RootNamespace>Cvte.Compiler</RootNamespace>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
+    <AssemblyName>codet</AssemblyName>
+    <PackageId>Cvte.Compiler</PackageId>
+    <RootNamespace>Cvte.Compiler</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+    <PackageOutputPath>..\..\bin\$(Configuration)</PackageOutputPath>
+    <Company>广州视睿电子科技有限公司 (Guangzhou Shirui Electronics Co.)</Company>
+    <Authors>lvyi</Authors>
+    <RepositoryUrl>git@gitlab.gz.cvte.cn:iip-win/Cvte.Compiler.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://gitlab.gz.cvte.cn/iip-win/Cvte.Compiler</PackageProjectUrl>
+    <Copyright>Copyright © 2018 Guangzhou Shirui Electronics Co.,Ltd, All Rights Reserved.</Copyright>
+    <Description>
+      使代码在编译期执行，以提升运行时效率。
+      Cvte.Compiler 提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
+    </Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +28,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cvte.Compiler\Cvte.Compiler.csproj" />
+    <ProjectReference Include="..\Cvte.Compiler\Cvte.Compiler.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 将 Cvte.Compiler 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
   </ItemGroup>
 
 </Project>

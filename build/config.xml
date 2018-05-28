@@ -1,0 +1,5 @@
+<config>
+    <sln_file>..\Cvte.Compiler.sln</sln_file>
+    <msbuild-outdir>..\bin\Release</msbuild-outdir>
+    <setup-subrepository>CC\Cvte.Compiler</setup-subrepository>
+</config>
