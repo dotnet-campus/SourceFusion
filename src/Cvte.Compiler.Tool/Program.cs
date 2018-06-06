@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Cvte.Compiler
@@ -7,6 +8,11 @@ namespace Cvte.Compiler
     {
         private static int Main(string[] args)
         {
+            if (!Debugger.IsAttached)
+            {
+                Debugger.Launch();
+            }
+
             if (args.Length < 6)
             {
                 UsingForegroundColor(ConsoleColor.Red, () => Console.WriteLine("必须传入足够的参数。"));

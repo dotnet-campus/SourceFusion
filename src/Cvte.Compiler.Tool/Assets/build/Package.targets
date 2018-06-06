@@ -1,0 +1,15 @@
+﻿<Project>
+
+  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
+    <NuGetWalterlvToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netcoreapp2.0\codet.dll</NuGetWalterlvToolPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
+    <NuGetWalterlvToolPath>$(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</NuGetWalterlvToolPath>
+  </PropertyGroup>
+
+  <Target Name="WalterlvDemo" BeforeTargets="CoreCompile">
+    <Exec Command="dotnet &quot;$(NuGetWalterlvToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i obj -c &quot;@(Compile)&quot;" />
+  </Target>
+
+</Project>

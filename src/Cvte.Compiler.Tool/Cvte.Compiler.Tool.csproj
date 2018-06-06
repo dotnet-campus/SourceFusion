@@ -24,15 +24,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cvte.Compiler\Cvte.Compiler.csproj" PrivateAssets="All" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
+    <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="*.DotSettings" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +46,9 @@
     <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
     <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
     <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
+    <!-- 将 Cvte.Compiler 作为本地依赖放入到 NuGet 包中。 -->
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
   </ItemGroup>
 
 </Project>
