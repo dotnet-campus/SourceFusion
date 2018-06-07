@@ -21,8 +21,8 @@ namespace Cvte.Compiler.Syntax
 
         public override SyntaxNode VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
-            var name = (QualifiedNameSyntax) Visit(node.Name);
-            _namespace = name.ToFullString().Trim();
+            var nameSyntax = Visit(node.Name);
+            _namespace = nameSyntax.ToFullString().Trim();
             return base.VisitNamespaceDeclaration(node);
         }
 

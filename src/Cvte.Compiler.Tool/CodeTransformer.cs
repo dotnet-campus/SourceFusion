@@ -57,7 +57,7 @@ namespace Cvte.Compiler
                 {
                     if (declaration.Attributes.Any(x => x == "CodeTransform"))
                     {
-                        InvokeCodeTransformer(declaration, syntaxTree);
+                        InvokeCodeTransformer(file, declaration, syntaxTree);
                     }
                 }
             }
@@ -66,16 +66,18 @@ namespace Cvte.Compiler
         /// <summary>
         /// 执行 <see cref="IPlainCodeTransformer"/> 的转换代码的方法。
         /// </summary>
+        /// <param name="codeFile">此代码文件的文件路径。</param>
         /// <param name="declaration">类声明信息。</param>
         /// <param name="syntaxTree">整个文件的语法树。</param>
-        private void InvokeCodeTransformer(ClassDeclaration declaration, SyntaxTree syntaxTree)
+        private void InvokeCodeTransformer(string codeFile, ClassDeclaration declaration, SyntaxTree syntaxTree)
         {
             var type = CompileType(declaration.Name, syntaxTree);
             var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
             var attribute = type.GetCustomAttribute<CodeTransformAttribute>();
 
             foreach (var sourceFile in attribute.SourceFiles
-                .Select(x => Path.GetFullPath(Path.Combine(_workingFolder, x))))
+                .Select(x => Path.GetFullPath(Path.Combine(
+                    x.StartsWith("/") || x.StartsWith("\\") ? _workingFolder : Path.GetDirectoryName(codeFile), x))))
             {
                 var fileName = Path.GetFileNameWithoutExtension(sourceFile);
                 var extension = attribute.TargetType == FileType.Compile ? ".cs" : Path.GetExtension(sourceFile);
