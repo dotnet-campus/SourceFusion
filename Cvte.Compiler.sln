@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cvte.Compiler.Tool", "src\Cvte.Compiler.Tool\Cvte.Compiler.Tool.csproj", "{EFDCE47F-3FCE-4428-9F63-340806876FE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cvte.Compiler", "src\Cvte.Compiler\Cvte.Compiler.csproj", "{833511F2-E986-4D5E-8D34-EF53786801F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cvte.Compiler.Core", "src\Cvte.Compiler\Cvte.Compiler.Core.csproj", "{833511F2-E986-4D5E-8D34-EF53786801F3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cvte.Compiler.Tests", "tests\Cvte.Compiler.Tests\Cvte.Compiler.Tests.csproj", "{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}"
 EndProject

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.1.0-alpha</Version>
+    <Version>0.2.0-alpha</Version>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net471</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <AssemblyName>codet</AssemblyName>
     <PackageId>Cvte.Compiler</PackageId>
@@ -28,27 +28,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cvte.Compiler\Cvte.Compiler.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Cvte.Compiler\Cvte.Compiler.Core.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
     <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Remove="*.DotSettings" />
-  </ItemGroup>
 
   <ItemGroup>
     <!-- 将 Cvte.Compiler 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.Core.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.Core.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.Core.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
     <!-- 将 Cvte.Compiler 作为本地依赖放入到 NuGet 包中。 -->
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.dll" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
-    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.pdb" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.Core.dll" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
+    <None Include="..\Cvte.Compiler\bin\$(Configuration)\netstandard2.0\Cvte.Compiler.Core.pdb" Visible="False" Pack="True" PackagePath="tools\netcoreapp2.0" />
   </ItemGroup>
 
 </Project>

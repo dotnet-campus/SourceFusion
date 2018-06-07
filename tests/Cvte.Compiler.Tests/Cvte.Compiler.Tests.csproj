@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Cvte.Compiler\Cvte.Compiler.csproj" />
+    <ProjectReference Include="..\..\src\Cvte.Compiler\Cvte.Compiler.Core.csproj" />
   </ItemGroup>
 
 </Project>
