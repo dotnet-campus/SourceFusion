@@ -37,6 +37,11 @@ namespace Cvte.Compiler
         }
 
         /// <summary>
+        /// 获取或设置一个值，该值指示在转换代码之后，被转换的文件是否还保留。默认不保留。
+        /// </summary>
+        public bool KeepSourceFiles { get; set; } = false;
+
+        /// <summary>
         /// 编译时将转换 <paramref name="sourceType"/> 类型。
         /// </summary>
         public CodeTransformAttribute(Type sourceType) => SourceType = sourceType;

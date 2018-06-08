@@ -40,13 +40,17 @@ namespace Cvte.Compiler
         {
             _workingFolder = Path.GetFullPath(workingFolder);
             _intermediateFolder = Path.GetFullPath(Path.Combine(workingFolder, intermediateFolder));
+            if (!Directory.Exists(_intermediateFolder))
+            {
+                Directory.CreateDirectory(_intermediateFolder);
+            }
             _compilingFiles = compilingFiles.Select(x => Path.GetFullPath(Path.Combine(workingFolder, x))).ToArray();
         }
 
         /// <summary>
         /// 执行代码转换。这将开始从所有的编译文件中搜索 <see cref="CodeTransformAttribute"/>，并执行其转换方法。
         /// </summary>
-        internal void Transform()
+        internal IEnumerable<string> Transform()
         {
             foreach (var file in _compilingFiles)
             {
@@ -57,7 +61,12 @@ namespace Cvte.Compiler
                 {
                     if (declaration.Attributes.Any(x => x == "CodeTransform"))
                     {
-                        InvokeCodeTransformer(file, declaration, syntaxTree);
+                        var excludedFiles = InvokeCodeTransformer(file, declaration, syntaxTree);
+                        yield return file;
+                        foreach (var excludedFile in excludedFiles)
+                        {
+                            yield return excludedFile;
+                        }
                     }
                 }
             }
@@ -69,15 +78,16 @@ namespace Cvte.Compiler
         /// <param name="codeFile">此代码文件的文件路径。</param>
         /// <param name="declaration">类声明信息。</param>
         /// <param name="syntaxTree">整个文件的语法树。</param>
-        private void InvokeCodeTransformer(string codeFile, ClassDeclaration declaration, SyntaxTree syntaxTree)
+        private IEnumerable<string> InvokeCodeTransformer(string codeFile, ClassDeclaration declaration, SyntaxTree syntaxTree)
         {
             var type = CompileType(declaration.Name, syntaxTree);
             var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
             var attribute = type.GetCustomAttribute<CodeTransformAttribute>();
 
-            foreach (var sourceFile in attribute.SourceFiles
+            var sourceFiles = attribute.SourceFiles
                 .Select(x => Path.GetFullPath(Path.Combine(
-                    x.StartsWith("/") || x.StartsWith("\\") ? _workingFolder : Path.GetDirectoryName(codeFile), x))))
+                    x.StartsWith("/") || x.StartsWith("\\") ? _workingFolder : Path.GetDirectoryName(codeFile), x)));
+            foreach (var sourceFile in sourceFiles)
             {
                 var fileName = Path.GetFileNameWithoutExtension(sourceFile);
                 var extension = attribute.TargetType == FileType.Compile ? ".cs" : Path.GetExtension(sourceFile);
@@ -86,6 +96,10 @@ namespace Cvte.Compiler
                 {
                     var targetFile = Path.Combine(_intermediateFolder, $"{fileName}.g.{i}{extension}");
                     File.WriteAllText(targetFile, transformedText, Encoding.UTF8);
+                }
+                if (!attribute.KeepSourceFiles)
+                {
+                    yield return sourceFile;
                 }
             }
         }

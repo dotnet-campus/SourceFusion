@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Cvte.Compiler
@@ -23,9 +24,10 @@ namespace Cvte.Compiler
             var intermediateFolder = args[3];
             var compilingFiles = args[5].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             var transformer = new CodeTransformer(workingFolder, intermediateFolder, compilingFiles);
-            transformer.Transform();
+            var excludes = transformer.Transform();
+            var toExcludes = string.Join(";", excludes.Select(x => PathEx.MakeRelativePath(workingFolder, x)));
 
-            Console.WriteLine("所有类型已转换完毕。");
+            Console.WriteLine(toExcludes);
             return 0;
         }
 
