@@ -10,8 +10,8 @@ namespace Cvte.Compiler.Syntax
     internal class CompileTypeVisitor : CSharpSyntaxRewriter
     {
         private string _namespace;
-        private readonly List<ICompileType> _classes = new List<ICompileType>();
-        internal IReadOnlyList<ICompileType> Classes => _classes;
+        private readonly List<ICompileType> _types = new List<ICompileType>();
+        internal IReadOnlyList<ICompileType> Types => _types;
 
         public override SyntaxNode VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
@@ -25,7 +25,7 @@ namespace Cvte.Compiler.Syntax
             var identifier = VisitToken(node.Identifier);
             var list = VisitList(node.AttributeLists).SelectMany(x => x.Attributes)
                 .Select(x => new CompileAttribute(x.Name.ToFullString()));
-            _classes.Add(new CompileType(
+            _types.Add(new CompileType(
                 identifier.ValueText,
                 _namespace,
                 list));

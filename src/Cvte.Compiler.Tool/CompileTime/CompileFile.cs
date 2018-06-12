@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,47 +11,33 @@ namespace Cvte.Compiler.CompileTime
 {
     public class CompileFile
     {
-        public CompileFile(string fileName)
+        public CompileFile(string file)
         {
-            //var originalText = File.ReadAllText(file);
-            //var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+            _file = new FileInfo(file);
+            var originalText = File.ReadAllText(file);
+            var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
 
-            //var compileTypeVisitor = new CompileTypeVisitor();
-            //var classDeclarationVisitor = new ClassDeclarationVisitor();
-            //classDeclarationVisitor.Visit(tree.GetRoot());
-            //return classDeclarationVisitor.Classes;
-
-            //var declarations = ClassDeclarationVisitor.VisiteSyntaxTree(syntaxTree);
-            //foreach (var declaration in declarations)
-            //{
-            //    if (declaration.Attributes.Any(x => x == "CodeTransform"))
-            //    {
-            //        var excludedFiles = InvokeCodeTransformer(file, declaration, syntaxTree);
-            //        yield return file;
-            //        foreach (var excludedFile in excludedFiles)
-            //        {
-            //            yield return excludedFile;
-            //        }
-            //    }
-            //}
+            var compileTypeVisitor = new CompileTypeVisitor();
+            compileTypeVisitor.Visit(syntaxTree.GetRoot());
+            Types = compileTypeVisitor.Types.ToList();
         }
 
-        private FileInfo _file { get; }
+        private readonly FileInfo _file;
 
-        public ICompileType[] Types { get; }
+        public IReadOnlyCollection<ICompileType> Types { get; }
 
         /// <summary>
-        /// 编译指定语法树中的源码，以获取其中定义的类型（类型名称由参数 <paramref name="originalClassName"/> 指定）。
+        /// 编译指定语法树中的源码，以获取其中定义的类型。
         /// </summary>
         /// <param name="syntaxTree">整个文件的语法树。</param>
-        /// <returns>文件中的转换器的类型。</returns>
+        /// <returns>文件中已发现的所有类型。</returns>
         private Type[] Compile(SyntaxTree syntaxTree)
         {
             var assemblyName = $"{_file.Name}.g";
-            var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
+            var compilation = CSharpCompilation.Create(assemblyName, new[] {syntaxTree},
                     options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .AddReferences(
-                    AppDomain.CurrentDomain.GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location)));
+                .AddReferences(AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(x => MetadataReference.CreateFromFile(x.Location)));
 
             using (var ms = new MemoryStream())
             {
