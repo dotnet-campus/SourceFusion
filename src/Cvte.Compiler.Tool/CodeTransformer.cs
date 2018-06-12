@@ -4,9 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Cvte.Compiler.Syntax;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+using Cvte.Compiler.CompileTime;
 
 namespace Cvte.Compiler
 {
@@ -26,9 +24,9 @@ namespace Cvte.Compiler
         private readonly string _intermediateFolder;
 
         /// <summary>
-        /// 获取所有参与编译的文件。
+        /// 获取编译期的程序集。
         /// </summary>
-        private readonly string[] _compilingFiles;
+        private readonly CompileAssembly _assembly;
 
         /// <summary>
         /// 创建用于转换源码的 <see cref="CodeTransformer"/>。
@@ -44,7 +42,9 @@ namespace Cvte.Compiler
             {
                 Directory.CreateDirectory(_intermediateFolder);
             }
-            _compilingFiles = compilingFiles.Select(x => Path.GetFullPath(Path.Combine(workingFolder, x))).ToArray();
+
+            compilingFiles = compilingFiles.Select(x => Path.GetFullPath(Path.Combine(workingFolder, x))).ToArray();
+            _assembly = new CompileAssembly(compilingFiles);
         }
 
         /// <summary>
@@ -52,17 +52,17 @@ namespace Cvte.Compiler
         /// </summary>
         internal IEnumerable<string> Transform()
         {
-            foreach (var file in _compilingFiles)
+            foreach (var assemblyFile in _assembly.Files)
             {
-                var originalText = File.ReadAllText(file);
-                var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
-                var declarations = ClassDeclarationVisitor.VisiteSyntaxTree(syntaxTree);
-                foreach (var declaration in declarations)
+                var compileType = assemblyFile.Types.FirstOrDefault();
+                if (compileType != null)
                 {
-                    if (declaration.Attributes.Any(x => x == "CodeTransform"))
+                    if (compileType.Attributes.Any(x => x.Name == "CodeTransform"))
                     {
-                        var excludedFiles = InvokeCodeTransformer(file, declaration, syntaxTree);
-                        yield return file;
+                        var type = assemblyFile.Compile().First();
+                        var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
+                        var excludedFiles = InvokeCodeTransformer(assemblyFile.Name, transformer);
+                        yield return assemblyFile.Name;
                         foreach (var excludedFile in excludedFiles)
                         {
                             yield return excludedFile;
@@ -76,13 +76,10 @@ namespace Cvte.Compiler
         /// 执行 <see cref="IPlainCodeTransformer"/> 的转换代码的方法。
         /// </summary>
         /// <param name="codeFile">此代码文件的文件路径。</param>
-        /// <param name="declaration">类声明信息。</param>
-        /// <param name="syntaxTree">整个文件的语法树。</param>
-        private IEnumerable<string> InvokeCodeTransformer(string codeFile, ClassDeclaration declaration, SyntaxTree syntaxTree)
+        /// <param name="transformer">编译好的代码转换类实例。</param>
+        private IEnumerable<string> InvokeCodeTransformer(string codeFile, IPlainCodeTransformer transformer)
         {
-            var type = CompileType(declaration.Name, syntaxTree);
-            var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
-            var attribute = type.GetCustomAttribute<CodeTransformAttribute>();
+            var attribute = transformer.GetType().GetCustomAttribute<CodeTransformAttribute>();
 
             var sourceFiles = attribute.SourceFiles
                 .Select(x => Path.GetFullPath(Path.Combine(
@@ -97,42 +94,11 @@ namespace Cvte.Compiler
                     var targetFile = Path.Combine(_intermediateFolder, $"{fileName}.g.{i}{extension}");
                     File.WriteAllText(targetFile, transformedText, Encoding.UTF8);
                 }
+
                 if (!attribute.KeepSourceFiles)
                 {
                     yield return sourceFile;
                 }
-            }
-        }
-
-        /// <summary>
-        /// 编译指定语法树中的源码，以获取其中定义的类型（类型名称由参数 <paramref name="originalClassName"/> 指定）。
-        /// </summary>
-        /// <param name="originalClassName">通过语法树估算的类型名称。</param>
-        /// <param name="syntaxTree">整个文件的语法树。</param>
-        /// <returns>文件中的转换器的类型。</returns>
-        private static Type CompileType(string originalClassName, SyntaxTree syntaxTree)
-        {
-            var assemblyName = $"{originalClassName}.g";
-            var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
-                    options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .AddReferences(
-                    AppDomain.CurrentDomain.GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location)));
-
-            using (var ms = new MemoryStream())
-            {
-                var result = compilation.Emit(ms);
-
-                if (result.Success)
-                {
-                    ms.Seek(0, SeekOrigin.Begin);
-                    var assembly = Assembly.Load(ms.ToArray());
-                    return assembly.GetTypes().First(x => x.Name == originalClassName);
-                }
-
-                var failures = result.Diagnostics.Where(diagnostic =>
-                    diagnostic.IsWarningAsError ||
-                    diagnostic.Severity == DiagnosticSeverity.Error);
-                throw new CompilingException(failures.Select(x => $"{x.Id}: {x.GetMessage()}"));
             }
         }
     }

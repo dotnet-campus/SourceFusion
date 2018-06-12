@@ -31,12 +31,5 @@ namespace Cvte.Compiler.Syntax
                 list));
             return base.VisitClassDeclaration(node);
         }
-
-        internal static IReadOnlyList<ClassDeclaration> VisiteSyntaxTree(SyntaxTree tree)
-        {
-            var classDeclarationVisitor = new ClassDeclarationVisitor();
-            classDeclarationVisitor.Visit(tree.GetRoot());
-            return classDeclarationVisitor.Classes;
-        }
     }
 }

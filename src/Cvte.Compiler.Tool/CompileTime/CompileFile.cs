@@ -9,32 +9,33 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Cvte.Compiler.CompileTime
 {
-    public class CompileFile
+    internal class CompileFile
     {
         public CompileFile(string file)
         {
-            _file = new FileInfo(file);
+            Name = file;
             var originalText = File.ReadAllText(file);
-            var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+            _syntaxTree = CSharpSyntaxTree.ParseText(originalText);
 
             var compileTypeVisitor = new CompileTypeVisitor();
-            compileTypeVisitor.Visit(syntaxTree.GetRoot());
+            compileTypeVisitor.Visit(_syntaxTree.GetRoot());
             Types = compileTypeVisitor.Types.ToList();
         }
 
-        private readonly FileInfo _file;
+        private readonly SyntaxTree _syntaxTree;
+
+        public string Name { get; }
 
         public IReadOnlyCollection<ICompileType> Types { get; }
 
         /// <summary>
         /// 编译指定语法树中的源码，以获取其中定义的类型。
         /// </summary>
-        /// <param name="syntaxTree">整个文件的语法树。</param>
         /// <returns>文件中已发现的所有类型。</returns>
-        private Type[] Compile(SyntaxTree syntaxTree)
+        public Type[] Compile()
         {
-            var assemblyName = $"{_file.Name}.g";
-            var compilation = CSharpCompilation.Create(assemblyName, new[] {syntaxTree},
+            var assemblyName = $"{Name}.g";
+            var compilation = CSharpCompilation.Create(assemblyName, new[] {_syntaxTree},
                     options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddReferences(AppDomain.CurrentDomain.GetAssemblies()
                     .Select(x => MetadataReference.CreateFromFile(x.Location)));
