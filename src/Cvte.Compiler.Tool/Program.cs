@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Cvte.Compiler
 {
@@ -9,11 +7,6 @@ namespace Cvte.Compiler
     {
         private static int Main(string[] args)
         {
-            if (!Debugger.IsAttached)
-            {
-                Debugger.Launch();
-            }
-
             if (args.Length < 6)
             {
                 UsingForegroundColor(ConsoleColor.Red, () => Console.WriteLine("必须传入足够的参数。"));
@@ -25,7 +18,7 @@ namespace Cvte.Compiler
             var compilingFiles = args[5].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             var transformer = new CodeTransformer(workingFolder, intermediateFolder, compilingFiles);
             var excludes = transformer.Transform();
-            var toExcludes = string.Join(";", excludes.Select(x => PathEx.MakeRelativePath(workingFolder, x)));
+            var toExcludes = string.Join($"{Environment.NewLine}", excludes.Select(x => PathEx.MakeRelativePath(workingFolder, x)));
 
             Console.WriteLine(toExcludes);
             return 0;

@@ -1,25 +1,33 @@
 ﻿<Project>
 
   <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
-    <NuGetWalterlvToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netcoreapp2.0\codet.dll</NuGetWalterlvToolPath>
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netcoreapp2.0\codet.dll</TransformCodeToolPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-    <NuGetWalterlvToolPath>$(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</NuGetWalterlvToolPath>
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
   </PropertyGroup>
 
   <PropertyGroup>
     <CvteCompilerGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\Cvte.Compiler.GeneratedCodes</CvteCompilerGeneratedCodeFolder>
   </PropertyGroup>
-
+    
   <Target Name="CvteCompilerGenerateCode" BeforeTargets="CoreCompile">
-    <Exec Command="dotnet &quot;$(NuGetWalterlvToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;@(Compile)&quot;" />
+    <Exec ConsoleToMSBuild="True"
+          Command="dotnet &quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;@(Compile)&quot;">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfCvteCompilerGenerateCode" />
+    </Exec>
   </Target>
 
-  <Target Name="_IncludeCvteCompilerGeneratedCode" DependsOnTargets="CvteCompilerGenerateCode">
+  <Target Name="_IncludeCvteCompilerGeneratedCode" AfterTargets="CvteCompilerGenerateCode">
+    <CreateItem Include="$(OutputOfCvteCompilerGenerateCode)">
+      <Output TaskParameter="Include" ItemName="ExcludedCompileFile" />
+    </CreateItem>
     <ItemGroup>
       <Compile Include="$(CvteCompilerGeneratedCodeFolder)\*.cs" />
+      <Compile Remove="@(ExcludedCompileFile)" />
     </ItemGroup>
+    <Message Text="编译时排除的文件：@(ExcludedCompileFile)" />
   </Target>
 
 </Project>
