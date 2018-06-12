@@ -2,5 +2,6 @@
 {
     public interface ICompileMember : ICompileAttributeProvider
     {
+        string Name { get; }
     }
 }

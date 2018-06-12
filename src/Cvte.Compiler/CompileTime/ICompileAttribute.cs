@@ -2,5 +2,6 @@
 {
     public interface ICompileAttribute
     {
+        string Name { get; }
     }
 }
