@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.2.0-alpha</Version>
+    <Version>0.3.0-alpha</Version>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.0;net471</TargetFrameworks>
     <LangVersion>latest</LangVersion>
