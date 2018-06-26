@@ -61,8 +61,8 @@ namespace Cvte.Compiler
                     {
                         var type = assemblyFile.Compile().First();
                         var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
-                        var excludedFiles = InvokeCodeTransformer(assemblyFile.Name, transformer);
-                        yield return assemblyFile.Name;
+                        var excludedFiles = InvokeCodeTransformer(assemblyFile.FullName, transformer);
+                        yield return assemblyFile.FullName;
                         foreach (var excludedFile in excludedFiles)
                         {
                             yield return excludedFile;

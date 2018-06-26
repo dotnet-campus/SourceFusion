@@ -11,10 +11,11 @@ namespace Cvte.Compiler.CompileTime
 {
     internal class CompileFile
     {
-        public CompileFile(string file)
+        public CompileFile(string fullName)
         {
-            Name = file;
-            var originalText = File.ReadAllText(file);
+            FullName = fullName;
+            Name = Path.GetFileName(fullName);
+            var originalText = File.ReadAllText(fullName);
             _syntaxTree = CSharpSyntaxTree.ParseText(originalText);
 
             var compileTypeVisitor = new CompileTypeVisitor();
@@ -25,6 +26,8 @@ namespace Cvte.Compiler.CompileTime
         private readonly SyntaxTree _syntaxTree;
 
         public string Name { get; }
+
+        public string FullName { get; }
 
         public IReadOnlyCollection<ICompileType> Types { get; }
 
