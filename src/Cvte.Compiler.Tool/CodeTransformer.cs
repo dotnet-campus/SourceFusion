@@ -82,15 +82,18 @@ namespace Cvte.Compiler
             var attribute = transformer.GetType().GetCustomAttribute<CodeTransformAttribute>();
 
             var sourceFiles = attribute.SourceFiles
-                .Select(x => Path.GetFullPath(Path.Combine(
-                    x.StartsWith("/") || x.StartsWith("\\") ? _workingFolder : Path.GetDirectoryName(codeFile), x)));
+                .Select(x => Path.GetFullPath(Path.Combine(x.StartsWith("/") || x.StartsWith("\\")
+                    ? _workingFolder
+                    : Path.GetDirectoryName(codeFile), x)));
             foreach (var sourceFile in sourceFiles)
             {
                 var fileName = Path.GetFileNameWithoutExtension(sourceFile);
                 var extension = attribute.TargetType == FileType.Compile ? ".cs" : Path.GetExtension(sourceFile);
-                foreach (var (i, transformedText) in Enumerable.Range(0, attribute.RepeatCount)
-                    .Select(i => (i, transformer.Transform(File.ReadAllText(sourceFile), new TransformingContext(i)))))
+
+                var text = File.ReadAllText(sourceFile);
+                for (var i = 0; i < attribute.RepeatCount; i++)
                 {
+                    var transformedText = transformer.Transform(text, new TransformingContext(i));
                     var targetFile = Path.Combine(_intermediateFolder, $"{fileName}.g.{i}{extension}");
                     File.WriteAllText(targetFile, transformedText, Encoding.UTF8);
                 }

@@ -1,11 +1,11 @@
 ﻿<Project>
 
   <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
-    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\net47\codet.exe</TransformCodeToolPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -14,7 +14,7 @@
     
   <Target Name="CvteCompilerGenerateCode" BeforeTargets="CoreCompile">
     <Exec ConsoleToMSBuild="True"
-          Command="dotnet &quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;@(Compile)&quot;">
+          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;@(Compile)&quot;">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfCvteCompilerGenerateCode" />
     </Exec>
   </Target>
