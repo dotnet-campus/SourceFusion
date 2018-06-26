@@ -15,19 +15,20 @@
   <Target Name="CvteCompilerGenerateCode" BeforeTargets="CoreCompile">
     <Exec ConsoleToMSBuild="True"
           Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;@(Compile)&quot;">
-      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfCvteCompilerGenerateCode" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfCvteCompilerGenerateCode" />
+      <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfCvteCompiler" />
     </Exec>
   </Target>
 
-  <Target Name="_IncludeCvteCompilerGeneratedCode" AfterTargets="CvteCompilerGenerateCode">
-    <CreateItem Include="$(OutputOfCvteCompilerGenerateCode)">
-      <Output TaskParameter="Include" ItemName="ExcludedCompileFile" />
+  <Target Name="_IncludeCvteCompilerGeneratedCode" Condition="$(_ExitCodeOfCvteCompiler) == '0' " AfterTargets="CvteCompilerGenerateCode">
+    <CreateItem Include="$(_OutputOfCvteCompilerGenerateCode)">
+      <Output TaskParameter="Include" ItemName="_ExcludedCompileFile" />
     </CreateItem>
     <ItemGroup>
       <Compile Include="$(CvteCompilerGeneratedCodeFolder)\*.cs" />
-      <Compile Remove="@(ExcludedCompileFile)" />
+      <Compile Remove="@(_ExcludedCompileFile)" />
     </ItemGroup>
-    <Message Text="编译时排除的文件：@(ExcludedCompileFile)" />
+    <Message Text="编译时排除的文件：@(_ExcludedCompileFile)" />
   </Target>
 
 </Project>
