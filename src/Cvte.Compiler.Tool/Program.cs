@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Cvte.Compiler
 {
@@ -21,11 +20,9 @@ namespace Cvte.Compiler
                 return -1;
             }
 
-            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
-
             try
             {
-                var workingFolder = args[1];
+                var workingFolder = Path.GetFullPath(args[1]);
                 var intermediateFolder = args[3];
                 var compilingFiles = args[5].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 var transformer = new CodeTransformer(workingFolder, intermediateFolder, compilingFiles);
@@ -47,26 +44,6 @@ namespace Cvte.Compiler
                 Console.Write($"error:{ex}");
             }
             return 0;
-        }
-
-        private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs e)
-        {
-            if (e.Name.Contains("Cvte.Compiler.Core"))
-            {
-                var baseFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var targetFolder = Path.Combine(baseFolder, "../../lib");
-                targetFolder = new DirectoryInfo(targetFolder).GetDirectories(
-#if NETCOREAPP
-                    "netstandard2.0"
-#else
-                    "net45"
-#endif
-                    , SearchOption.TopDirectoryOnly).FirstOrDefault()?.FullName;
-                var dll = Path.Combine(targetFolder, "Cvte.Compiler.Core.dll");
-                return Assembly.LoadFile(dll);
-            }
-
-            return null;
         }
 
         private static void UsingForegroundColor(ConsoleColor color, Action action)
