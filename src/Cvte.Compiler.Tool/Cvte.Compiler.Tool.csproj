@@ -53,9 +53,7 @@
 
       <!-- 将 Cvte.Compiler.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
       <None Include="$(OutputPath)*.*" Exclude="$(OutputPath)codet.exe;$(OutputPath)codet.pdb" Pack="True" PackagePath="tools\net47" />
-      <_XYZ Include="$(OutputPath)*.*" />
     </ItemGroup>
-    <Message Text="@(_XYZ)" />
   </Target>
   
 </Project>
