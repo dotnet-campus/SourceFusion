@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.5.0-alpha</Version>
+    <Version>0.1.0-alpha</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>net47</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -10,7 +10,6 @@
     <RootNamespace>Cvte.Compiler</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
-    <IncludeSymbols>true</IncludeSymbols>
     <PackageOutputPath>..\..\bin\$(Configuration)</PackageOutputPath>
     <Company>广州视睿电子科技有限公司 (Guangzhou Shirui Electronics Co.)</Company>
     <Authors>lvyi</Authors>
