@@ -48,7 +48,7 @@ namespace Cvte.Compiler
         }
 
         /// <summary>
-        /// 执行代码转换。这将开始从所有的编译文件中搜索 <see cref="CodeTransformAttribute"/>，并执行其转换方法。
+        /// 执行代码转换。这将开始从所有的编译文件中搜索 <see cref="CompileTimeCodeAttribute"/>，并执行其转换方法。
         /// </summary>
         internal IEnumerable<string> Transform()
         {
@@ -79,7 +79,7 @@ namespace Cvte.Compiler
         /// <param name="transformer">编译好的代码转换类实例。</param>
         private IEnumerable<string> InvokeCodeTransformer(string codeFile, IPlainCodeTransformer transformer)
         {
-            var attribute = transformer.GetType().GetCustomAttribute<CodeTransformAttribute>();
+            var attribute = transformer.GetType().GetCustomAttribute<CompileTimeCodeAttribute>();
 
             var sourceFiles = attribute.SourceFiles
                 .Select(x => Path.GetFullPath(Path.Combine(x.StartsWith("/") || x.StartsWith("\\")

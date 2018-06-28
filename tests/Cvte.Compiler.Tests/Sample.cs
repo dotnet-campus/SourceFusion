@@ -4,7 +4,7 @@ using static System.Environment;
 
 namespace Cvte.Compiler.Tests
 {
-    [CodeTransform("Fakes/ActionCommand.cs", RepeatCount = 4)]
+    [CompileTimeCode("Fakes/ActionCommand.cs", RepeatCount = 4)]
     public class Sample : IPlainCodeTransformer
     {
         private const string ToolName = "Cvte.Compiler.Tests";

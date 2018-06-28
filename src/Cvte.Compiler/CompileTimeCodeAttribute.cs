@@ -4,10 +4,10 @@ using System.Diagnostics.Contracts;
 namespace Cvte.Compiler
 {
     /// <summary>
-    /// 标记此类型将用于编译时进行源码转换。注意：编译完毕后此类型将从目标程序集中消失。
+    /// 标记此类型仅在编译期间使用。注意：编译完毕后此类型将从目标程序集中消失。
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class CodeTransformAttribute : Attribute
+    public sealed class CompileTimeCodeAttribute : Attribute
     {
         /// <summary>
         /// 获取要转换的所有文件。
@@ -44,12 +44,12 @@ namespace Cvte.Compiler
         /// <summary>
         /// 编译时将转换 <paramref name="sourceType"/> 类型。
         /// </summary>
-        public CodeTransformAttribute(Type sourceType) => SourceType = sourceType;
+        public CompileTimeCodeAttribute(Type sourceType) => SourceType = sourceType;
 
         /// <summary>
         /// 编译时将转换 <paramref name="sourceFileNames"/> 文件到新的文件。
         /// </summary>
-        public CodeTransformAttribute(params string[] sourceFileNames) => SourceFiles = sourceFileNames;
+        public CompileTimeCodeAttribute(params string[] sourceFileNames) => SourceFiles = sourceFileNames;
 
         [ContractPublicPropertyName(nameof(RepeatCount))]
         private int _repeatCount = 1;
