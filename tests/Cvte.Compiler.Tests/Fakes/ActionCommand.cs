@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Cvte.Compiler.Tests.Generic
+namespace Cvte.Compiler.Tests.Fakes
 {
     /// <summary>
     /// 这是一个纯测试用类，没有任何用途。

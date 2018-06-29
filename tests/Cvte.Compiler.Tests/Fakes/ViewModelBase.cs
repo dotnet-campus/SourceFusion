@@ -1,6 +1,6 @@
 ﻿namespace Cvte.Compiler.Tests.Fakes
 {
-    internal interface IFoo
+    public abstract class ViewModelBase
     {
     }
 }

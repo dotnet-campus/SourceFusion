@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-using static System.Environment;
 
 namespace Cvte.Compiler.Tests
 {
     [CompileTimeCode("Fakes/ActionCommand.cs", RepeatCount = 3)]
-    public class Sample : IPlainCodeTransformer
+    public class GenerateGeneric : IPlainCodeTransformer
     {
         private const string ToolName = "Cvte.Compiler.Tests";
         private const string ToolVersion = "1.0";
@@ -39,10 +38,10 @@ namespace Cvte.Compiler.Tests
                 .Replace(" T ", FromTemplate(" ({0}) ", "T{n}", ", ", genericCount))
                 .Replace(" t;", FromTemplate(" ({0});", "t{n}", ", ", genericCount))
                 // 生成 [GeneratedCode]。
-                .Replace("    public interface ", $"    {Generatedattribute}{NewLine}    public interface ")
-                .Replace("    public class ", $"    {Generatedattribute}{NewLine}    public class ")
-                .Replace("    public sealed class ", $"    {Generatedattribute}{NewLine}    public sealed class ");
-            return content.Trim() + NewLine + GeneratedFooter;
+                .Replace("    public interface ", $"    {Generatedattribute}{Environment.NewLine}    public interface ")
+                .Replace("    public class ", $"    {Generatedattribute}{Environment.NewLine}    public class ")
+                .Replace("    public sealed class ", $"    {Generatedattribute}{Environment.NewLine}    public sealed class ");
+            return content.Trim() + Environment.NewLine + GeneratedFooter;
         }
 
         private static string FromTemplate(string template, string part, string seperator, int count)
