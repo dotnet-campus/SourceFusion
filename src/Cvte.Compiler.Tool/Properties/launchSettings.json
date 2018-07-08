@@ -2,7 +2,8 @@
   "profiles": {
     "Build Test Project": {
       "commandName": "Project",
-      "commandLineArgs": "-p ..\\..\\tests\\Cvte.Compiler.Tests -i obj\\GeneratedCode -c Sample.cs",
+      //"commandLineArgs": "Cvte.Compiler compile -p ..\\..\\tests\\Cvte.Compiler.Tests -i obj\\GeneratedCode -c Sample.cs",
+      "commandLineArgs": "Cvte.Compiler echo",
       "workingDirectory": "."
     }
   }
