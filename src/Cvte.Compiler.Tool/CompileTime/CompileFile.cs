@@ -9,8 +9,15 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Cvte.Compiler.CompileTime
 {
+    /// <summary>
+    /// 编译文件
+    /// </summary>
     internal class CompileFile
     {
+        /// <summary>
+        /// 创建编译文件
+        /// </summary>
+        /// <param name="fullName"></param>
         public CompileFile(string fullName)
         {
             FullName = fullName;
@@ -25,10 +32,19 @@ namespace Cvte.Compiler.CompileTime
 
         private readonly SyntaxTree _syntaxTree;
 
+        /// <summary>
+        /// 获取文件名
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// 获取文件的完整目录
+        /// </summary>
         public string FullName { get; }
 
+        /// <summary>
+        /// 获取找到的类
+        /// </summary>
         public IReadOnlyCollection<ICompileType> Types { get; }
 
         /// <summary>

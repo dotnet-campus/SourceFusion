@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace Cvte.Compiler.CompileTime
 {
+    /// <summary>
+    /// 编译找到的对象，可以是类型、属性
+    /// </summary>
     internal abstract class CompileMember : ICompileMember
     {
         protected CompileMember(string name, IEnumerable<ICompileAttribute> attributes)
@@ -11,7 +14,14 @@ namespace Cvte.Compiler.CompileTime
             Attributes = attributes.ToArray();
         }
 
+        /// <summary>
+        /// 找到的对象名字
+        /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// 对象的特性
+        /// </summary>
         public ICompileAttribute[] Attributes { get; }
     }
 }
