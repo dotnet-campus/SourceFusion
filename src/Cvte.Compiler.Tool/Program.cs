@@ -22,12 +22,12 @@ namespace Cvte.Compiler
 
                     try
                     {
-                        var transformer = new CodeTransformer(options.WorkFolder, options.IntermediateFolder,
+                        var transformer = new CodeTransformer(options.WorkingFolder, options.IntermediateFolder,
                             options.CompilingFiles.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries));
 
                         var excludes = transformer.Transform();
                         var toExcludes = string.Join($"{Environment.NewLine}",
-                            excludes.Select(x => PathEx.MakeRelativePath(options.WorkFolder, x)));
+                            excludes.Select(x => PathEx.MakeRelativePath(options.WorkingFolder, x)));
 
                         Console.WriteLine(toExcludes);
                     }

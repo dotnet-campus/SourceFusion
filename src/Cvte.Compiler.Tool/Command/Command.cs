@@ -8,7 +8,7 @@ namespace Cvte.Compiler.Command
     public class Command
     {
         [Option('p', Required = true, HelpText = "转换源码的工作路径")]
-        public string WorkFolder { get; set; }
+        public string WorkingFolder { get; set; }
 
         [Option('i', "IntermediateFolder", HelpText = "中间文件的生成路径")]
         public string IntermediateFolder { get; set; }
