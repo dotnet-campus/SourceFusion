@@ -11,9 +11,11 @@ namespace Cvte.Compiler.CompileTime
 
         public CompileAssembly(IEnumerable<string> compileFiles)
         {
-            _compileFilesLazy = new Lazy<List<CompileFile>>(
+            _compileFilesLazy = new Lazy<List<CompileFile>>
+            (
                 () => compileFiles.Select(x => new CompileFile(x)).ToList(),
-                LazyThreadSafetyMode.ExecutionAndPublication);
+                LazyThreadSafetyMode.ExecutionAndPublication
+                );
         }
 
         public IReadOnlyCollection<CompileFile> Files => _compileFilesLazy.Value;
