@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cvte.Compiler.CompileTime;
+using Cvte.Compiler.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Cvte.Compiler
 {
@@ -31,7 +34,6 @@ namespace Cvte.Compiler
 
         public IEnumerable<string> Transform()
         {
-            yield break;
             foreach (var assemblyFile in _assembly.Files)
             {
                 var compileType = assemblyFile.Types.FirstOrDefault();
@@ -39,9 +41,26 @@ namespace Cvte.Compiler
                 {
                     if (compileType.Attributes.Any(x => x.Match<CompileTimeTemplateAttribute>()))
                     {
+                        var excludedFiles = TransformTemplate(assemblyFile);
+                        foreach (var exclude in excludedFiles)
+                        {
+                            yield return exclude;
+                        }
                     }
                 }
             }
+        }
+
+        private IEnumerable<string> TransformTemplate(CompileFile assemblyFile)
+        {
+            var originalText = File.ReadAllText(assemblyFile.FullName);
+            var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+            var visitor = new PlaceholderVisitor();
+            visitor.Visit(syntaxTree.GetRoot());
+
+            // 在此处添加占位符的解析信息的读取。
+
+            yield break;
         }
     }
 }
