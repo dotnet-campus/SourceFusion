@@ -83,7 +83,7 @@ namespace Cvte.Compiler
                 var compileType = assemblyFile.Types.FirstOrDefault();
                 if (compileType != null)
                 {
-                    if (compileType.Attributes.Any(x => x.Match<CompileTimeCodeAttribute>()))
+                    if (compileType.Attributes.Any(x => x.Match(nameof(CompileTimeCodeAttribute))))
                     {
                         var type = assemblyFile.Compile().First();
                         var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);

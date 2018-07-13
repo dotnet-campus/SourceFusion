@@ -34,5 +34,22 @@ namespace Cvte.Compiler.CompileTime
 
             return Name == attributeName;
         }
+
+        /// <inheritdoc />
+        public bool Match(string attributeName)
+        {
+            if (Name == attributeName)
+            {
+                return true;
+            }
+
+            var index = attributeName.LastIndexOf("Attribute", StringComparison.InvariantCulture);
+            if (index >= 0)
+            {
+                attributeName = attributeName.Substring(0, index);
+            }
+
+            return Name == attributeName;
+        }
     }
 }
