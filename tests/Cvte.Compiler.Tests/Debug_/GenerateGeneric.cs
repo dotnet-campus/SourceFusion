@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Cvte.Compiler.Tests
 {
-    [CompileTimeCode("Fakes/ActionCommand.cs", RepeatCount = 3)]
+    [CompileTimeCode("Fakes/ActionCommand.cs", RepeatCount = 3, KeepSourceFiles = true)]
     public class GenerateGeneric : IPlainCodeTransformer
     {
         private const string ToolName = "Cvte.Compiler.Tests";
