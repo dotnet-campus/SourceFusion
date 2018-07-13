@@ -1,16 +1,22 @@
-﻿using System;
-
-namespace Cvte.Compiler.CompileTime
+﻿namespace Cvte.Compiler.CompileTime
 {
     public interface ICompileAttribute
     {
+        /// <summary>
+        /// 获取此特性在代码中书写的名称。
+        /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// 判断当前<see cref="ICompileAttribute"/>是否符合条件
+        /// 判断当前的 <see cref="ICompileAttribute"/> 是否匹配指定的特性名称。
+        /// 由于特性的名称可能包含 Attribute 后缀或命名空间前缀，所以使用此方法判断此特性是否是指定名称的特性会更加安全。
         /// </summary>
-        /// <param name="attributeName">传入的 attributeName 可以带 Attribute 后缀</param>
-        /// <returns></returns>
+        /// <param name="attributeName">
+        /// 进行比较的特性名称。
+        /// </param>
+        /// <returns>
+        /// 如果此特性符合 <paramref name="attributeName"/> 名称，则返回 true；否则返回 false。
+        /// </returns>
         bool Match(string attributeName);
     }
 }

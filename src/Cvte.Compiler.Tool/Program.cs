@@ -28,12 +28,22 @@ namespace Cvte.Compiler
                         PrepairFolders(intermediateFolder);
 
                         var assembly = new CompileAssembly(compilingFiles);
+
+                        // 分析 IPlainCodeTransformer。
                         var transformer = new CodeTransformer(workingFolder, intermediateFolder, assembly);
                         var excludes = transformer.Transform();
-                        var toExcludes = string.Join($"{Environment.NewLine}",
-                            excludes.Select(x => PathEx.MakeRelativePath(workingFolder, x)));
 
-                        Console.WriteLine(toExcludes);
+                        // 分析 CompileTimeTemplate。
+                        var templateTransformer = new TemplateTransformer(workingFolder, intermediateFolder, assembly);
+                        var templateExcludes = templateTransformer.Transform();
+
+                        var toExcludes = excludes.Union(templateExcludes)
+                            .Select(x => PathEx.MakeRelativePath(workingFolder, x)).ToArray();
+
+                        foreach (var exclude in toExcludes)
+                        {
+                            Console.WriteLine(exclude);
+                        }
                     }
                     catch (CompilingException ex)
                     {
