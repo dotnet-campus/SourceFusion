@@ -85,7 +85,7 @@ namespace Cvte.Compiler
                 (
                     compileType != null
                     && compileType.Attributes
-                        .Any(x => x.Match(nameof(CompileTimeCodeAttribute)))
+                        .Any(x => x.Match<CompileTimeCodeAttribute>())
                 )
                 {
                     var type = assemblyFile.Compile().First();
