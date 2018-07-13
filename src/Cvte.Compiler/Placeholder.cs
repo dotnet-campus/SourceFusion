@@ -19,6 +19,9 @@ namespace Cvte.Compiler
         /// 类型为 <typeparamref name="T"/>[] 的占位符。
         /// 在编译完成后，将替换成参数 <paramref name="compileTimeCodeGenerator"/> 生成的代码。
         /// </returns>
+        /// <remarks>
+        /// 此方法由编译期间 NuGet 包的 targets 提供实现。
+        /// </remarks>
         [CompileTimeMethod]
         public static extern T[] Array<T>(Func<ICompilingContext, string> compileTimeCodeGenerator);
     }
