@@ -5,10 +5,17 @@ using System.Threading;
 
 namespace Cvte.Compiler.CompileTime
 {
+    /// <summary>
+    /// 编译时找到的程序集
+    /// </summary>
     internal class CompileAssembly : ICompileAssembly
     {
         private readonly Lazy<List<CompileFile>> _compileFilesLazy;
 
+        /// <summary>
+        /// 创建编译找到程序集
+        /// </summary>
+        /// <param name="compileFiles"></param>
         public CompileAssembly(IEnumerable<string> compileFiles)
         {
             _compileFilesLazy = new Lazy<List<CompileFile>>

@@ -2,8 +2,15 @@
 
 namespace Cvte.Compiler.CompileTime
 {
+    /// <summary>
+    /// 编译时的特性
+    /// </summary>
     public class CompileAttribute : ICompileAttribute
     {
+        /// <summary>
+        /// 创建编译时的特性
+        /// </summary>
+        /// <param name="name"></param>
         public CompileAttribute(string name)
         {
             Name = name;
