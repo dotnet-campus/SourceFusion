@@ -24,7 +24,7 @@ namespace Cvte.Compiler
 
                     try
                     {
-                        var (workingFolder, intermediateFolder, compilingFiles) = DestructPaths(options);
+                        var (workingFolder, intermediateFolder, compilingFiles) = DeconstructPaths(options);
                         PrepairFolders(intermediateFolder);
 
                         var assembly = new CompileAssembly(compilingFiles);
@@ -57,7 +57,7 @@ namespace Cvte.Compiler
             string workingFolder,
             string intermediateFolder,
             string[] compilingFiles)
-            DestructPaths(Options options)
+            DeconstructPaths(Options options)
         {
             var workingFolder = Path.GetFullPath(options.WorkingFolder);
             var intermediateFolder = Path.IsPathRooted(options.IntermediateFolder)
