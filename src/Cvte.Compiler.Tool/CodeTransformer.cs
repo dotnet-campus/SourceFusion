@@ -65,18 +65,12 @@ namespace Cvte.Compiler
         /// </summary>
         /// <param name="workingFolder">转换源码的工作路径。</param>
         /// <param name="intermediateFolder">中间文件的生成路径（文件夹，相对路径）。</param>
-        /// <param name="compilingFiles">所有参与编译的文件。</param>
-        internal CodeTransformer(string workingFolder, string intermediateFolder, IEnumerable<string> compilingFiles)
+        /// <param name="assembly">需要分析源码转换的程序集。</param>
+        internal CodeTransformer(string workingFolder, string intermediateFolder, CompileAssembly assembly)
         {
-            _workingFolder = Path.GetFullPath(workingFolder);
-            _intermediateFolder = Path.GetFullPath(Path.Combine(workingFolder, intermediateFolder));
-            if (!Directory.Exists(_intermediateFolder))
-            {
-                Directory.CreateDirectory(_intermediateFolder);
-            }
-
-            compilingFiles = compilingFiles.Select(x => Path.GetFullPath(Path.Combine(workingFolder, x))).ToArray();
-            _assembly = new CompileAssembly(compilingFiles);
+            _workingFolder = workingFolder;
+            _intermediateFolder = intermediateFolder;
+            _assembly = assembly;
         }
 
         /// <summary>
