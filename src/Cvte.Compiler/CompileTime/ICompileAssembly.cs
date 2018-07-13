@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cvte.Compiler.CompileTime
+﻿namespace Cvte.Compiler.CompileTime
 {
     public interface ICompileAssembly
     {
