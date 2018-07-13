@@ -6,7 +6,7 @@ namespace Cvte.Compiler
     /// <summary>
     /// 标记此类型仅在编译期间使用。注意：编译完毕后此类型将从目标程序集中消失。
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class CompileTimeCodeAttribute : Attribute
     {
         /// <summary>

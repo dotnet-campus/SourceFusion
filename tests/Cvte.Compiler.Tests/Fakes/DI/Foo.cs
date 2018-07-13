@@ -1,4 +1,4 @@
-﻿namespace Cvte.Compiler.Tests.Fakes
+﻿namespace Cvte.Compiler.Tests.Fakes.DI
 {
     [Export]
     internal class Foo : IFoo
