@@ -7,16 +7,16 @@ namespace Cvte.Compiler.Command
 {
     public class Command
     {
-        [Option('p', Required = true, HelpText = "转换源码的工作路径")]
+        [Option('p', Required = true, HelpText = "转换源码的工作路径。")]
         public string WorkingFolder { get; set; }
 
-        [Option('i', "IntermediateFolder", HelpText = "中间文件的生成路径")]
+        [Option('i', "IntermediateFolder", HelpText = "项目临时生成文件夹的相对或绝对路径。")]
         public string IntermediateFolder { get; set; }
 
-        [Option('c', "CompilingFiles", HelpText = "所有参与编译的文件，多个文件使用;分割")]
+        [Option('c', "CompilingFiles", HelpText = "所有参与编译的文件，多个文件使用分号（;）分割。")]
         public string CompilingFiles { get; set; }
 
-        [Option("debug-mode", HelpText = "测试模式")]
+        [Option("debug-mode", HelpText = "如果指定，将在启动编译时进入调试模式。")]
         public bool DebugMode { get; set; }
     }
 }
