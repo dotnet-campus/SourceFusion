@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Cvte.Compiler.Tests.Fakes;
+﻿using System.Linq;
 using Cvte.Compiler.Tests.Fakes.Modules;
 
 namespace Cvte.Compiler.Tests
