@@ -81,18 +81,20 @@ namespace Cvte.Compiler
             foreach (var assemblyFile in _assembly.Files)
             {
                 var compileType = assemblyFile.Types.FirstOrDefault();
-                if (compileType != null)
+                if
+                (
+                    compileType != null
+                    && compileType.Attributes
+                        .Any(x => x.Match(nameof(CompileTimeCodeAttribute)))
+                )
                 {
-                    if (compileType.Attributes.Any(x => x.Match(nameof(CompileTimeCodeAttribute))))
+                    var type = assemblyFile.Compile().First();
+                    var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
+                    var excludedFiles = InvokeCodeTransformer(assemblyFile.FullName, transformer);
+                    yield return assemblyFile.FullName;
+                    foreach (var excludedFile in excludedFiles)
                     {
-                        var type = assemblyFile.Compile().First();
-                        var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
-                        var excludedFiles = InvokeCodeTransformer(assemblyFile.FullName, transformer);
-                        yield return assemblyFile.FullName;
-                        foreach (var excludedFile in excludedFiles)
-                        {
-                            yield return excludedFile;
-                        }
+                        yield return excludedFile;
                     }
                 }
             }
