@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using CommandLine;
-using CommandLine.Text;
+﻿using CommandLine;
 
-namespace Cvte.Compiler.Command
+namespace Cvte.Compiler.Cli
 {
-    public class Command
+    internal class Options
     {
         [Option('p', Required = true, HelpText = "转换源码的工作路径。")]
         public string WorkingFolder { get; set; }
