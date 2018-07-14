@@ -6,10 +6,19 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Cvte.Compiler.Syntax
 {
+    /// <summary>
+    /// 包含从语法树中解析 <see cref="Placeholder"/> 类型调用的语法树访问者。
+    /// </summary>
     internal class PlaceholderVisitor : CSharpSyntaxRewriter
     {
+        /// <summary>
+        /// 在调用 <see cref="CSharpSyntaxRewriter.Visit"/> 方法后，可通过此属性获取从语法树中解析得到的占位符（<see cref="Placeholder"/>）信息。
+        /// </summary>
         internal IReadOnlyCollection<PlaceholderInfo> Placeholders => _placeholders;
 
+        /// <summary>
+        /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
+        /// </summary>
         private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -36,9 +45,19 @@ namespace Cvte.Compiler.Syntax
             return base.VisitInvocationExpression(node);
         }
 
+        /// <summary>
+        /// 包含占位符在语法树中的信息。
+        /// </summary>
         internal class PlaceholderInfo
         {
-            public PlaceholderInfo(TextSpan span, string methodName,
+            /// <summary>
+            /// 初始化 <see cref="PlaceholderInfo"/> 的新实例。
+            /// </summary>
+            /// <param name="span">占位符在源代码文件中的文本区间。</param>
+            /// <param name="methodName">此占位符调用的 <see cref="Placeholder"/> 类型中的方法名称。</param>
+            /// <param name="invocationParameterName">占位符中需要在编译期间执行的方法参数名称。</param>
+            /// <param name="invocationBody">占位符中需要在编译期间执行的方法体。</param>
+            internal PlaceholderInfo(TextSpan span, string methodName,
                 string invocationParameterName, string invocationBody)
             {
                 Span = span;
@@ -47,12 +66,24 @@ namespace Cvte.Compiler.Syntax
                 InvocationBody = invocationBody;
             }
 
+            /// <summary>
+            /// 获取源代码文件中占位符调用的是 <see cref="Placeholder"/> 类型中的哪个方法。
+            /// </summary>
             public string MethodName { get; }
 
+            /// <summary>
+            /// 获取占位符中需要在编译期间执行的方法参数名称。
+            /// </summary>
             public string InvocationParameterName { get; }
 
+            /// <summary>
+            /// 获取占位符中需要在编译期间执行的方法体。
+            /// </summary>
             public string InvocationBody { get; }
 
+            /// <summary>
+            /// 获取占位符在源代码文件中的文本区间。
+            /// </summary>
             public TextSpan Span { get; }
         }
     }
