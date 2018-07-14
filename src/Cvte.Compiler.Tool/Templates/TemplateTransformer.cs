@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cvte.Compiler.CompileTime;
 using Cvte.Compiler.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Cvte.Compiler
+namespace Cvte.Compiler.Templates
 {
     internal class TemplateTransformer
     {
