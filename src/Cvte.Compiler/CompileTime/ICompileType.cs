@@ -1,4 +1,6 @@
-﻿namespace Cvte.Compiler.CompileTime
+﻿using System.Collections.Generic;
+
+namespace Cvte.Compiler.CompileTime
 {
     /// <summary>
     /// 编译时的类型
@@ -16,11 +18,12 @@
         /// <summary>
         /// 类型的基类
         /// </summary>
-        ICompileType BaseType { get; }
+        IReadOnlyList<string> BaseTypeList { get; }
         /// <summary>
-        /// 类型继承的接口
+        /// 引用的命名空间
         /// </summary>
-        ICompileInterface[] Interfaces { get; }
+        IReadOnlyList<string> UsingNamespaceList { get; }
+     
         /// <summary>
         /// 类型包含的属性
         /// </summary>

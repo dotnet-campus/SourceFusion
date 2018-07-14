@@ -20,12 +20,23 @@ namespace Cvte.Compiler.Syntax
         /// </summary>
         internal IReadOnlyList<ICompileType> Types => _types;
 
+        private List<string> UsingNamespaceList { get; } = new List<string>();
+
         /// <summary>
         /// 创建文件编译访问
         /// </summary>
         /// <param name="visitIntoStructuredTrivia"></param>
         public CompileTypeVisitor(bool visitIntoStructuredTrivia = false) : base(visitIntoStructuredTrivia)
         {
+        }
+
+        /// <inheritdoc />
+        public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+        {
+            var name = node.Name.ToString();
+
+            UsingNamespaceList.Add(name);
+            return base.VisitUsingDirective(node);
         }
 
         /// <summary>
@@ -42,6 +53,7 @@ namespace Cvte.Compiler.Syntax
             return base.VisitNamespaceDeclaration(node);
         }
 
+
         /// <summary>
         /// 获取类
         /// </summary>
@@ -50,6 +62,17 @@ namespace Cvte.Compiler.Syntax
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             var identifier = VisitToken(node.Identifier);
+
+            var baseTypeList = new List<string>();
+            if (node.BaseList != null)
+            {
+                foreach (var temp in node.BaseList.Types)
+                {
+                    var name = temp.Type.ToString();
+
+                    baseTypeList.Add(name);
+                }
+            }
 
             //获取类的特性
             var attributeLists = VisitList(node.AttributeLists).SelectMany(x => x.Attributes)
@@ -61,7 +84,9 @@ namespace Cvte.Compiler.Syntax
                 (
                     identifier.ValueText,
                     _namespace,
-                    attributeLists
+                    attributeLists,
+                    baseTypeList,
+                    UsingNamespaceList
                 )
             );
             return base.VisitClassDeclaration(node);
