@@ -33,7 +33,8 @@ namespace Cvte.Compiler.Syntax
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
-            var name = node.Name.ToFullString().Trim();
+            var name = node.Name.ToString();
+
             UsingNamespaceList.Add(name);
             return base.VisitUsingDirective(node);
         }
@@ -67,7 +68,8 @@ namespace Cvte.Compiler.Syntax
             {
                 foreach (var temp in node.BaseList.Types)
                 {
-                    var name = temp.Type.ToFullString().Trim();
+                    var name = temp.Type.ToString();
+
                     baseTypeList.Add(name);
                 }
             }
@@ -82,12 +84,10 @@ namespace Cvte.Compiler.Syntax
                 (
                     identifier.ValueText,
                     _namespace,
-                    attributeLists
+                    attributeLists,
+                    baseTypeList,
+                    UsingNamespaceList
                 )
-                {
-                    BaseTypeList = baseTypeList,
-                    UsingNamespaceList = UsingNamespaceList,
-                }
             );
             return base.VisitClassDeclaration(node);
         }

@@ -14,11 +14,16 @@ namespace Cvte.Compiler.CompileTime
         /// <param name="name">类的名字</param>
         /// <param name="namespace">类的命名空间</param>
         /// <param name="attributes">类的特性</param>
-        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes)
+        /// <param name="baseTypeList"></param>
+        /// <param name="usingNamespaceList"></param>
+        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes, List<string> baseTypeList, List<string> usingNamespaceList)
             : base(name, attributes)
         {
             Namespace = @namespace;
+            BaseTypeList = baseTypeList;
+            UsingNamespaceList = usingNamespaceList;
             FullName = $"{@namespace}.{name}";
+            
         }
 
         /// <inheritdoc />
@@ -28,10 +33,11 @@ namespace Cvte.Compiler.CompileTime
         public string FullName { get; }
 
         /// <inheritdoc />
-        public List<string> BaseTypeList { get; set; }
+        public IReadOnlyList<string> BaseTypeList { get; }
 
         /// <inheritdoc />
-        public List<string> UsingNamespaceList { get; set; }
+        public IReadOnlyList<string> UsingNamespaceList { get; }
+
 
         /// <summary>
         /// 类型的命名空间

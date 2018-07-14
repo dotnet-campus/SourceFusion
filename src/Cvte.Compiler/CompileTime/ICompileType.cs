@@ -18,11 +18,11 @@ namespace Cvte.Compiler.CompileTime
         /// <summary>
         /// 类型的基类
         /// </summary>
-        List<string> BaseTypeList { get; }
+        IReadOnlyList<string> BaseTypeList { get; }
         /// <summary>
         /// 引用的命名空间
         /// </summary>
-        List<string> UsingNamespaceList { get; }
+        IReadOnlyList<string> UsingNamespaceList { get; }
      
         /// <summary>
         /// 类型包含的属性
