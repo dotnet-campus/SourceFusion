@@ -55,12 +55,13 @@ namespace Cvte.Compiler
         {
             var originalText = File.ReadAllText(assemblyFile.FullName);
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+
             var visitor = new PlaceholderVisitor();
             visitor.Visit(syntaxTree.GetRoot());
 
-            // 在此处添加占位符的解析信息的读取。
+            var placeholders = visitor.Placeholders;
 
-            yield break;
+            return Enumerable.Empty<string>();
         }
     }
 }
