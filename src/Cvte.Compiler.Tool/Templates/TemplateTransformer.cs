@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -62,9 +61,7 @@ namespace Cvte.Compiler.Templates
             var placeholders = visitor.Placeholders;
             foreach (var placeholder in placeholders)
             {
-                var lambda = placeholder.Compile();
-                var actualText = lambda(_compilingContext);
-                actualText = placeholder.Wrap(actualText);
+                var actualText = placeholder.Execute(_compilingContext);
 
                 builder.Append(originalText.Substring(currentTextPosition, placeholder.Span.Start));
                 builder.Append(actualText);
