@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Text;
+using Cvte.Compiler.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
 using static Cvte.Compiler.Syntax.PlaceholderVisitor;
 
 namespace Cvte.Compiler.Templates
@@ -8,6 +12,17 @@ namespace Cvte.Compiler.Templates
     /// </summary>
     internal static class PlaceholderExtensions
     {
+        private const string ClassTemplate = @"using System.Linq;
+using Cvte.Compiler;
+using Cvte.Compiler.CompileTime;
+
+public static class PlaceholderImpl
+{
+    public static string InvokePlaceholder(ICompilingContext {parameterName})
+    {body}
+}
+";
+
         /// <summary>
         /// 执行占位符对 <see cref="Placeholder"/> 中外部方法（extern）的调用，得到代码片段字符串。
         /// </summary>
@@ -29,9 +44,15 @@ namespace Cvte.Compiler.Templates
         /// <returns>用于调用占位符中编译期可执行代码的委托。</returns>
         private static Func<ICompilingContext, string> Compile(this PlaceholderInfo placeholderInfo)
         {
-            return context => @"new ModuleInfo<Cvte.Compiler.Tests.Fakes.Modules.FooModule>(),
-new ModuleInfo<Cvte.Compiler.Tests.Fakes.Modules.BarModule>(),
-";
+            var builder = new StringBuilder(ClassTemplate)
+                .Replace("{parameterName}", placeholderInfo.InvocationParameterName)
+                .Replace("{body}", placeholderInfo.InvocationBody);
+            var syntaxTree = CSharpSyntaxTree.ParseText(builder.ToString());
+            var types = syntaxTree.Compile("PlaceholderInvoking.g");
+            var placeholderImpl = types.First(x => x.Name == "PlaceholderImpl");
+            var method = placeholderImpl.GetMethod("InvokePlaceholder");
+            var func = (Func<ICompilingContext, string>) method.CreateDelegate(typeof(Func<ICompilingContext, string>));
+            return func;
         }
 
         /// <summary>
