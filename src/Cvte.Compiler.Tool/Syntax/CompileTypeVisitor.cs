@@ -75,22 +75,24 @@ namespace Cvte.Compiler.Syntax
             }
 
             //获取类的特性
-            var attributeLists = VisitList(node.AttributeLists).SelectMany(x => x.Attributes)
-                .Select(x => new CompileAttribute(x.Name.ToFullString()));
+            var attributeLists = GetCompileAttributeList(node.AttributeLists);
 
-            _types.Add
+            _lastType = new CompileType
             (
-                new CompileType
-                (
-                    identifier.ValueText,
-                    _namespace,
-                    attributeLists,
-                    baseTypeList,
-                    UsingNamespaceList
-                )
+                identifier.ValueText,
+                _namespace,
+                attributeLists,
+                baseTypeList,
+                UsingNamespaceList
             );
+
+            _types.Add(_lastType);
+
+
             return base.VisitClassDeclaration(node);
         }
+
+        private ICompileType _lastType;
 
         /// <summary>
         /// 获取属性
@@ -99,7 +101,45 @@ namespace Cvte.Compiler.Syntax
         /// <returns></returns>
         public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
+            var attributeLists = GetCompileAttributeList(node.AttributeLists);
+
+            // accessor 就是获取 Set get
+
+            ICompileMethod get = null;
+            ICompileMethod set = null;
+
+            foreach (var temp in node.AccessorList.Accessors)
+            {
+
+                if (temp.Keyword.Text == "get")
+                {
+                    get = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "get");
+                }
+                else if (temp.Keyword.Text == "set")
+                {
+                    set=new CompileMethod(GetCompileAttributeList(temp.AttributeLists),"set");
+                }
+            }
+
+
+            var compileProperty = new CompileProperty(node.Type.ToString(), attributeLists, node.Identifier.ToString())
+            {
+                SetMethod = set,
+                GetMethod = get,
+            };
+
+            var type = _lastType;
+            ((ICompileTypeProperty) type).CompilePropertyList.Add(compileProperty);
+
             return base.VisitPropertyDeclaration(node);
         }
+
+        private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
+        {
+            return VisitList(attributeList).SelectMany(x => x.Attributes)
+                .Select(x => new CompileAttribute(x.Name.ToFullString())).Cast<ICompileAttribute>().ToArray();
+        }
+
+
     }
 }
