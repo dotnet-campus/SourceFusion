@@ -1,22 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cvte.Compiler.CompileTime
 {
-    public class CompileMethod : ICompileMethod
+    internal class CompileMethod : CompileMember, ICompileMethod
     {
         /// <inheritdoc />
-        public CompileMethod(ICompileAttribute[] attributes, string name)
+        public CompileMethod(IEnumerable<ICompileAttribute> attributes, string name) : base(name, attributes)
         {
-            if (ReferenceEquals(attributes, null)) throw new ArgumentNullException(nameof(attributes));
-            if (ReferenceEquals(name, null)) throw new ArgumentNullException(nameof(name));
-            Attributes = attributes;
-            Name = name;
+
         }
-
-        /// <inheritdoc />
-        public ICompileAttribute[] Attributes { get; }
-
-        /// <inheritdoc />
-        public string Name { get; }
     }
 }
