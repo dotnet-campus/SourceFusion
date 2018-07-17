@@ -117,16 +117,20 @@ namespace Cvte.Compiler.Syntax
                 }
                 else if (temp.Keyword.Text == "set")
                 {
-                    set=new CompileMethod(GetCompileAttributeList(temp.AttributeLists),"set");
+                    set = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "set");
                 }
             }
-
 
             var compileProperty = new CompileProperty(node.Type.ToString(), attributeLists, node.Identifier.ToString())
             {
                 SetMethod = set,
                 GetMethod = get,
             };
+
+            foreach (var temp in node.Modifiers)
+            {
+                compileProperty.MemberModifiers |= SyntaxKindToMemberModifiers(temp.Kind());
+            }
 
             var type = _lastType;
             ((ICompileTypeProperty) type).CompilePropertyList.Add(compileProperty);
@@ -140,6 +144,23 @@ namespace Cvte.Compiler.Syntax
                 .Select(x => new CompileAttribute(x.Name.ToFullString())).Cast<ICompileAttribute>().ToArray();
         }
 
+        private MemberModifiers SyntaxKindToMemberModifiers(SyntaxKind kind)
+        {
+            var kindList = new Dictionary<SyntaxKind, MemberModifiers>()
+            {
+                {SyntaxKind.PublicKeyword,MemberModifiers.Public },
+                {SyntaxKind.PrivateKeyword,MemberModifiers.Private },
+                {SyntaxKind.ProtectedKeyword,MemberModifiers.Protected },
+                {SyntaxKind.InternalKeyword,MemberModifiers.Internal },
 
+            };
+
+            if (kindList.ContainsKey(kind))
+            {
+                return kindList[kind];
+            }
+
+            return MemberModifiers.Unset;
+        }
     }
 }
