@@ -6,7 +6,7 @@ namespace Cvte.Compiler.CompileTime
     /// <summary>
     /// 编译时找到的类型
     /// </summary>
-    internal class CompileType : CompileMember, ICompileType
+    internal class CompileType : CompileMember, ICompileType, ICompileTypeProperty, ICompileTypeMethod, ICompileTypeField
     {
         /// <summary>
         /// 创建编译时找到的类型
@@ -23,7 +23,7 @@ namespace Cvte.Compiler.CompileTime
             BaseTypeList = baseTypeList;
             UsingNamespaceList = usingNamespaceList;
             FullName = $"{@namespace}.{name}";
-            
+
         }
 
         /// <inheritdoc />
@@ -44,24 +44,53 @@ namespace Cvte.Compiler.CompileTime
         /// </summary>
         public string Namespace { get; }
 
- 
-   
+
+
         /// <summary>
         /// 类型包含的属性
         /// </summary>
         /// <returns></returns>
-        public ICompileProperty[] GetProperties() => throw new NotImplementedException();
+        public ICompileProperty[] GetProperties()
+        {
+            return ((ICompileTypeProperty) this).CompilePropertyList.ToArray();
+        }
+
+        List<ICompileProperty> ICompileTypeProperty.CompilePropertyList { get; } = new List<ICompileProperty>();
+        List<ICompileMethod> ICompileTypeMethod.CompileMethodList { get; } = new List<ICompileMethod>();
+        List<ICompileField> ICompileTypeField.CompileFieldList { get; } = new List<ICompileField>();
 
         /// <summary>
         /// 类型的所有成员
         /// </summary>
         /// <returns></returns>
-        public ICompileMethod[] GetMethods() => throw new NotImplementedException();
+        public ICompileMethod[] GetMethods()
+        {
+            return ((ICompileTypeMethod) this).CompileMethodList.ToArray();
+        }
 
         /// <summary>
         /// 类型的字段
         /// </summary>
         /// <returns></returns>
-        public ICompileField[] GetFields() => throw new NotImplementedException();
+        public ICompileField[] GetFields()
+        {
+            return ((ICompileTypeField) this).CompileFieldList.ToArray();
+        }
     }
+
+    internal interface ICompileTypeProperty
+    {
+        List<ICompileProperty> CompilePropertyList { get; }
+    }
+
+    internal interface ICompileTypeMethod
+    {
+        List<ICompileMethod> CompileMethodList { get; }
+    }
+
+    internal interface ICompileTypeField
+    {
+        List<ICompileField> CompileFieldList { get; }
+    }
+
 }
