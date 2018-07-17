@@ -19,6 +19,9 @@ namespace Cvte.Compiler.CompileTime
         /// </summary>
         public string Name { get; }
 
+        /// <inheritdoc />
+        public MemberModifiers MemberModifiers { set; get; }
+
         /// <summary>
         /// 对象的特性
         /// </summary>
