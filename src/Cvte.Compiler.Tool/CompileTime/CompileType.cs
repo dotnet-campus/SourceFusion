@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cvte.Compiler.CompileTime
 {
@@ -16,14 +15,29 @@ namespace Cvte.Compiler.CompileTime
         /// <param name="attributes">类的特性</param>
         /// <param name="baseTypeList"></param>
         /// <param name="usingNamespaceList"></param>
-        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes, List<string> baseTypeList, List<string> usingNamespaceList)
+        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes,
+            List<string> baseTypeList, List<string> usingNamespaceList)
             : base(name, attributes)
         {
             Namespace = @namespace;
             BaseTypeList = baseTypeList;
             UsingNamespaceList = usingNamespaceList;
             FullName = $"{@namespace}.{name}";
-            
+        }
+
+        public void AddCompileProperty(ICompileProperty property)
+        {
+            _properties.Add(property);
+        }
+
+        public void AddCompileMethod(ICompileMethod member)
+        {
+            _methods.Add(member);
+        }
+
+        public void AddCompileField(ICompileField field)
+        {
+            _fields.Add(field);
         }
 
         /// <inheritdoc />
@@ -38,30 +52,23 @@ namespace Cvte.Compiler.CompileTime
         /// <inheritdoc />
         public IReadOnlyList<string> UsingNamespaceList { get; }
 
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileProperty> Properties => _properties;
+
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileMethod> Methods => _methods;
+
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileField> Fields => _fields;
 
         /// <summary>
         /// 类型的命名空间
         /// </summary>
         public string Namespace { get; }
 
- 
-   
-        /// <summary>
-        /// 类型包含的属性
-        /// </summary>
-        /// <returns></returns>
-        public ICompileProperty[] GetProperties() => throw new NotImplementedException();
+        private readonly List<ICompileField> _fields = new List<ICompileField>();
+        private readonly List<ICompileMethod> _methods = new List<ICompileMethod>();
 
-        /// <summary>
-        /// 类型的所有成员
-        /// </summary>
-        /// <returns></returns>
-        public ICompileMethod[] GetMethods() => throw new NotImplementedException();
-
-        /// <summary>
-        /// 类型的字段
-        /// </summary>
-        /// <returns></returns>
-        public ICompileField[] GetFields() => throw new NotImplementedException();
+        private readonly List<ICompileProperty> _properties = new List<ICompileProperty>();
     }
 }

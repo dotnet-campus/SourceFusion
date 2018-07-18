@@ -8,27 +8,22 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Cvte.Compiler.Syntax
 {
     /// <summary>
-    /// 访问编译的所有类和属性
+    ///     访问编译的所有类和属性
     /// </summary>
     internal class CompileTypeVisitor : CSharpSyntaxRewriter
     {
-        private string _namespace;
-        private readonly List<ICompileType> _types = new List<ICompileType>();
-
         /// <summary>
-        /// 所有找到的类型
-        /// </summary>
-        internal IReadOnlyList<ICompileType> Types => _types;
-
-        private List<string> UsingNamespaceList { get; } = new List<string>();
-
-        /// <summary>
-        /// 创建文件编译访问
+        ///     创建文件编译访问
         /// </summary>
         /// <param name="visitIntoStructuredTrivia"></param>
         public CompileTypeVisitor(bool visitIntoStructuredTrivia = false) : base(visitIntoStructuredTrivia)
         {
         }
+
+        /// <summary>
+        ///     所有找到的类型
+        /// </summary>
+        internal IReadOnlyList<ICompileType> Types => _types;
 
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
@@ -40,7 +35,7 @@ namespace Cvte.Compiler.Syntax
         }
 
         /// <summary>
-        /// 获取命名空间
+        ///     获取命名空间
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -49,24 +44,124 @@ namespace Cvte.Compiler.Syntax
             var nameSyntax = Visit(node.Name);
             // 命名空间
             _namespace = nameSyntax.ToFullString().Trim();
+
             //可能有多个命名空间
             return base.VisitNamespaceDeclaration(node);
         }
 
-
         /// <summary>
-        /// 获取类
+        ///     获取类
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var identifier = VisitToken(node.Identifier);
+            _lastType = GetCompileType(node);
+
+            _types.Add(_lastType);
+
+            return base.VisitClassDeclaration(node);
+        }
+
+        /// <inheritdoc />
+        public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        {
+            _lastType = GetCompileType(node);
+
+            _types.Add(_lastType);
+
+            return base.VisitInterfaceDeclaration(node);
+        }
+
+        /// <summary>
+        ///     获取属性
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            var attributeLists = GetCompileAttributeList(node.AttributeLists);
+
+            // accessor 就是获取 Set get
+
+            ICompileMethod get = null;
+            ICompileMethod set = null;
+
+            foreach (var temp in node.AccessorList.Accessors)
+            {
+                if (temp.Keyword.Text == "get")
+                {
+                    get = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "get");
+                }
+                else if (temp.Keyword.Text == "set")
+                {
+                    set = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "set");
+                }
+            }
+
+            var compileProperty = new CompileProperty(node.Type.ToString(), attributeLists, node.Identifier.ToString())
+            {
+                SetMethod = set,
+                GetMethod = get
+            };
+
+            foreach (var temp in node.Modifiers)
+            {
+                compileProperty.MemberModifiers |= SyntaxKindToMemberModifiers(temp.Kind());
+            }
+
+            var type = _lastType;
+            type.AddCompileProperty(compileProperty);
+
+            return base.VisitPropertyDeclaration(node);
+        }
+
+
+        /// <inheritdoc />
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            var type = _lastType;
+
+            type.AddCompileMethod
+            (
+                new CompileMethod(GetCompileAttributeList(node.AttributeLists), node.ToString())
+                {
+                    MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
+                }
+            );
+
+            return base.VisitMethodDeclaration(node);
+        }
+
+        /// <inheritdoc />
+        public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
+        {
+            var type = _lastType;
+
+            type.AddCompileField
+            (
+                new CompileField(node.ToString(), GetCompileAttributeList(node.AttributeLists))
+                {
+                    MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
+                }
+            );
+
+            return base.VisitFieldDeclaration(node);
+        }
+
+        private readonly List<ICompileType> _types = new List<ICompileType>();
+
+        private CompileType _lastType;
+        private string _namespace;
+
+        private CompileType GetCompileType(TypeDeclarationSyntax type)
+        {
+            var identifier = VisitToken(type.Identifier);
 
             var baseTypeList = new List<string>();
-            if (node.BaseList != null)
+            if (type.BaseList != null)
             {
-                foreach (var temp in node.BaseList.Types)
+                foreach (var temp in type.BaseList.Types)
                 {
                     var name = temp.Type.ToString();
 
@@ -75,31 +170,53 @@ namespace Cvte.Compiler.Syntax
             }
 
             //获取类的特性
-            var attributeLists = VisitList(node.AttributeLists).SelectMany(x => x.Attributes)
-                .Select(x => new CompileAttribute(x.Name.ToFullString()));
+            var attributeLists = GetCompileAttributeList(type.AttributeLists);
 
-            _types.Add
+            return new CompileType
             (
-                new CompileType
-                (
-                    identifier.ValueText,
-                    _namespace,
-                    attributeLists,
-                    baseTypeList,
-                    UsingNamespaceList
-                )
+                identifier.ValueText,
+                _namespace,
+                attributeLists,
+                baseTypeList,
+                UsingNamespaceList
             );
-            return base.VisitClassDeclaration(node);
         }
 
-        /// <summary>
-        /// 获取属性
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        private List<string> UsingNamespaceList { get; } = new List<string>();
+
+        private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
         {
-            return base.VisitPropertyDeclaration(node);
+            return VisitList(attributeList).SelectMany(x => x.Attributes)
+                .Select(x => new CompileAttribute(x.Name.ToFullString())).Cast<ICompileAttribute>().ToArray();
+        }
+
+        private MemberModifiers SyntaxKindListToMemberModifiers(IEnumerable<SyntaxKind> kind)
+        {
+            var modifiers = MemberModifiers.Unset;
+            foreach (var temp in kind)
+            {
+                modifiers |= SyntaxKindToMemberModifiers(temp);
+            }
+
+            return modifiers;
+        }
+
+        private MemberModifiers SyntaxKindToMemberModifiers(SyntaxKind kind)
+        {
+            var kindList = new Dictionary<SyntaxKind, MemberModifiers>
+            {
+                {SyntaxKind.PublicKeyword, MemberModifiers.Public},
+                {SyntaxKind.PrivateKeyword, MemberModifiers.Private},
+                {SyntaxKind.ProtectedKeyword, MemberModifiers.Protected},
+                {SyntaxKind.InternalKeyword, MemberModifiers.Internal}
+            };
+
+            if (kindList.ContainsKey(kind))
+            {
+                return kindList[kind];
+            }
+
+            return MemberModifiers.Unset;
         }
     }
 }

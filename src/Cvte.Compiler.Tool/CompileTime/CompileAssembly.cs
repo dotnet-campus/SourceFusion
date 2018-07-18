@@ -10,8 +10,6 @@ namespace Cvte.Compiler.CompileTime
     /// </summary>
     internal class CompileAssembly : ICompileAssembly
     {
-        private readonly Lazy<List<CompileFile>> _compileFilesLazy;
-
         /// <summary>
         /// 创建编译找到程序集
         /// </summary>
@@ -22,7 +20,7 @@ namespace Cvte.Compiler.CompileTime
             (
                 () => compileFiles.Select(x => new CompileFile(x)).ToList(),
                 LazyThreadSafetyMode.ExecutionAndPublication
-                );
+            );
         }
 
         public IReadOnlyCollection<CompileFile> Files => _compileFilesLazy.Value;
@@ -31,5 +29,7 @@ namespace Cvte.Compiler.CompileTime
         {
             return Files.SelectMany(x => x.Types).ToArray();
         }
+
+        private readonly Lazy<List<CompileFile>> _compileFilesLazy;
     }
 }

@@ -21,7 +21,7 @@ namespace Cvte.Compiler
 
             var fromUri = new Uri(fromPath);
             var toUri = new Uri(toPath);
-            
+
             if (fromUri.Scheme != toUri.Scheme)
             {
                 // 不是同一种路径，无法转换成相对路径。

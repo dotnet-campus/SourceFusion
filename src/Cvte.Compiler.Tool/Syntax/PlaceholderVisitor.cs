@@ -16,11 +16,6 @@ namespace Cvte.Compiler.Syntax
         /// </summary>
         internal IReadOnlyCollection<PlaceholderInfo> Placeholders => _placeholders;
 
-        /// <summary>
-        /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
-        /// </summary>
-        private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
-
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (node.Expression is MemberAccessExpressionSyntax memberAccessExpression)
@@ -44,6 +39,11 @@ namespace Cvte.Compiler.Syntax
 
             return base.VisitInvocationExpression(node);
         }
+
+        /// <summary>
+        /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
+        /// </summary>
+        private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
 
         /// <summary>
         /// 包含占位符在语法树中的信息。

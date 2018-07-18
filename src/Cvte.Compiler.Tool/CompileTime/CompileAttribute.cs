@@ -16,8 +16,6 @@ namespace Cvte.Compiler.CompileTime
             Name = name;
         }
 
-        public string Name { get; }
-
         public bool Match<TAttribute>() where TAttribute : Attribute
         {
             var attributeName = typeof(TAttribute).Name;
@@ -34,6 +32,8 @@ namespace Cvte.Compiler.CompileTime
 
             return Name == attributeName;
         }
+
+        public string Name { get; }
 
         /// <inheritdoc />
         public bool Match(string attributeName)

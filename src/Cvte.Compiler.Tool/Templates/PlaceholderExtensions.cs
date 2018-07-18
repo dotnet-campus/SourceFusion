@@ -24,20 +24,6 @@ public static class PlaceholderImpl
 ";
 
         /// <summary>
-        /// 执行占位符对 <see cref="Placeholder"/> 中外部方法（extern）的调用，得到代码片段字符串。
-        /// </summary>
-        /// <param name="placeholderInfo">包含表达式树中解析出来的占位符信息。</param>
-        /// <param name="context">编译期代码执行所需的上下文信息。</param>
-        /// <returns>占位符中的编译期代码执行后得到的代码片段字符串。</returns>
-        internal static string Execute(this PlaceholderInfo placeholderInfo, ICompilingContext context)
-        {
-            var lambda = placeholderInfo.Compile();
-            var codeSnippet = lambda(context);
-            codeSnippet = placeholderInfo.Wrap(codeSnippet);
-            return codeSnippet;
-        }
-
-        /// <summary>
         /// 将占位符中的在编译期执行的 Lambda 表达式编译成可执行函数。
         /// </summary>
         /// <param name="placeholderInfo">包含表达式树中解析出来的占位符信息。</param>
@@ -72,6 +58,20 @@ public static class PlaceholderImpl
                 default:
                     throw new MissingMethodException($"{nameof(Placeholder)} 中不包含名为 {placeholderInfo.MethodName} 的方法。");
             }
+        }
+
+        /// <summary>
+        /// 执行占位符对 <see cref="Placeholder"/> 中外部方法（extern）的调用，得到代码片段字符串。
+        /// </summary>
+        /// <param name="placeholderInfo">包含表达式树中解析出来的占位符信息。</param>
+        /// <param name="context">编译期代码执行所需的上下文信息。</param>
+        /// <returns>占位符中的编译期代码执行后得到的代码片段字符串。</returns>
+        internal static string Execute(this PlaceholderInfo placeholderInfo, ICompilingContext context)
+        {
+            var lambda = placeholderInfo.Compile();
+            var codeSnippet = lambda(context);
+            codeSnippet = placeholderInfo.Wrap(codeSnippet);
+            return codeSnippet;
         }
     }
 }

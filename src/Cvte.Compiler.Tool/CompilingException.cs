@@ -6,8 +6,6 @@ namespace Cvte.Compiler
 {
     public class CompilingException : Exception
     {
-        public IReadOnlyList<string> Errors { get; }
-
         /// <summary>
         /// 创建编译时异常
         /// </summary>
@@ -16,5 +14,7 @@ namespace Cvte.Compiler
         {
             Errors = errors.ToList();
         }
+
+        public IReadOnlyList<string> Errors { get; }
     }
 }

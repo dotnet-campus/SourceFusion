@@ -75,7 +75,7 @@ namespace Cvte.Compiler
                 ? Path.GetFullPath(options.IntermediateFolder)
                 : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.IntermediateFolder));
             var compilingFiles = options.CompilingFiles
-                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
                 .ToArray();
 
