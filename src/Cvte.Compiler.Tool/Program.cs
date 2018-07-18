@@ -6,6 +6,7 @@ using System.Linq;
 using CommandLine;
 using Cvte.Compiler.Cli;
 using Cvte.Compiler.CompileTime;
+using Cvte.Compiler.Templates;
 
 namespace Cvte.Compiler
 {
