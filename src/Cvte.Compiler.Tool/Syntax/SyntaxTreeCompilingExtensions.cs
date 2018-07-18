@@ -18,7 +18,7 @@ namespace Cvte.Compiler.Syntax
         /// <returns>文件中已发现的所有类型。</returns>
         public static Type[] Compile(this SyntaxTree syntaxTree, string assemblyName)
         {
-            var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
+            var compilation = CSharpCompilation.Create(assemblyName, new[] {syntaxTree},
                     options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddReferences(AppDomain.CurrentDomain.GetAssemblies()
                     .Where(x => !string.IsNullOrEmpty(x.Location))

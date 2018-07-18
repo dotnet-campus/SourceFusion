@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cvte.Compiler.CompileTime
 {
     /// <summary>
     /// 编译时找到的类型
     /// </summary>
-    internal class CompileType : CompileMember, ICompileType, ICompileTypeProperty, ICompileTypeMethod, ICompileTypeField
+    internal class CompileType : CompileMember, ICompileType, ICompileTypeProperty, ICompileTypeMethod,
+        ICompileTypeField
     {
         /// <summary>
         /// 创建编译时找到的类型
@@ -16,14 +16,14 @@ namespace Cvte.Compiler.CompileTime
         /// <param name="attributes">类的特性</param>
         /// <param name="baseTypeList"></param>
         /// <param name="usingNamespaceList"></param>
-        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes, List<string> baseTypeList, List<string> usingNamespaceList)
+        public CompileType(string name, string @namespace, IEnumerable<ICompileAttribute> attributes,
+            List<string> baseTypeList, List<string> usingNamespaceList)
             : base(name, attributes)
         {
             Namespace = @namespace;
             BaseTypeList = baseTypeList;
             UsingNamespaceList = usingNamespaceList;
             FullName = $"{@namespace}.{name}";
-
         }
 
         /// <inheritdoc />
@@ -45,7 +45,6 @@ namespace Cvte.Compiler.CompileTime
         public string Namespace { get; }
 
 
-
         /// <summary>
         /// 类型包含的属性
         /// </summary>
@@ -54,10 +53,6 @@ namespace Cvte.Compiler.CompileTime
         {
             return ((ICompileTypeProperty) this).CompilePropertyList.ToArray();
         }
-
-        List<ICompileProperty> ICompileTypeProperty.CompilePropertyList { get; } = new List<ICompileProperty>();
-        List<ICompileMethod> ICompileTypeMethod.CompileMethodList { get; } = new List<ICompileMethod>();
-        List<ICompileField> ICompileTypeField.CompileFieldList { get; } = new List<ICompileField>();
 
         /// <summary>
         /// 类型的所有成员
@@ -76,6 +71,11 @@ namespace Cvte.Compiler.CompileTime
         {
             return ((ICompileTypeField) this).CompileFieldList.ToArray();
         }
+
+        List<ICompileField> ICompileTypeField.CompileFieldList { get; } = new List<ICompileField>();
+        List<ICompileMethod> ICompileTypeMethod.CompileMethodList { get; } = new List<ICompileMethod>();
+
+        List<ICompileProperty> ICompileTypeProperty.CompilePropertyList { get; } = new List<ICompileProperty>();
     }
 
     internal interface ICompileTypeProperty
@@ -92,5 +92,4 @@ namespace Cvte.Compiler.CompileTime
     {
         List<ICompileField> CompileFieldList { get; }
     }
-
 }

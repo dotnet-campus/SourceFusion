@@ -36,31 +36,6 @@ namespace Cvte.Compiler
         }
 
         /// <summary>
-        /// 获取可以为每一个生成的文件都增加的文件头。
-        /// </summary>
-        private static readonly string GeneratedHeader;
-
-        /// <summary>
-        /// 如果需要为类加上 <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/>，则使用此字符串。
-        /// </summary>
-        private static readonly string GeneratedAttribute;
-
-        /// <summary>
-        /// 获取转换源码的工作路径。
-        /// </summary>
-        private readonly string _workingFolder;
-
-        /// <summary>
-        /// 获取中间文件的生成路径（文件夹，相对路径）。
-        /// </summary>
-        private readonly string _intermediateFolder;
-
-        /// <summary>
-        /// 获取编译期的程序集。
-        /// </summary>
-        private readonly CompileAssembly _assembly;
-
-        /// <summary>
         /// 创建用于转换源码的 <see cref="CodeTransformer"/>。
         /// </summary>
         /// <param name="workingFolder">转换源码的工作路径。</param>
@@ -74,31 +49,29 @@ namespace Cvte.Compiler
         }
 
         /// <summary>
-        /// 执行代码转换。这将开始从所有的编译文件中搜索 <see cref="CompileTimeCodeAttribute"/>，并执行其转换方法。
+        /// 获取可以为每一个生成的文件都增加的文件头。
         /// </summary>
-        internal IEnumerable<string> Transform()
-        {
-            foreach (var assemblyFile in _assembly.Files)
-            {
-                var compileType = assemblyFile.Types.FirstOrDefault();
-                if
-                (
-                    compileType != null
-                    && compileType.Attributes
-                        .Any(x => x.Match<CompileTimeCodeAttribute>())
-                )
-                {
-                    var type = assemblyFile.Compile().First();
-                    var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
-                    var excludedFiles = InvokeCodeTransformer(assemblyFile.FullName, transformer);
-                    yield return assemblyFile.FullName;
-                    foreach (var excludedFile in excludedFiles)
-                    {
-                        yield return excludedFile;
-                    }
-                }
-            }
-        }
+        private static readonly string GeneratedHeader;
+
+        /// <summary>
+        /// 如果需要为类加上 <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/>，则使用此字符串。
+        /// </summary>
+        private static readonly string GeneratedAttribute;
+
+        /// <summary>
+        /// 获取编译期的程序集。
+        /// </summary>
+        private readonly CompileAssembly _assembly;
+
+        /// <summary>
+        /// 获取中间文件的生成路径（文件夹，相对路径）。
+        /// </summary>
+        private readonly string _intermediateFolder;
+
+        /// <summary>
+        /// 获取转换源码的工作路径。
+        /// </summary>
+        private readonly string _workingFolder;
 
         /// <summary>
         /// 执行 <see cref="IPlainCodeTransformer"/> 的转换代码的方法。
@@ -129,6 +102,33 @@ namespace Cvte.Compiler
                 if (!attribute.KeepSourceFiles)
                 {
                     yield return sourceFile;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 执行代码转换。这将开始从所有的编译文件中搜索 <see cref="CompileTimeCodeAttribute"/>，并执行其转换方法。
+        /// </summary>
+        internal IEnumerable<string> Transform()
+        {
+            foreach (var assemblyFile in _assembly.Files)
+            {
+                var compileType = assemblyFile.Types.FirstOrDefault();
+                if
+                (
+                    compileType != null
+                    && compileType.Attributes
+                        .Any(x => x.Match<CompileTimeCodeAttribute>())
+                )
+                {
+                    var type = assemblyFile.Compile().First();
+                    var transformer = (IPlainCodeTransformer) Activator.CreateInstance(type);
+                    var excludedFiles = InvokeCodeTransformer(assemblyFile.FullName, transformer);
+                    yield return assemblyFile.FullName;
+                    foreach (var excludedFile in excludedFiles)
+                    {
+                        yield return excludedFile;
+                    }
                 }
             }
         }

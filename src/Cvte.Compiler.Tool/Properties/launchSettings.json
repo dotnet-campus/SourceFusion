@@ -2,7 +2,8 @@
   "profiles": {
     "Build Test Project": {
       "commandName": "Project",
-      "commandLineArgs": "-p ..\\..\\tests\\Cvte.Compiler.Tests -i obj\\GeneratedCode -c Debug_\\GenerateGeneric.cs;Debug_\\ModuleCollector.cs;Fakes\\DI\\ExportAttribute.cs;Fakes\\DI\\Foo.cs;Fakes\\DI\\IFoo.cs;Fakes\\DI\\ImportAttribute.cs;Fakes\\Modules\\BarModule.cs;Fakes\\Modules\\FooModule.cs;Fakes\\Modules\\IModule.cs;Fakes\\Modules\\ModuleAttribute.cs;Fakes\\Modules\\ModuleInfo.cs;Fakes\\Mvvm\\FooViewModel.cs;Fakes\\Mvvm\\IFooViewModel.cs;Fakes\\Mvvm\\ViewModelBase.cs;Fakes\\ActionCommand.cs;",
+      "commandLineArgs":
+        "-p ..\\..\\tests\\Cvte.Compiler.Tests -i obj\\GeneratedCode -c Debug_\\GenerateGeneric.cs;Debug_\\ModuleCollector.cs;Fakes\\DI\\ExportAttribute.cs;Fakes\\DI\\Foo.cs;Fakes\\DI\\IFoo.cs;Fakes\\DI\\ImportAttribute.cs;Fakes\\Modules\\BarModule.cs;Fakes\\Modules\\FooModule.cs;Fakes\\Modules\\IModule.cs;Fakes\\Modules\\ModuleAttribute.cs;Fakes\\Modules\\ModuleInfo.cs;Fakes\\Mvvm\\FooViewModel.cs;Fakes\\Mvvm\\IFooViewModel.cs;Fakes\\Mvvm\\ViewModelBase.cs;Fakes\\ActionCommand.cs;",
       "workingDirectory": "."
     }
   }

@@ -10,26 +10,6 @@ namespace Cvte.Compiler.Templates
 {
     internal class TemplateTransformer
     {
-        /// <summary>
-        /// 获取转换源码的工作路径。
-        /// </summary>
-        private readonly string _workingFolder;
-
-        /// <summary>
-        /// 获取中间文件的生成路径（文件夹，相对路径）。
-        /// </summary>
-        private readonly string _intermediateFolder;
-
-        /// <summary>
-        /// 获取编译期的程序集。
-        /// </summary>
-        private readonly CompileAssembly _assembly;
-
-        /// <summary>
-        /// 获取编译期执行上下文。
-        /// </summary>
-        private readonly CompilingContext _compilingContext;
-
         internal TemplateTransformer(string workingFolder, string intermediateFolder, CompileAssembly assembly)
         {
             _workingFolder = workingFolder;
@@ -45,6 +25,26 @@ namespace Cvte.Compiler.Templates
                 where compileType?.Attributes.Any(x => x.Match<CompileTimeTemplateAttribute>()) is true
                 select TransformTemplate(assemblyFile);
         }
+
+        /// <summary>
+        /// 获取编译期的程序集。
+        /// </summary>
+        private readonly CompileAssembly _assembly;
+
+        /// <summary>
+        /// 获取编译期执行上下文。
+        /// </summary>
+        private readonly CompilingContext _compilingContext;
+
+        /// <summary>
+        /// 获取中间文件的生成路径（文件夹，相对路径）。
+        /// </summary>
+        private readonly string _intermediateFolder;
+
+        /// <summary>
+        /// 获取转换源码的工作路径。
+        /// </summary>
+        private readonly string _workingFolder;
 
         private string TransformTemplate(CompileFile assemblyFile)
         {

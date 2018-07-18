@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cvte.Compiler.CompileTime
 {
@@ -8,7 +7,6 @@ namespace Cvte.Compiler.CompileTime
         /// <inheritdoc />
         public CompileMethod(IEnumerable<ICompileAttribute> attributes, string name) : base(name, attributes)
         {
-
         }
     }
 }

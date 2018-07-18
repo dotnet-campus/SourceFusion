@@ -29,8 +29,6 @@ namespace Cvte.Compiler.CompileTime
             Types = compileTypeVisitor.Types.ToList();
         }
 
-        private readonly SyntaxTree _syntaxTree;
-
         /// <summary>
         /// 获取文件的名称（不含路径，包含扩展名）。
         /// </summary>
@@ -55,5 +53,7 @@ namespace Cvte.Compiler.CompileTime
             var assemblyName = $"{Name}.g";
             return _syntaxTree.Compile(assemblyName);
         }
+
+        private readonly SyntaxTree _syntaxTree;
     }
 }

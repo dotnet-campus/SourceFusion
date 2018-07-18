@@ -12,16 +12,6 @@ namespace Cvte.Compiler.Syntax
     /// </summary>
     internal class CompileTypeVisitor : CSharpSyntaxRewriter
     {
-        private string _namespace;
-        private readonly List<ICompileType> _types = new List<ICompileType>();
-
-        /// <summary>
-        /// 所有找到的类型
-        /// </summary>
-        internal IReadOnlyList<ICompileType> Types => _types;
-
-        private List<string> UsingNamespaceList { get; } = new List<string>();
-
         /// <summary>
         /// 创建文件编译访问
         /// </summary>
@@ -29,6 +19,11 @@ namespace Cvte.Compiler.Syntax
         public CompileTypeVisitor(bool visitIntoStructuredTrivia = false) : base(visitIntoStructuredTrivia)
         {
         }
+
+        /// <summary>
+        /// 所有找到的类型
+        /// </summary>
+        internal IReadOnlyList<ICompileType> Types => _types;
 
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
@@ -49,6 +44,7 @@ namespace Cvte.Compiler.Syntax
             var nameSyntax = Visit(node.Name);
             // 命名空间
             _namespace = nameSyntax.ToFullString().Trim();
+
             //可能有多个命名空间
             return base.VisitNamespaceDeclaration(node);
         }
@@ -92,8 +88,6 @@ namespace Cvte.Compiler.Syntax
             return base.VisitClassDeclaration(node);
         }
 
-        private ICompileType _lastType;
-
         /// <summary>
         /// 获取属性
         /// </summary>
@@ -123,7 +117,7 @@ namespace Cvte.Compiler.Syntax
             var compileProperty = new CompileProperty(node.Type.ToString(), attributeLists, node.Identifier.ToString())
             {
                 SetMethod = set,
-                GetMethod = get,
+                GetMethod = get
             };
 
             foreach (var temp in node.Modifiers)
@@ -165,6 +159,13 @@ namespace Cvte.Compiler.Syntax
             return base.VisitFieldDeclaration(node);
         }
 
+        private readonly List<ICompileType> _types = new List<ICompileType>();
+
+        private ICompileType _lastType;
+        private string _namespace;
+
+        private List<string> UsingNamespaceList { get; } = new List<string>();
+
         private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
         {
             return VisitList(attributeList).SelectMany(x => x.Attributes)
@@ -184,12 +185,12 @@ namespace Cvte.Compiler.Syntax
 
         private MemberModifiers SyntaxKindToMemberModifiers(SyntaxKind kind)
         {
-            var kindList = new Dictionary<SyntaxKind, MemberModifiers>()
+            var kindList = new Dictionary<SyntaxKind, MemberModifiers>
             {
                 {SyntaxKind.PublicKeyword, MemberModifiers.Public},
                 {SyntaxKind.PrivateKeyword, MemberModifiers.Private},
                 {SyntaxKind.ProtectedKeyword, MemberModifiers.Protected},
-                {SyntaxKind.InternalKeyword, MemberModifiers.Internal},
+                {SyntaxKind.InternalKeyword, MemberModifiers.Internal}
             };
 
             if (kindList.ContainsKey(kind))
