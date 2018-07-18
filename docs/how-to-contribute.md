@@ -1,0 +1,16 @@
+# 如何为 Cvte.Compiler 贡献代码
+
+Cvte.Compiler 基于 Roslyn 对代码进行编译期分析和执行。
+
+## 核心程序集
+
+核心程序集有两个：
+
+- Cvte.Compiler.Core
+- Cvte.Compiler.Tool
+
+Cvte.Compiler.Core 是抽象部分，当作为 NuGet 包安装后，会被目标程序集引用，这样目标程序集可以编写出编译期间运行的的代码。Cvte.Compiler.Tool 是对以上抽象的具体实现部分，当作为 NuGet 包按装后，如果目标程序集执行编译操作，那么此程序集将被执行。也就是说，Cvte.Compiler.Core 的存在是为了让目标程序集能够编写出编译期间执行的代码，而 Cvte.Compiler.Tool 则是执行目标程序集中指定为编译期执行的代码。
+
+这两个程序集有一些开发上的约定。
+
+- Cvte.Compiler.Core 由于会被目标项目通过 PackageReference 的方式`引用，所以尽量不要引入
