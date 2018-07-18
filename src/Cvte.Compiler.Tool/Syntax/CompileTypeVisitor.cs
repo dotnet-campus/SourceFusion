@@ -110,7 +110,6 @@ namespace Cvte.Compiler.Syntax
 
             foreach (var temp in node.AccessorList.Accessors)
             {
-
                 if (temp.Keyword.Text == "get")
                 {
                     get = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "get");
@@ -143,12 +142,27 @@ namespace Cvte.Compiler.Syntax
         {
             var type = _lastType;
 
-            ((ICompileTypeMethod) type).CompileMethodList.Add(new CompileMethod(GetCompileAttributeList(node.AttributeLists), node.ToString())
-            {
-                MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
-            });
+            ((ICompileTypeMethod) type).CompileMethodList.Add(
+                new CompileMethod(GetCompileAttributeList(node.AttributeLists), node.ToString())
+                {
+                    MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
+                });
 
             return base.VisitMethodDeclaration(node);
+        }
+
+        /// <inheritdoc />
+        public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
+        {
+            var type = _lastType;
+
+            ((ICompileTypeField) type).CompileFieldList.Add(
+                new CompileField(node.ToString(), GetCompileAttributeList(node.AttributeLists))
+                {
+                    MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
+                });
+
+            return base.VisitFieldDeclaration(node);
         }
 
         private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
@@ -172,11 +186,10 @@ namespace Cvte.Compiler.Syntax
         {
             var kindList = new Dictionary<SyntaxKind, MemberModifiers>()
             {
-                {SyntaxKind.PublicKeyword,MemberModifiers.Public },
-                {SyntaxKind.PrivateKeyword,MemberModifiers.Private },
-                {SyntaxKind.ProtectedKeyword,MemberModifiers.Protected },
-                {SyntaxKind.InternalKeyword,MemberModifiers.Internal },
-
+                {SyntaxKind.PublicKeyword, MemberModifiers.Public},
+                {SyntaxKind.PrivateKeyword, MemberModifiers.Private},
+                {SyntaxKind.ProtectedKeyword, MemberModifiers.Protected},
+                {SyntaxKind.InternalKeyword, MemberModifiers.Internal},
             };
 
             if (kindList.ContainsKey(kind))
