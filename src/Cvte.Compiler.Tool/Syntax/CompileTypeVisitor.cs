@@ -138,10 +138,34 @@ namespace Cvte.Compiler.Syntax
             return base.VisitPropertyDeclaration(node);
         }
 
+        /// <inheritdoc />
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            var type = _lastType;
+
+            ((ICompileTypeMethod) type).CompileMethodList.Add(new CompileMethod(GetCompileAttributeList(node.AttributeLists), node.ToString())
+            {
+                MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
+            });
+
+            return base.VisitMethodDeclaration(node);
+        }
+
         private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
         {
             return VisitList(attributeList).SelectMany(x => x.Attributes)
                 .Select(x => new CompileAttribute(x.Name.ToFullString())).Cast<ICompileAttribute>().ToArray();
+        }
+
+        private MemberModifiers SyntaxKindListToMemberModifiers(IEnumerable<SyntaxKind> kind)
+        {
+            var modifiers = MemberModifiers.Unset;
+            foreach (var temp in kind)
+            {
+                modifiers |= SyntaxKindToMemberModifiers(temp);
+            }
+
+            return modifiers;
         }
 
         private MemberModifiers SyntaxKindToMemberModifiers(SyntaxKind kind)
