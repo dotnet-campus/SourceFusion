@@ -126,7 +126,7 @@ namespace Cvte.Compiler.Syntax
             }
 
             var type = _lastType;
-            ((ICompileTypeProperty) type).CompilePropertyList.Add(compileProperty);
+            type.AddCompileProperty(compileProperty);
 
             return base.VisitPropertyDeclaration(node);
         }
@@ -136,11 +136,13 @@ namespace Cvte.Compiler.Syntax
         {
             var type = _lastType;
 
-            ((ICompileTypeMethod) type).CompileMethodList.Add(
+            type.AddCompileMethod
+            (
                 new CompileMethod(GetCompileAttributeList(node.AttributeLists), node.ToString())
                 {
                     MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
-                });
+                }
+            );
 
             return base.VisitMethodDeclaration(node);
         }
@@ -150,18 +152,20 @@ namespace Cvte.Compiler.Syntax
         {
             var type = _lastType;
 
-            ((ICompileTypeField) type).CompileFieldList.Add(
+            type.AddCompileField
+            (
                 new CompileField(node.ToString(), GetCompileAttributeList(node.AttributeLists))
                 {
                     MemberModifiers = SyntaxKindListToMemberModifiers(node.Modifiers.Select(temp => temp.Kind()))
-                });
+                }
+            );
 
             return base.VisitFieldDeclaration(node);
         }
 
         private readonly List<ICompileType> _types = new List<ICompileType>();
 
-        private ICompileType _lastType;
+        private CompileType _lastType;
         private string _namespace;
 
         private List<string> UsingNamespaceList { get; } = new List<string>();

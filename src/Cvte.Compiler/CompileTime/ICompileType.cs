@@ -23,21 +23,20 @@ namespace Cvte.Compiler.CompileTime
         /// 引用的命名空间
         /// </summary>
         IReadOnlyList<string> UsingNamespaceList { get; }
-     
+
         /// <summary>
         /// 类型包含的属性
         /// </summary>
-        /// <returns></returns>
-        ICompileProperty[] GetProperties();
+        IReadOnlyList<ICompileProperty> Properties { get; }
+
         /// <summary>
-        /// 类型的所有成员
+        /// 类型的方法
         /// </summary>
-        /// <returns></returns>
-        ICompileMethod[] GetMethods();
+        IReadOnlyList<ICompileMethod> Methods { get; }
+
         /// <summary>
         /// 类型的字段
         /// </summary>
-        /// <returns></returns>
-        ICompileField[] GetFields();
+        IReadOnlyList<ICompileField> Fields { get; }
     }
 }

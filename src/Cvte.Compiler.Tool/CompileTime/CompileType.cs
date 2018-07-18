@@ -5,8 +5,7 @@ namespace Cvte.Compiler.CompileTime
     /// <summary>
     /// 编译时找到的类型
     /// </summary>
-    internal class CompileType : CompileMember, ICompileType, ICompileTypeProperty, ICompileTypeMethod,
-        ICompileTypeField
+    internal class CompileType : CompileMember, ICompileType
     {
         /// <summary>
         /// 创建编译时找到的类型
@@ -26,6 +25,21 @@ namespace Cvte.Compiler.CompileTime
             FullName = $"{@namespace}.{name}";
         }
 
+        public void AddCompileProperty(ICompileProperty property)
+        {
+            _properties.Add(property);
+        }
+
+        public void AddCompileMethod(ICompileMethod member)
+        {
+            _methods.Add(member);
+        }
+
+        public void AddCompileField(ICompileField field)
+        {
+            _fields.Add(field);
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// 获取类的全名
@@ -38,58 +52,23 @@ namespace Cvte.Compiler.CompileTime
         /// <inheritdoc />
         public IReadOnlyList<string> UsingNamespaceList { get; }
 
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileProperty> Properties => _properties;
+
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileMethod> Methods => _methods;
+
+        /// <inheritdoc />
+        public IReadOnlyList<ICompileField> Fields => _fields;
 
         /// <summary>
         /// 类型的命名空间
         /// </summary>
         public string Namespace { get; }
 
+        private readonly List<ICompileField> _fields = new List<ICompileField>();
+        private readonly List<ICompileMethod> _methods = new List<ICompileMethod>();
 
-        /// <summary>
-        /// 类型包含的属性
-        /// </summary>
-        /// <returns></returns>
-        public ICompileProperty[] GetProperties()
-        {
-            return ((ICompileTypeProperty) this).CompilePropertyList.ToArray();
-        }
-
-        /// <summary>
-        /// 类型的所有成员
-        /// </summary>
-        /// <returns></returns>
-        public ICompileMethod[] GetMethods()
-        {
-            return ((ICompileTypeMethod) this).CompileMethodList.ToArray();
-        }
-
-        /// <summary>
-        /// 类型的字段
-        /// </summary>
-        /// <returns></returns>
-        public ICompileField[] GetFields()
-        {
-            return ((ICompileTypeField) this).CompileFieldList.ToArray();
-        }
-
-        List<ICompileField> ICompileTypeField.CompileFieldList { get; } = new List<ICompileField>();
-        List<ICompileMethod> ICompileTypeMethod.CompileMethodList { get; } = new List<ICompileMethod>();
-
-        List<ICompileProperty> ICompileTypeProperty.CompilePropertyList { get; } = new List<ICompileProperty>();
-    }
-
-    internal interface ICompileTypeProperty
-    {
-        List<ICompileProperty> CompilePropertyList { get; }
-    }
-
-    internal interface ICompileTypeMethod
-    {
-        List<ICompileMethod> CompileMethodList { get; }
-    }
-
-    internal interface ICompileTypeField
-    {
-        List<ICompileField> CompileFieldList { get; }
+        private readonly List<ICompileProperty> _properties = new List<ICompileProperty>();
     }
 }
