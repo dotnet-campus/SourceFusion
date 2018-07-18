@@ -8,12 +8,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Cvte.Compiler.Syntax
 {
     /// <summary>
-    /// 访问编译的所有类和属性
+    ///     访问编译的所有类和属性
     /// </summary>
     internal class CompileTypeVisitor : CSharpSyntaxRewriter
     {
         /// <summary>
-        /// 创建文件编译访问
+        ///     创建文件编译访问
         /// </summary>
         /// <param name="visitIntoStructuredTrivia"></param>
         public CompileTypeVisitor(bool visitIntoStructuredTrivia = false) : base(visitIntoStructuredTrivia)
@@ -21,7 +21,7 @@ namespace Cvte.Compiler.Syntax
         }
 
         /// <summary>
-        /// 所有找到的类型
+        ///     所有找到的类型
         /// </summary>
         internal IReadOnlyList<ICompileType> Types => _types;
 
@@ -35,7 +35,7 @@ namespace Cvte.Compiler.Syntax
         }
 
         /// <summary>
-        /// 获取命名空间
+        ///     获取命名空间
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -49,47 +49,32 @@ namespace Cvte.Compiler.Syntax
             return base.VisitNamespaceDeclaration(node);
         }
 
-
         /// <summary>
-        /// 获取类
+        ///     获取类
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var identifier = VisitToken(node.Identifier);
-
-            var baseTypeList = new List<string>();
-            if (node.BaseList != null)
-            {
-                foreach (var temp in node.BaseList.Types)
-                {
-                    var name = temp.Type.ToString();
-
-                    baseTypeList.Add(name);
-                }
-            }
-
-            //获取类的特性
-            var attributeLists = GetCompileAttributeList(node.AttributeLists);
-
-            _lastType = new CompileType
-            (
-                identifier.ValueText,
-                _namespace,
-                attributeLists,
-                baseTypeList,
-                UsingNamespaceList
-            );
+            _lastType = GetCompileType(node);
 
             _types.Add(_lastType);
-
 
             return base.VisitClassDeclaration(node);
         }
 
+        /// <inheritdoc />
+        public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        {
+            _lastType = GetCompileType(node);
+
+            _types.Add(_lastType);
+
+            return base.VisitInterfaceDeclaration(node);
+        }
+
         /// <summary>
-        /// 获取属性
+        ///     获取属性
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -131,6 +116,7 @@ namespace Cvte.Compiler.Syntax
             return base.VisitPropertyDeclaration(node);
         }
 
+
         /// <inheritdoc />
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
@@ -167,6 +153,34 @@ namespace Cvte.Compiler.Syntax
 
         private CompileType _lastType;
         private string _namespace;
+
+        private CompileType GetCompileType(TypeDeclarationSyntax type)
+        {
+            var identifier = VisitToken(type.Identifier);
+
+            var baseTypeList = new List<string>();
+            if (type.BaseList != null)
+            {
+                foreach (var temp in type.BaseList.Types)
+                {
+                    var name = temp.Type.ToString();
+
+                    baseTypeList.Add(name);
+                }
+            }
+
+            //获取类的特性
+            var attributeLists = GetCompileAttributeList(type.AttributeLists);
+
+            return new CompileType
+            (
+                identifier.ValueText,
+                _namespace,
+                attributeLists,
+                baseTypeList,
+                UsingNamespaceList
+            );
+        }
 
         private List<string> UsingNamespaceList { get; } = new List<string>();
 
