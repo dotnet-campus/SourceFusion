@@ -13,4 +13,5 @@ Cvte.Compiler.Core 是抽象部分，当作为 NuGet 包安装后，会被目标
 
 这两个程序集有一些开发上的约定。
 
-- Cvte.Compiler.Core 由于会被目标项目通过 PackageReference 的方式`引用，所以尽量不要引入
+- Cvte.Compiler.Core 由于会被目标项目通过 PackageReference 的方式引用，所以不要额外引入第三方依赖。
+- Cvte.Compiler.Tool 由于其控制台输出被用于特殊用途，所以请不要使用 `Console.WriteLine` 等进行调试。
