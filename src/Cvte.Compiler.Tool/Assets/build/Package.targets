@@ -9,19 +9,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <CvteCompilerGeneratedCodeArgsFile>obj\$(Configuration)\$(TargetFramework)\compilingArgs.txt</CvteCompilerGeneratedCodeArgsFile>
     <CvteCompilerGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\Cvte.Compiler.GeneratedCodes</CvteCompilerGeneratedCodeFolder>
   </PropertyGroup>
 
   <Target Name="_CvteCompilerWriteArgs" BeforeTargets="CvteCompilerGenerateCode">
-    <PropertyGroup>
-      <CompileArgFiles>$(CvteCompilerGeneratedCodeFolder)\compilingArgs.txt</CompileArgFiles>
-    </PropertyGroup>
-    <WriteLinesToFile File="$(CompileArgFiles)" Lines="@(Compile)" Overwrite="True" />
+    <WriteLinesToFile File="$(CvteCompilerGeneratedCodeArgsFile)" Lines="@(Compile)" Overwrite="True" />
   </Target>
     
   <Target Name="CvteCompilerGenerateCode" BeforeTargets="CoreCompile">
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;$(CompileArgFiles)&quot;">
+          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(CvteCompilerGeneratedCodeFolder) -c &quot;$(CvteCompilerGeneratedCodeArgsFile)&quot;">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfCvteCompilerGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfCvteCompiler" />
     </Exec>
