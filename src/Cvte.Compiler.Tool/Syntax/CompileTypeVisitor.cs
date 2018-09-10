@@ -87,15 +87,18 @@ namespace Cvte.Compiler.Syntax
             ICompileMethod get = null;
             ICompileMethod set = null;
 
-            foreach (var temp in node.AccessorList.Accessors)
+            if (node.AccessorList != null)
             {
-                if (temp.Keyword.Text == "get")
+                foreach (var temp in node.AccessorList.Accessors)
                 {
-                    get = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "get");
-                }
-                else if (temp.Keyword.Text == "set")
-                {
-                    set = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "set");
+                    if (temp.Keyword.Text == "get")
+                    {
+                        get = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "get");
+                    }
+                    else if (temp.Keyword.Text == "set")
+                    {
+                        set = new CompileMethod(GetCompileAttributeList(temp.AttributeLists), "set");
+                    }
                 }
             }
 

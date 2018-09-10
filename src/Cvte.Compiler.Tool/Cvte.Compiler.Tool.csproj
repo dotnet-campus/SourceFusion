@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.3.0-alpha</Version>
+    <Version>0.3.7-alpha</Version>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
     <LangVersion>latest</LangVersion>
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.2.0" />
+    <PackageReference Include="CommandLineParser" Version="2.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="All" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
   </ItemGroup>
@@ -52,7 +52,7 @@
       <None Include="..\Cvte.Compiler\bin\$(Configuration)\net45\Cvte.Compiler.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
 
       <!-- 将 Cvte.Compiler.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
-      <None Include="$(OutputPath)*.*" Exclude="$(OutputPath)codet.exe;$(OutputPath)codet.pdb" Pack="True" PackagePath="tools\net47" />
+      <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
     </ItemGroup>
   </Target>
   
