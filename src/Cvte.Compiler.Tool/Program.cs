@@ -14,10 +14,17 @@ namespace Cvte.Compiler
     {
         private static int Main(string[] args)
         {
+            var options = new Options
+            {
+               WorkingFolder = args[1],
+                IntermediateFolder = args[3],
+                CompilingFiles = args[5],
+            };
+
             // Initialize basic command options.
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(options =>
-                {
+            //Parser.Default.ParseArguments<Options>(args)
+            //    .WithParsed(options =>
+            //    {
                     if (options.DebugMode)
                     {
                         Debugger.Launch();
@@ -57,8 +64,8 @@ namespace Cvte.Compiler
                     {
                         Console.Write($"error:{ex}");
                     }
-                })
-                .WithNotParsed(errorList => { });
+                //})
+                //.WithNotParsed(errorList => { });
 
             return 0;
         }
@@ -74,8 +81,8 @@ namespace Cvte.Compiler
             var intermediateFolder = Path.IsPathRooted(options.IntermediateFolder)
                 ? Path.GetFullPath(options.IntermediateFolder)
                 : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.IntermediateFolder));
-            var compilingFiles = options.CompilingFiles
-                .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
+            var files = File.ReadAllLines(options.CompilingFiles);
+            var compilingFiles = files
                 .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
                 .ToArray();
 
