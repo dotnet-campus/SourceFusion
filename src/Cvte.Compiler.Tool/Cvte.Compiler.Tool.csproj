@@ -45,6 +45,7 @@
 
       <!-- 将 Cvte.Compiler.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
       <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
+      <None Include="$(OutputPath)netcoreapp2.0\*.*" Exclude="$(OutputPath)netcoreapp2.0\codet.dll;$(OutputPath)netcoreapp2.0\codet.pdb;$(OutputPath)netcoreapp2.0\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.0" />
     </ItemGroup>
   </Target>
   

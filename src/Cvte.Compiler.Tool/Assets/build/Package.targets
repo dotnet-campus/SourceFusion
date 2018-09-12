@@ -8,6 +8,10 @@
     <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
+    <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+  </PropertyGroup>
+
   <PropertyGroup>
     <CvteCompilerGeneratedCodeArgsFile>obj\$(Configuration)\$(TargetFramework)\compilingArgs.txt</CvteCompilerGeneratedCodeArgsFile>
     <CvteCompilerGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\Cvte.Compiler.GeneratedCodes</CvteCompilerGeneratedCodeFolder>
