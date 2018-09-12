@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		build\config.xml = build\config.xml
+		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
 Global

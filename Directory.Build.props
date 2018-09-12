@@ -1,0 +1,12 @@
+<Project>
+  <Import Project="build\Version.props" />
+  <PropertyGroup>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</PackageOutputPath>
+    <Company>广州视睿电子科技有限公司 (Guangzhou Shirui Electronics Co.)</Company>
+    <Authors>lvyi</Authors>
+    <RepositoryUrl>git@gitlab.gz.cvte.cn:iip-win/Cvte.Compiler.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://gitlab.gz.cvte.cn/iip-win/Cvte.Compiler</PackageProjectUrl>
+    <Copyright>Copyright © 2018 Guangzhou Shirui Electronics Co.,Ltd, All Rights Reserved.</Copyright>
+  </PropertyGroup>
+</Project>

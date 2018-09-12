@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.3.9-alpha</Version>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
     <LangVersion>latest</LangVersion>
@@ -11,13 +10,6 @@
     <RootNamespace>Cvte.Compiler</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
-    <PackageOutputPath>..\..\bin\$(Configuration)</PackageOutputPath>
-    <Company>广州视睿电子科技有限公司 (Guangzhou Shirui Electronics Co.)</Company>
-    <Authors>lvyi</Authors>
-    <RepositoryUrl>git@gitlab.gz.cvte.cn:iip-win/Cvte.Compiler.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://gitlab.gz.cvte.cn/iip-win/Cvte.Compiler</PackageProjectUrl>
-    <Copyright>Copyright © 2018 Guangzhou Shirui Electronics Co.,Ltd, All Rights Reserved.</Copyright>
     <Description>
       使代码在编译期执行，以提升运行时效率。
       Cvte.Compiler 提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
@@ -53,6 +45,7 @@
 
       <!-- 将 Cvte.Compiler.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
       <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
+      <None Include="$(OutputPath)netcoreapp2.0\*.*" Exclude="$(OutputPath)netcoreapp2.0\codet.dll;$(OutputPath)netcoreapp2.0\codet.pdb;$(OutputPath)netcoreapp2.0\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.0" />
     </ItemGroup>
   </Target>
   
