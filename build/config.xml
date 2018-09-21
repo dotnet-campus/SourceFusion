@@ -1,5 +1,5 @@
 <config>
-    <sln_file>..\Cvte.Compiler.sln</sln_file>
+    <sln_file>..\SourceFusion.sln</sln_file>
     <msbuild-outdir>..\bin\Release</msbuild-outdir>
-    <setup-subrepository>CC\Cvte.Compiler</setup-subrepository>
+    <setup-subrepository>CC\SourceFusion</setup-subrepository>
 </config>

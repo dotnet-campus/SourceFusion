@@ -1,0 +1,43 @@
+﻿<Project>
+
+  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\net47\codet.exe</TransformCodeToolPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
+    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
+    <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SourceFusionGeneratedCodeArgsFile>obj\$(Configuration)\$(TargetFramework)\compilingArgs.txt</SourceFusionGeneratedCodeArgsFile>
+    <SourceFusionGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\SourceFusion.GeneratedCodes</SourceFusionGeneratedCodeFolder>
+  </PropertyGroup>
+
+  <Target Name="_SourceFusionWriteArgs" BeforeTargets="SourceFusionGenerateCode">
+    <WriteLinesToFile File="$(SourceFusionGeneratedCodeArgsFile)" Lines="@(Compile)" Overwrite="True" />
+  </Target>
+    
+  <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
+    <Exec ConsoleToMSBuild="True"
+          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionGeneratedCodeArgsFile)&quot;">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
+      <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
+    </Exec>
+  </Target>
+
+  <Target Name="_IncludeSourceFusionGeneratedCode" Condition="$(_ExitCodeOfSourceFusion) == '0' " AfterTargets="SourceFusionGenerateCode">
+    <CreateItem Include="$(_OutputOfSourceFusionGenerateCode)">
+      <Output TaskParameter="Include" ItemName="_ExcludedCompileFile" />
+    </CreateItem>
+    <ItemGroup>
+      <Compile Include="$(SourceFusionGeneratedCodeFolder)\*.cs" />
+      <Compile Remove="@(_ExcludedCompileFile)" />
+    </ItemGroup>
+    <Message Text="编译时排除的文件：@(_ExcludedCompileFile)" />
+  </Target>
+
+</Project>

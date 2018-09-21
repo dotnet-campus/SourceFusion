@@ -2,11 +2,15 @@
   <Import Project="build\Version.props" />
   <PropertyGroup>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</PackageOutputPath>
-    <Company>广州视睿电子科技有限公司 (Guangzhou Shirui Electronics Co.)</Company>
-    <Authors>lvyi</Authors>
-    <RepositoryUrl>git@gitlab.gz.cvte.cn:iip-win/Cvte.Compiler.git</RepositoryUrl>
+    <Authors>dotnet-campus</Authors>
+    <Company>dotnet-campus</Company>
+    <LangVersion>latest</LangVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright (c) 2018 dotnet-campus</Copyright>
+    <PackageLicenseUrl>https://github.com/dotnet-campus/SourceFusion/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dotnet-campus/SourceFusion</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet-campus/SourceFusion.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://gitlab.gz.cvte.cn/iip-win/Cvte.Compiler</PackageProjectUrl>
-    <Copyright>Copyright © 2018 Guangzhou Shirui Electronics Co.,Ltd, All Rights Reserved.</Copyright>
+    <PackageTags>source;dotnet;nuget;msbuild;compile</PackageTags>
   </PropertyGroup>
 </Project>
