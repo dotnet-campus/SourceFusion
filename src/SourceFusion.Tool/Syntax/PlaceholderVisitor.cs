@@ -26,13 +26,15 @@ namespace dotnetCampus.SourceFusion.Syntax
                 {
                     // Placeholder 已确认，调用泛型方法已确认。
                     var methodName = genericName.Identifier.ToString();
+                    var returnType = ((IdentifierNameSyntax) genericName.TypeArgumentList.Arguments.First())
+                        .Identifier.ToString();
                     if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression
                         is SimpleLambdaExpressionSyntax lambdaExpression)
                     {
                         // 参数列表为 Lambda 表达式已确认。
                         var parameter = lambdaExpression.Parameter.Identifier.ToString();
                         var body = lambdaExpression.Body.ToString();
-                        _placeholders.Add(new PlaceholderInfo(node.FullSpan, methodName, parameter, body));
+                        _placeholders.Add(new PlaceholderInfo(node.FullSpan, methodName, parameter, body, returnType));
                     }
                 }
             }
@@ -58,12 +60,13 @@ namespace dotnetCampus.SourceFusion.Syntax
             /// <param name="invocationParameterName">占位符中需要在编译期间执行的方法参数名称。</param>
             /// <param name="invocationBody">占位符中需要在编译期间执行的方法体。</param>
             internal PlaceholderInfo(TextSpan span, string methodName,
-                string invocationParameterName, string invocationBody)
+                string invocationParameterName, string invocationBody, string returnType)
             {
                 Span = span;
                 MethodName = methodName;
                 InvocationParameterName = invocationParameterName;
                 InvocationBody = invocationBody;
+                ReturnType = returnType;
             }
 
             /// <summary>
@@ -80,6 +83,11 @@ namespace dotnetCampus.SourceFusion.Syntax
             /// 获取占位符中需要在编译期间执行的方法体。
             /// </summary>
             public string InvocationBody { get; }
+
+            /// <summary>
+            /// 获取占位符的返回值单项类型。
+            /// </summary>
+            public string ReturnType { get; }
 
             /// <summary>
             /// 获取占位符在源代码文件中的文本区间。

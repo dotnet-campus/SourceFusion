@@ -12,8 +12,8 @@ namespace dotnetCampus.SourceFusion.Templates
     internal static class PlaceholderExtensions
     {
         private const string ClassTemplate = @"using System.Linq;
-using SourceFusion;
-using SourceFusion.CompileTime;
+using dotnetCampus.SourceFusion;
+using dotnetCampus.SourceFusion.CompileTime;
 
 public static class PlaceholderImpl
 {
@@ -51,7 +51,7 @@ public static class PlaceholderImpl
             switch (placeholderInfo.MethodName)
             {
                 case nameof(Placeholder.Array):
-                    return $@"
+                    return $@" new {placeholderInfo.ReturnType}[]
 {{
 {text}}}";
                 default:
