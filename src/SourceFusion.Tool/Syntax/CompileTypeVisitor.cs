@@ -63,6 +63,15 @@ namespace dotnetCampus.SourceFusion.Syntax
             return base.VisitClassDeclaration(node);
         }
 
+        public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            _lastType = GetCompileType(node);
+
+            _types.Add(_lastType);
+
+            return base.VisitStructDeclaration(node);
+        }
+
         /// <inheritdoc />
         public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
