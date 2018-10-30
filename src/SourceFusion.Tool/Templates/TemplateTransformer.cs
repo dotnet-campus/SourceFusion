@@ -69,6 +69,8 @@ namespace dotnetCampus.SourceFusion.Templates
             }
 
             builder.Append(originalText.Substring(currentTextPosition, originalText.Length - currentTextPosition));
+            builder.Replace("[CompileTimeTemplate]", "");
+            builder.Replace("using dotnetCampus.SourceFusion;", "");
 
             var targetText = builder.ToString();
             var fileName = Path.GetFileNameWithoutExtension(assemblyFile.FullName);
