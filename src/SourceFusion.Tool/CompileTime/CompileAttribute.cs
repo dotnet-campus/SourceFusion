@@ -1,21 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace dotnetCampus.SourceFusion.CompileTime
 {
     /// <summary>
-    /// 编译时的特性
+    /// The <see cref="Attribute"/> that is in the compile time context.
     /// </summary>
     public class CompileAttribute : ICompileAttribute
     {
         /// <summary>
-        /// 创建编译时的特性
+        /// Initialize a new instance of the <see cref="CompileAttribute"/>.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The identifier name of the Attribute.</param>
         public CompileAttribute(string name)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
+        /// <summary>
+        /// Gets the identifier name of the Attribute.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets or sets the properties of the Attribute.
+        /// </summary>
+        /// <param name="propertyName">The property name of the Attribute.</param>
+        /// <returns></returns>
+        public string this[string propertyName]
+        {
+            get => _propertyDictionary.TryGetValue(
+                propertyName ?? throw new ArgumentNullException(nameof(propertyName)), out var value)
+                ? value
+                : "";
+            internal set => _propertyDictionary
+                [propertyName ?? throw new ArgumentNullException(nameof(propertyName))] = value;
+        }
+
+        /// <summary>
+        /// Check whether this <see cref="CompileAttribute"/> indicate the runtime version of <typeparamref name="TAttribute"/>.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The runtime version of <see cref="Attribute"/>.
+        /// </typeparam>
+        /// <returns>
+        /// If the <see cref="CompileAttribute"/> indicate the runtime version of <typeparamref name="TAttribute"/>, returns true.
+        /// Else returns false.
+        /// </returns>
         public bool Match<TAttribute>() where TAttribute : Attribute
         {
             var attributeName = typeof(TAttribute).Name;
@@ -33,8 +64,6 @@ namespace dotnetCampus.SourceFusion.CompileTime
             return Name == attributeName;
         }
 
-        public string Name { get; }
-
         /// <inheritdoc />
         public bool Match(string attributeName)
         {
@@ -51,6 +80,8 @@ namespace dotnetCampus.SourceFusion.CompileTime
 
             return Name == attributeName;
         }
+
+        private readonly Dictionary<string, string> _propertyDictionary = new Dictionary<string, string>();
     }
 
     /// <summary>
