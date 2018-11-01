@@ -209,19 +209,10 @@ namespace dotnetCampus.SourceFusion.Syntax
                     x.Name.ToFullString(),
                     x.ArgumentList?.Arguments.Select(a =>
                     {
-                        if (a.Expression is LiteralExpressionSyntax)
-                        {
-                            // Attribute 中形如 Property = "Value" 的语法。
-                            var property = a.NameEquals?.Name.Identifier.ToString();
-                            var value = a.Expression.ToString();
-                            return new KeyValuePair<string, string>(property, value);
-                        }
-                        else
-                        {
-                            
-                        }
-
-                        return default;
+                        // Attribute 中形如 Property = "Value" 的语法。
+                        var property = a.NameEquals?.Name.Identifier.ToString();
+                        var value = a.Expression.ToString();
+                        return new KeyValuePair<string, string>(property, value);
                     }).Where(pair => pair.Key != null)))
                 .Cast<ICompileAttribute>().ToArray();
         }
