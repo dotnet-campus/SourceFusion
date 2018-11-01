@@ -198,8 +198,32 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
         {
-            return VisitList(attributeList).SelectMany(x => x.Attributes)
-                .Select(x => new CompileAttribute(x.Name.ToFullString())).Cast<ICompileAttribute>().ToArray();
+            if (!attributeList.Any())
+            {
+                return new ICompileAttribute[0];
+            }
+
+            return VisitList(attributeList)
+                .SelectMany(x => x.Attributes)
+                .Select(x => new CompileAttribute(
+                    x.Name.ToFullString(),
+                    x.ArgumentList?.Arguments.Select(a =>
+                    {
+                        if (a.Expression is LiteralExpressionSyntax)
+                        {
+                            // Attribute 中形如 Property = "Value" 的语法。
+                            var property = a.NameEquals?.Name.Identifier.ToString();
+                            var value = a.Expression.ToString();
+                            return new KeyValuePair<string, string>(property, value);
+                        }
+                        else
+                        {
+                            
+                        }
+
+                        return default;
+                    }).Where(pair => pair.Key != null)))
+                .Cast<ICompileAttribute>().ToArray();
         }
 
         private MemberModifiers SyntaxKindListToMemberModifiers(IEnumerable<SyntaxKind> kind)

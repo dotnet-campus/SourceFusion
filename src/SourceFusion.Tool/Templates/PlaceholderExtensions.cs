@@ -11,7 +11,8 @@ namespace dotnetCampus.SourceFusion.Templates
     /// </summary>
     internal static class PlaceholderExtensions
     {
-        private const string ClassTemplate = @"using System.Linq;
+        private const string ClassTemplate = @"using System;
+using System.Linq;
 using dotnetCampus.SourceFusion;
 using dotnetCampus.SourceFusion.CompileTime;
 

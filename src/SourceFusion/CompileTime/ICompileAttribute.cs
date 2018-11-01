@@ -18,5 +18,12 @@
         /// 如果此特性符合 <paramref name="attributeName"/> 名称，则返回 true；否则返回 false。
         /// </returns>
         bool Match(string attributeName);
+
+        /// <summary>
+        /// Gets or sets the properties of the Attribute.
+        /// </summary>
+        /// <param name="propertyName">The property name of the Attribute.</param>
+        /// <returns></returns>
+        string this[string propertyName] { get; }
     }
 }

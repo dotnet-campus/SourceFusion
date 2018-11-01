@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -23,16 +24,16 @@ namespace dotnetCampus.SourceFusion
         /// <param name="template">代码片段模板，例如 “new {0}(), ”。</param>
         /// <param name="placeholders">用于填充代码模板的集合，例如 { "Foo", "Bar" }。</param>
         public CompileCodeSnippet(string template, IEnumerable<string> placeholders)
-        {
-            var builder = new StringBuilder();
+            => _snippet = BuildSnippet(placeholders, v => string.Format(template, v));
 
-            foreach (var placeholder in placeholders)
-            {
-                builder.Append(string.Format(template, placeholder));
-            }
+        public CompileCodeSnippet(string template, IEnumerable<(string, string)> placeholders)
+            => _snippet = BuildSnippet(placeholders, v => string.Format(template, v.Item1, v.Item2));
 
-            _snippet = builder.ToString();
-        }
+        public CompileCodeSnippet(string template, IEnumerable<(string, string, string)> placeholders)
+            => _snippet = BuildSnippet(placeholders, v => string.Format(template, v.Item1, v.Item2, v.Item3));
+
+        public CompileCodeSnippet(string template, IEnumerable<(string, string, string, string)> placeholders)
+            => _snippet = BuildSnippet(placeholders, v => string.Format(template, v.Item1, v.Item2, v.Item3, v.Item4));
 
         /// <summary>
         /// 输出代码片段。
@@ -46,7 +47,19 @@ namespace dotnetCampus.SourceFusion
         /// <param name="snippet">代码片段的实例。</param>
         public static implicit operator string(CompileCodeSnippet snippet)
         {
-            return snippet.ToString();
+            return snippet._snippet;
+        }
+
+        private static string BuildSnippet<T>(IEnumerable<T> placeholders, Func<T, string> buildLine)
+        {
+            var builder = new StringBuilder();
+
+            foreach (var placeholder in placeholders)
+            {
+                builder.Append(buildLine(placeholder));
+            }
+
+            return builder.ToString();
         }
     }
 }

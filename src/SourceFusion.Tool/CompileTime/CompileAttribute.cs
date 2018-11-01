@@ -12,9 +12,16 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// Initialize a new instance of the <see cref="CompileAttribute"/>.
         /// </summary>
         /// <param name="name">The identifier name of the Attribute.</param>
-        public CompileAttribute(string name)
+        public CompileAttribute(string name, IEnumerable<KeyValuePair<string, string>> propertyValues = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            if (propertyValues != null)
+            {
+                foreach (var pair in propertyValues)
+                {
+                    _propertyDictionary.Add(pair.Key, pair.Value);
+                }
+            }
         }
 
         /// <summary>
