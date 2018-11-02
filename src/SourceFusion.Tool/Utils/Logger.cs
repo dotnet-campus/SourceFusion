@@ -1,9 +1,19 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace dotnetCampus.SourceFusion.Utils
 {
-    internal class Logger : ILogger
+    internal sealed class Logger : ILogger, IDisposable
     {
+        private readonly Stopwatch _watch;
+        private bool _isDisposed;
+
+        public Logger()
+        {
+            _watch = new Stopwatch();
+            _watch.Start();
+        }
+
         public void Message(string text, ConsoleColor? color = null)
         {
             if (color == null)
@@ -17,6 +27,11 @@ namespace dotnetCampus.SourceFusion.Utils
                 Console.WriteLine(text);
                 Console.ForegroundColor = oldColor;
             }
+        }
+
+        public void Time(string progressAbove)
+        {
+
         }
 
         public void Warning(string text)
@@ -50,6 +65,34 @@ namespace dotnetCampus.SourceFusion.Utils
             {
                 Error(exception);
             }
+        }
+
+        internal TimeSpan Elapsed => _watch.Elapsed;
+
+        ~Logger()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool isDisposing)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (isDisposing)
+            {
+                _watch.Stop();
+            }
+
+            _isDisposed = true;
         }
     }
 }
