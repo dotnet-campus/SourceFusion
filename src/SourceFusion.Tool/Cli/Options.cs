@@ -13,6 +13,9 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('c', "CompilingFiles", HelpText = "所有参与编译的文件，多个文件使用分号（;）分割。")]
         public string CompilingFiles { get; set; }
 
+        [Option('f', "FilterFiles", HelpText = "只分析指定（正则表达式）名称的文件。")]
+        public string FilterFiles { get; set; }
+
         [Option("debug-mode", HelpText = "如果指定，将在启动编译时进入调试模式。")]
         public bool DebugMode { get; set; }
     }

@@ -19,6 +19,7 @@ namespace dotnetCampus.SourceFusion
                 WorkingFolder = args[1],
                 IntermediateFolder = args[3],
                 CompilingFiles = args[5],
+                FilterFiles = args[7],
             };
 
             if (options.DebugMode)
@@ -95,15 +96,27 @@ namespace dotnetCampus.SourceFusion
             DeconstructPaths(Options options)
         {
             var workingFolder = Path.GetFullPath(options.WorkingFolder);
+
             var intermediateFolder = Path.IsPathRooted(options.IntermediateFolder)
                 ? Path.GetFullPath(options.IntermediateFolder)
                 : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.IntermediateFolder));
-            var files = File.ReadAllLines(options.CompilingFiles);
-            var compilingFiles = files
+
+            var compilingFiles = File.ReadAllLines(options.CompilingFiles)
                 .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
                 .ToArray();
 
-            return (workingFolder, intermediateFolder, compilingFiles);
+            var filterFiles = File.Exists(options.FilterFiles)
+                ? File.ReadAllLines(options.FilterFiles)
+                    .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
+                    .ToArray()
+                : new string[0];
+
+            // filterFiles 是仅需扫描的文件，用 compilingFiles 取一下交集，可以避免被移除的文件也加入编译范围。
+            var filteredCompilingFiles = filterFiles.Any()
+                ? compilingFiles.Intersect(filterFiles).ToArray()
+                : compilingFiles;
+
+            return (workingFolder, intermediateFolder, filteredCompilingFiles);
         }
 
         private static void PrepairFolders(params string[] folders)

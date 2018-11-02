@@ -13,17 +13,27 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SourceFusionGeneratedCodeArgsFile>obj\$(Configuration)\$(TargetFramework)\compilingArgs.txt</SourceFusionGeneratedCodeArgsFile>
     <SourceFusionGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\SourceFusion.GeneratedCodes</SourceFusionGeneratedCodeFolder>
   </PropertyGroup>
 
-  <Target Name="_SourceFusionWriteArgs" BeforeTargets="SourceFusionGenerateCode">
-    <WriteLinesToFile File="$(SourceFusionGeneratedCodeArgsFile)" Lines="@(Compile)" Overwrite="True" />
+  <Target Name="_SourceFusionWriteCompilingArgs" BeforeTargets="SourceFusionGenerateCode">
+    <PropertyGroup>
+      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">obj\$(Configuration)\$(TargetFramework)\args\compilingArgs.txt</SourceFusionCompilingArgsFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(SourceFusionCompilingArgsFile)" Lines="@(Compile)" Overwrite="True" />
+  </Target>
+
+  <Target Name="_SourceFusionWriteFilterArgs" BeforeTargets="SourceFusionGenerateCode">
+    <PropertyGroup>
+      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">obj\$(Configuration)\$(TargetFramework)\args\filterArgs.txt</SourceFusionFilterArgsFile>
+      <PrecompileFilter Condition=" '$(PrecompileFilter)' == '' ">*.cs</PrecompileFilter>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(SourceFusionFilterArgsFile)" Lines="@(PrecompileFilter)" Overwrite="True" />
   </Target>
     
   <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionGeneratedCodeArgsFile)&quot;">
+          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot;">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
     </Exec>
