@@ -6,6 +6,7 @@ using System.Linq;
 using dotnetCampus.SourceFusion.Cli;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Templates;
+using dotnetCampus.SourceFusion.Utils;
 
 namespace dotnetCampus.SourceFusion
 {
@@ -28,7 +29,9 @@ namespace dotnetCampus.SourceFusion
                 Debugger.Launch();
             }
 
-            var exitCode = Run(options);
+            var logger = new Logger();
+
+            var exitCode = Run(options, logger);
 
             watch.Stop();
 
@@ -42,7 +45,7 @@ namespace dotnetCampus.SourceFusion
             return exitCode;
         }
 
-        private static int Run(Options options)
+        private static int Run(Options options, ILogger logger)
         {
             // Initialize basic command options.
             //Parser.Default.ParseArguments<Options>(args)
@@ -68,19 +71,19 @@ namespace dotnetCampus.SourceFusion
 
                         foreach (var exclude in toExcludes)
                         {
-                            Console.WriteLine(exclude);
+                            logger.Message(exclude);
                         }
                     }
                     catch (CompilingException ex)
                     {
                         foreach (var error in ex.Errors)
                         {
-                            Console.Write($"error:{error}");
+                            logger.Error($"error:{error}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.Write($"error:{ex}");
+                        logger.Error($"error:{ex}");
                     }
                 //})
                 //.WithNotParsed(errorList => { });
