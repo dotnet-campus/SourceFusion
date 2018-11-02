@@ -14,9 +14,6 @@ namespace dotnetCampus.SourceFusion
     {
         private static int Main(string[] args)
         {
-            var watch = new Stopwatch();
-            watch.Start();
-
             var options = new Options
             {
                 WorkingFolder = args[1],
@@ -29,20 +26,19 @@ namespace dotnetCampus.SourceFusion
                 Debugger.Launch();
             }
 
-            var logger = new Logger();
-
-            var exitCode = Run(options, logger);
-
-            watch.Stop();
-
-            if (Debugger.IsAttached)
+            using (var logger = new Logger())
             {
-                Console.WriteLine($"预编译耗时：{watch.Elapsed}");
-                Console.WriteLine($"调试模式下已暂停，按任意键结束……");
-                Console.ReadKey();
-            }
+                var exitCode = Run(options, logger);
 
-            return exitCode;
+                if (Debugger.IsAttached)
+                {
+                    Console.WriteLine($"预编译耗时：{logger.Elapsed}");
+                    Console.WriteLine($"调试模式下已暂停，按任意键结束……");
+                    Console.ReadKey();
+                }
+
+                return exitCode;
+            }
         }
 
         private static int Run(Options options, ILogger logger)
