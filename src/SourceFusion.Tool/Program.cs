@@ -13,22 +13,41 @@ namespace dotnetCampus.SourceFusion
     {
         private static int Main(string[] args)
         {
+            var watch = new Stopwatch();
+            watch.Start();
+
             var options = new Options
             {
-               WorkingFolder = args[1],
+                WorkingFolder = args[1],
                 IntermediateFolder = args[3],
                 CompilingFiles = args[5],
             };
 
+            if (options.DebugMode)
+            {
+                Debugger.Launch();
+            }
+
+            var exitCode = Run(options);
+
+            watch.Stop();
+
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine($"预编译耗时：{watch.Elapsed}");
+                Console.WriteLine($"调试模式下已暂停，按任意键结束……");
+                Console.ReadKey();
+            }
+
+            return exitCode;
+        }
+
+        private static int Run(Options options)
+        {
             // Initialize basic command options.
             //Parser.Default.ParseArguments<Options>(args)
             //    .WithParsed(options =>
             //    {
-                    if (options.DebugMode)
-                    {
-                        Debugger.Launch();
-                    }
-
                     try
                     {
                         var (workingFolder, intermediateFolder, compilingFiles) = DeconstructPaths(options);
