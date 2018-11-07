@@ -12,6 +12,7 @@
     <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
   </PropertyGroup>
 
+  <!--第一阶段，创建 SourceFusion 需要的文件夹-->
   <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
     <PropertyGroup>
       <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</SourceFusionWorkingFolder>
@@ -26,6 +27,7 @@
     <MakeDir Directories="@(SourceFusionDirectory)" ContinueOnError="false" />
   </Target>
 
+  <!--第二阶段，写入 SourceFusion 需要的命令行参数 Compile-->
   <Target Name="_SourceFusionWriteCompilingArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
       <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">$(SourceFusionToolsFolder)CompilingArgs.txt</SourceFusionCompilingArgsFile>
@@ -33,6 +35,7 @@
     <WriteLinesToFile File="$(SourceFusionCompilingArgsFile)" Lines="@(Compile)" Overwrite="True" />
   </Target>
 
+  <!--第二阶段，写入 SourceFusion 需要的命令行参数 PrecompileFilter-->
   <Target Name="_SourceFusionWriteFilterArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
       <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">$(SourceFusionToolsFolder)FilterArgs.txt</SourceFusionFilterArgsFile>
@@ -41,6 +44,7 @@
     <WriteLinesToFile File="$(SourceFusionFilterArgsFile)" Lines="@(PrecompileFilter)" Overwrite="True" />
   </Target>
 
+  <!--第二阶段，进行重新编译测试-->
   <Target Name="_SourceFusionRebuildingTest" BeforeTargets="SourceFusionGenerateCode"
           Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
     <PropertyGroup>
@@ -51,7 +55,8 @@
     </ItemGroup>
     <WriteLinesToFile File="$(SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
   </Target>
-    
+
+  <!--第三阶段，执行 SourceFusion-->
   <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
     <PropertyGroup>
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
@@ -63,6 +68,7 @@
     </Exec>
   </Target>
 
+  <!--第四阶段，使用 SourceFusion 生成的新源码-->
   <Target Name="_IncludeSourceFusionGeneratedCode" Condition="$(_ExitCodeOfSourceFusion) == '0' " AfterTargets="SourceFusionGenerateCode">
     <CreateItem Include="$(_OutputOfSourceFusionGenerateCode)">
       <Output TaskParameter="Include" ItemName="_ExcludedCompileFile" />
