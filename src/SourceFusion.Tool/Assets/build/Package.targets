@@ -12,26 +12,48 @@
     <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SourceFusionGeneratedCodeFolder>obj\$(Configuration)\$(TargetFramework)\SourceFusion.GeneratedCodes</SourceFusionGeneratedCodeFolder>
-  </PropertyGroup>
+  <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
+    <PropertyGroup>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</SourceFusionWorkingFolder>
+    </PropertyGroup>
+    <ItemGroup>
+      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)" />
+      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)SourceFusion.Tools\" />
+      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\" />
+    </ItemGroup>
+    <MakeDir Directories="@(SourceFusionDirectory)" ContinueOnError="false" />
+  </Target>
 
   <Target Name="_SourceFusionWriteCompilingArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
-      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">obj\$(Configuration)\$(TargetFramework)\args\compilingArgs.txt</SourceFusionCompilingArgsFile>
+      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">$(SourceFusionWorkingFolder)SourceFusion.Tools\CompilingArgs.txt</SourceFusionCompilingArgsFile>
     </PropertyGroup>
     <WriteLinesToFile File="$(SourceFusionCompilingArgsFile)" Lines="@(Compile)" Overwrite="True" />
   </Target>
 
   <Target Name="_SourceFusionWriteFilterArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
-      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">obj\$(Configuration)\$(TargetFramework)\args\filterArgs.txt</SourceFusionFilterArgsFile>
+      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">$(SourceFusionWorkingFolder)SourceFusion.Tools\FilterArgs.txt</SourceFusionFilterArgsFile>
       <PrecompileFilter Condition=" '$(PrecompileFilter)' == '' ">*.cs</PrecompileFilter>
     </PropertyGroup>
     <WriteLinesToFile File="$(SourceFusionFilterArgsFile)" Lines="@(PrecompileFilter)" Overwrite="True" />
   </Target>
+
+  <Target Name="_SourceFusionRebuildingTest" BeforeTargets="SourceFusionGenerateCode"
+          Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionWorkingFolder)SourceFusion.Tools\RebuildingTest.txt">
+    <PropertyGroup>
+      <SourceFusionRebuildRequired>true</SourceFusionRebuildRequired>
+    </PropertyGroup>
+    <ItemGroup>
+      <RebuildingTestLine Include="true" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(SourceFusionWorkingFolder)SourceFusion.Tools\RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
+  </Target>
     
   <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes</SourceFusionGeneratedCodeFolder>
+    </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
           Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot;">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />

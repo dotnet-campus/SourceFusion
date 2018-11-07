@@ -1,3 +1,9 @@
 ﻿<Project>
+
+  <PropertyGroup>
+    <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\$(TargetFramework)\</SourceFusionWorkingFolder>
+  </PropertyGroup>
+
   <Import Project="..\build\SourceFusion.targets" />
+
 </Project>
