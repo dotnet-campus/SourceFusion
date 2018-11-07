@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Text;
 using dotnetCampus.SourceFusion.Cli;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Templates;
@@ -54,12 +55,18 @@ namespace dotnetCampus.SourceFusion
                     {
                         var (workingFolder, intermediateFolder, generatedCodeFolder, compilingFiles) = DeconstructPaths(options);
                         var rebuildRequired = options.RebuildRequired;
-                        
+                        var cachedExcludesListFile = Path.Combine(intermediateFolder, "Excludes.txt");
+
                         // 如果可以差量编译，那么检测之前已经生成的文件，然后将其直接输出。
-                        //if (!rebuildRequired)
-                        //{
-                        //    return 0;
-                        //}
+                        if (!rebuildRequired && File.Exists(cachedExcludesListFile))
+                        {
+                            var cachedExcludeLines = File.ReadAllLines(cachedExcludesListFile, Encoding.UTF8);
+                            foreach (var exclude in cachedExcludeLines)
+                            {
+                                logger.Message(exclude);
+                            }
+                            return 0;
+                        }
 
                         var assembly = new CompileAssembly(compilingFiles);
 
@@ -78,6 +85,8 @@ namespace dotnetCampus.SourceFusion
                         {
                             logger.Message(exclude);
                         }
+
+                        File.WriteAllLines(cachedExcludesListFile, toExcludes, Encoding.UTF8);
                     }
                     catch (CompilingException ex)
                     {
