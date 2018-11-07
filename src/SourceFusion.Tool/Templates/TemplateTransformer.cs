@@ -10,10 +10,10 @@ namespace dotnetCampus.SourceFusion.Templates
 {
     internal class TemplateTransformer
     {
-        internal TemplateTransformer(string workingFolder, string intermediateFolder, CompileAssembly assembly)
+        internal TemplateTransformer(string workingFolder, string generatedCodeFolder, CompileAssembly assembly)
         {
             _workingFolder = workingFolder;
-            _intermediateFolder = intermediateFolder;
+            _generatedCodeFolder = generatedCodeFolder;
             _assembly = assembly;
             _compilingContext = new CompilingContext(assembly);
         }
@@ -39,7 +39,7 @@ namespace dotnetCampus.SourceFusion.Templates
         /// <summary>
         /// 获取中间文件的生成路径（文件夹，相对路径）。
         /// </summary>
-        private readonly string _intermediateFolder;
+        private readonly string _generatedCodeFolder;
 
         /// <summary>
         /// 获取转换源码的工作路径。
@@ -74,7 +74,7 @@ namespace dotnetCampus.SourceFusion.Templates
 
             var targetText = builder.ToString();
             var fileName = Path.GetFileNameWithoutExtension(assemblyFile.FullName);
-            var targetFile = Path.Combine(_intermediateFolder, $"{fileName}.g.cs");
+            var targetFile = Path.Combine(_generatedCodeFolder, $"{fileName}.g.cs");
             File.WriteAllText(targetFile, targetText);
 
             return assemblyFile.FullName;

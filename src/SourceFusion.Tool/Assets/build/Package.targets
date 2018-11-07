@@ -15,47 +15,49 @@
   <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
     <PropertyGroup>
       <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</SourceFusionWorkingFolder>
+      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
     <ItemGroup>
       <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)" />
-      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)SourceFusion.Tools\" />
-      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\" />
+      <SourceFusionDirectory Include="$(SourceFusionToolsFolder)" />
+      <SourceFusionDirectory Include="$(SourceFusionGeneratedCodeFolder)" />
     </ItemGroup>
     <MakeDir Directories="@(SourceFusionDirectory)" ContinueOnError="false" />
   </Target>
 
   <Target Name="_SourceFusionWriteCompilingArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
-      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">$(SourceFusionWorkingFolder)SourceFusion.Tools\CompilingArgs.txt</SourceFusionCompilingArgsFile>
+      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">$(SourceFusionToolsFolder)CompilingArgs.txt</SourceFusionCompilingArgsFile>
     </PropertyGroup>
     <WriteLinesToFile File="$(SourceFusionCompilingArgsFile)" Lines="@(Compile)" Overwrite="True" />
   </Target>
 
   <Target Name="_SourceFusionWriteFilterArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
-      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">$(SourceFusionWorkingFolder)SourceFusion.Tools\FilterArgs.txt</SourceFusionFilterArgsFile>
+      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">$(SourceFusionToolsFolder)FilterArgs.txt</SourceFusionFilterArgsFile>
       <PrecompileFilter Condition=" '$(PrecompileFilter)' == '' ">*.cs</PrecompileFilter>
     </PropertyGroup>
     <WriteLinesToFile File="$(SourceFusionFilterArgsFile)" Lines="@(PrecompileFilter)" Overwrite="True" />
   </Target>
 
   <Target Name="_SourceFusionRebuildingTest" BeforeTargets="SourceFusionGenerateCode"
-          Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionWorkingFolder)SourceFusion.Tools\RebuildingTest.txt">
+          Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
     <PropertyGroup>
-      <SourceFusionRebuildRequired>true</SourceFusionRebuildRequired>
+      <SourceFusionRebuildRequired >true</SourceFusionRebuildRequired>
     </PropertyGroup>
     <ItemGroup>
       <RebuildingTestLine Include="true" />
     </ItemGroup>
-    <WriteLinesToFile File="$(SourceFusionWorkingFolder)SourceFusion.Tools\RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
+    <WriteLinesToFile File="$(SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
   </Target>
     
   <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
     <PropertyGroup>
-      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes</SourceFusionGeneratedCodeFolder>
+      <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot;">
+          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -r $(SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
     </Exec>

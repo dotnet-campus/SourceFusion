@@ -39,12 +39,12 @@ namespace dotnetCampus.SourceFusion
         /// 创建用于转换源码的 <see cref="CodeTransformer"/>。
         /// </summary>
         /// <param name="workingFolder">转换源码的工作路径。</param>
-        /// <param name="intermediateFolder">中间文件的生成路径（文件夹，相对路径）。</param>
+        /// <param name="generatedCodeFolder">中间文件的生成路径（文件夹，相对路径）。</param>
         /// <param name="assembly">需要分析源码转换的程序集。</param>
-        internal CodeTransformer(string workingFolder, string intermediateFolder, CompileAssembly assembly)
+        internal CodeTransformer(string workingFolder, string generatedCodeFolder, CompileAssembly assembly)
         {
             _workingFolder = workingFolder;
-            _intermediateFolder = intermediateFolder;
+            _generatedCodeFolder = generatedCodeFolder;
             _assembly = assembly;
         }
 
@@ -66,7 +66,7 @@ namespace dotnetCampus.SourceFusion
         /// <summary>
         /// 获取中间文件的生成路径（文件夹，相对路径）。
         /// </summary>
-        private readonly string _intermediateFolder;
+        private readonly string _generatedCodeFolder;
 
         /// <summary>
         /// 获取转换源码的工作路径。
@@ -95,7 +95,7 @@ namespace dotnetCampus.SourceFusion
                 for (var i = 0; i < attribute.RepeatCount; i++)
                 {
                     var transformedText = transformer.Transform(text, new TransformingContext(i));
-                    var targetFile = Path.Combine(_intermediateFolder, $"{fileName}.g.{i}{extension}");
+                    var targetFile = Path.Combine(_generatedCodeFolder, $"{fileName}.g.{i}{extension}");
                     File.WriteAllText(targetFile, GeneratedHeader + transformedText, Encoding.UTF8);
                 }
 

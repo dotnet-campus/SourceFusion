@@ -18,8 +18,10 @@ namespace dotnetCampus.SourceFusion
             {
                 WorkingFolder = args[1],
                 IntermediateFolder = args[3],
-                CompilingFiles = args[5],
-                FilterFiles = args[7],
+                GeneratedCodeFolder = args[5],
+                CompilingFiles = args[7],
+                FilterFiles = args[9],
+                RebuildRequired = args[11]?.Equals("true", StringComparison.InvariantCultureIgnoreCase) is true,
             };
 
             if (options.DebugMode)
@@ -50,17 +52,23 @@ namespace dotnetCampus.SourceFusion
             //    {
                     try
                     {
-                        var (workingFolder, intermediateFolder, compilingFiles) = DeconstructPaths(options);
-                        PrepairFolders(intermediateFolder);
+                        var (workingFolder, intermediateFolder, generatedCodeFolder, compilingFiles) = DeconstructPaths(options);
+                        var rebuildRequired = options.RebuildRequired;
+                        
+                        // 如果可以差量编译，那么检测之前已经生成的文件，然后将其直接输出。
+                        //if (!rebuildRequired)
+                        //{
+                        //    return 0;
+                        //}
 
                         var assembly = new CompileAssembly(compilingFiles);
 
                         // 分析 IPlainCodeTransformer。
-                        var transformer = new CodeTransformer(workingFolder, intermediateFolder, assembly);
+                        var transformer = new CodeTransformer(workingFolder, generatedCodeFolder, assembly);
                         var excludes = transformer.Transform();
 
                         // 分析 CompileTimeTemplate。
-                        var templateTransformer = new TemplateTransformer(workingFolder, intermediateFolder, assembly);
+                        var templateTransformer = new TemplateTransformer(workingFolder, generatedCodeFolder, assembly);
                         var templateExcludes = templateTransformer.Transform();
 
                         var toExcludes = excludes.Union(templateExcludes)
@@ -92,6 +100,7 @@ namespace dotnetCampus.SourceFusion
         private static (
             string workingFolder,
             string intermediateFolder,
+            string generatedCodesFolder,
             string[] compilingFiles)
             DeconstructPaths(Options options)
         {
@@ -100,6 +109,10 @@ namespace dotnetCampus.SourceFusion
             var intermediateFolder = Path.IsPathRooted(options.IntermediateFolder)
                 ? Path.GetFullPath(options.IntermediateFolder)
                 : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.IntermediateFolder));
+
+            var generatedCodesFolder = Path.IsPathRooted(options.GeneratedCodeFolder)
+                ? Path.GetFullPath(options.GeneratedCodeFolder)
+                : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.GeneratedCodeFolder));
 
             var compilingFiles = File.ReadAllLines(options.CompilingFiles)
                 .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
@@ -116,18 +129,7 @@ namespace dotnetCampus.SourceFusion
                 ? compilingFiles.Intersect(filterFiles).ToArray()
                 : compilingFiles;
 
-            return (workingFolder, intermediateFolder, filteredCompilingFiles);
-        }
-
-        private static void PrepairFolders(params string[] folders)
-        {
-            foreach (var folder in folders)
-            {
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-            }
+            return (workingFolder, intermediateFolder, generatedCodesFolder, filteredCompilingFiles);
         }
     }
 }
