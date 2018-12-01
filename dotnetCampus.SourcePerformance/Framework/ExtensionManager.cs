@@ -23,7 +23,7 @@ namespace dotnetCampus.SourcePerformance.Framework
         public void LoadExtensions()
         {
             _counter.Framework();
-#if !使用SourceFusion
+#if 使用SourceFusion
 
             Extensions.AddRange(_export.Interestings);
 
