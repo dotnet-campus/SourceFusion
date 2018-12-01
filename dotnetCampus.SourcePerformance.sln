@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.SourcePerformance", "dotnetCampus.SourcePerformance\dotnetCampus.SourcePerformance.csproj", "{4DBC0C71-EB77-4981-89E6-31E96D12D02B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Extension", "dotnetCampus.Extension\dotnetCampus.Extension.csproj", "{FE1CB601-3BAF-4930-994C-3B3874C31CC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.SourceGenerator", "dotnetCampus.SourceGenerator\dotnetCampus.SourceGenerator.csproj", "{95A852A0-27CE-447C-9FFC-158DF83BAB03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{4DBC0C71-EB77-4981-89E6-31E96D12D02B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DBC0C71-EB77-4981-89E6-31E96D12D02B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DBC0C71-EB77-4981-89E6-31E96D12D02B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE1CB601-3BAF-4930-994C-3B3874C31CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE1CB601-3BAF-4930-994C-3B3874C31CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE1CB601-3BAF-4930-994C-3B3874C31CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE1CB601-3BAF-4930-994C-3B3874C31CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
