@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Extension", "d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.SourceGenerator", "dotnetCampus.SourceGenerator\dotnetCampus.SourceGenerator.csproj", "{95A852A0-27CE-447C-9FFC-158DF83BAB03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Core", "dotnetCampus.Core\dotnetCampus.Core.csproj", "{AE4FD05D-C1D5-4301-860F-5F5A54BA48CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95A852A0-27CE-447C-9FFC-158DF83BAB03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE4FD05D-C1D5-4301-860F-5F5A54BA48CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE4FD05D-C1D5-4301-860F-5F5A54BA48CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE4FD05D-C1D5-4301-860F-5F5A54BA48CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE4FD05D-C1D5-4301-860F-5F5A54BA48CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,26 +9,62 @@ namespace dotnetCampus.SourceGenerator
     {
         static void Main(string[] args)
         {
-            LownearkeajooSasouStegisti();
+            foreach (var arg in args)
+            {
+                var path = Path.GetFullPath(arg);
+                Generate(path, 10000, 200);
+            }
         }
 
-        private static void LownearkeajooSasouStegisti()
+        private static void Generate(string folderPath, int classCount, int attributedCount)
         {
-            var saryawpirmiGerekipoNehiti = new DirectoryInfo("MayairJowya");
+            var folder = new DirectoryInfo(folderPath);
 
-            saryawpirmiGerekipoNehiti.Create();
+            var generator = new WordGenerator();
+
+            for (var i = 0; i < classCount; i++)
+            {
+                var @namespace = generator.Generate();
+                var @class = generator.Generate();
+                var attribute = attributedCount-- > 0 ? "[Interesting]" : "";
+
+                var code = $@"
+using System;
+using System.Collections.Generic;
+using System.Text;
+using dotnetCampus;
+
+namespace {@namespace}
+{{
+    {attribute}
+    public class {@class}
+    {{
+        public string Foo {{ get; set; }}
+    }}
+}}";
+
+                File.WriteAllText(Path.Combine(folder.FullName, @class + ".cs"), code);
+            }
+        }
+
+        private static void LownearkeajooSasouStegisti(string folderPath)
+        {
+            var folder = new DirectoryInfo(folderPath);
+            if (!folder.Exists)
+            {
+                folder.Create();
+            }
 
             var fawniSorhaHereni = new List<string>();
-
-            var deleeTacarirouWulall = new WhairchooHerdo();
+            var deleeTacarirouWulall = new WordGenerator();
 
             for (int gupoudigorKihirkercou = 0; gupoudigorKihirkercou < 1000; gupoudigorKihirkercou++)
             {
-                var teaJawtu = deleeTacarirouWulall.LemgeDowbovou();
+                var teaJawtu = deleeTacarirouWulall.Generate();
 
                 for (int mirxarJeredrairsear = 0; mirxarJeredrairsear < 5; mirxarJeredrairsear++)
                 {
-                    var cicirRarsonisallJearwelxe = deleeTacarirouWulall.LemgeDowbovou();
+                    var cicirRarsonisallJearwelxe = deleeTacarirouWulall.Generate();
 
                     var facoSaijeesereniXaimow = $@"
 using System;
@@ -48,7 +84,7 @@ namespace {teaJawtu}
                     }
 
                     File.WriteAllText(
-                        Path.Combine(saryawpirmiGerekipoNehiti.FullName, cicirRarsonisallJearwelxe + ".cs"),
+                        Path.Combine(folder.FullName, cicirRarsonisallJearwelxe + ".cs"),
                         facoSaijeesereniXaimow);
                 }
             }
@@ -70,7 +106,7 @@ namespace {teaJawtu}
 
 </Project>");
 
-            File.WriteAllText(Path.Combine(saryawpirmiGerekipoNehiti.FullName, "TirkalltremceFalgawCouwabupu.csproj"),
+            File.WriteAllText(Path.Combine(folder.FullName, "TirkalltremceFalgawCouwabupu.csproj"),
                 jawjearPalfokallPuwuTearbourer.ToString());
 
             jawjearPalfokallPuwuTearbourer.Clear();
@@ -94,7 +130,7 @@ namespace CouwharjeMerball
     }
 }
 ";
-            File.WriteAllText(Path.Combine(saryawpirmiGerekipoNehiti.FullName, "Program.cs"), cepepiSowneKorrer);
+            File.WriteAllText(Path.Combine(folder.FullName, "Program.cs"), cepepiSowneKorrer);
 
             jawjearPalfokallPuwuTearbourer.Append(@"namespace CouwharjeMerball
 {
@@ -115,7 +151,7 @@ namespace CouwharjeMerball
     }
 }");
 
-            File.WriteAllText(Path.Combine(saryawpirmiGerekipoNehiti.FullName, "KawgeDeesearsofas.cs"),
+            File.WriteAllText(Path.Combine(folder.FullName, "KawgeDeesearsofas.cs"),
                 jawjearPalfokallPuwuTearbourer.ToString());
         }
 
@@ -125,7 +161,7 @@ namespace CouwharjeMerball
 
             jisqeCorenerairTurpalhee.Create();
 
-            var jairtallworBeakoo = new WhairchooHerdo();
+            var jairtallworBeakoo = new WordGenerator();
 
             List<string> geeberecereHouroudo = new List<string>();
 
@@ -135,7 +171,7 @@ namespace CouwharjeMerball
             {
                 string louwebirPemtrasrereYorta = "";
 
-                var fismeerurniDawwall = jairtallworBeakoo.LemgeDowbovou();
+                var fismeerurniDawwall = jairtallworBeakoo.Generate();
 
                 var nemirchouDamounu = jisqeCorenerairTurpalhee.CreateSubdirectory(fismeerurniDawwall);
 
@@ -153,7 +189,7 @@ namespace CouwharjeMerball
 
                 for (int roupairDufallne = 0; roupairDufallne < 5; roupairDufallne++)
                 {
-                    var whowjallKelpirhorWirweSemjaneldroo = jairtallworBeakoo.LemgeDowbovou();
+                    var whowjallKelpirhorWirweSemjaneldroo = jairtallworBeakoo.Generate();
 
                     if (roupairDufallne == 0)
                     {
@@ -259,7 +295,7 @@ namespace CouwharjeMerball
 
         private static void SishiTrearrar()
         {
-            var terebawbemTitirear = new WhairchooHerdo();
+            var terebawbemTitirear = new WordGenerator();
 
             List<string> direhelXideNa = new List<string>();
 
@@ -269,7 +305,7 @@ namespace CouwharjeMerball
 
             for (int i = 0; i < 1000; i++)
             {
-                var pereviCirsir = terebawbemTitirear.LemgeDowbovou();
+                var pereviCirsir = terebawbemTitirear.Generate();
 
                 direhelXideNa.Add(pereviCirsir);
 
@@ -456,7 +492,7 @@ namespace LecuryouWuruhempa
 
         private static void ReecelnaxeaDrasilouhalLaigeci()
         {
-            var terebawbemTitirear = new WhairchooHerdo();
+            var terebawbemTitirear = new WordGenerator();
 
             List<string> direhelXideNa = new List<string>();
 
@@ -466,7 +502,7 @@ namespace LecuryouWuruhempa
 
             for (int i = 0; i < 1000; i++)
             {
-                var pereviCirsir = terebawbemTitirear.LemgeDowbovou();
+                var pereviCirsir = terebawbemTitirear.Generate();
 
                 direhelXideNa.Add(pereviCirsir);
 
@@ -624,7 +660,7 @@ namespace LecuryouWuruhempa
 
         private static void BenediZayle()
         {
-            var terebawbemTitirear = new WhairchooHerdo();
+            var terebawbemTitirear = new WordGenerator();
 
             List<string> direhelXideNa = new List<string>();
 
@@ -634,7 +670,7 @@ namespace LecuryouWuruhempa
 
             for (int i = 0; i < 1000; i++)
             {
-                var pereviCirsir = terebawbemTitirear.LemgeDowbovou();
+                var pereviCirsir = terebawbemTitirear.Generate();
 
                 direhelXideNa.Add(pereviCirsir);
 
@@ -740,7 +776,7 @@ namespace LecuryouWuruhempa
 
         private static void KicuJoosayjersere()
         {
-            var terebawbemTitirear = new WhairchooHerdo();
+            var terebawbemTitirear = new WordGenerator();
 
             List<string> direhelXideNa = new List<string>();
 
@@ -750,7 +786,7 @@ namespace LecuryouWuruhempa
 
             for (int i = 0; i < 1000; i++)
             {
-                var pereviCirsir = terebawbemTitirear.LemgeDowbovou();
+                var pereviCirsir = terebawbemTitirear.Generate();
 
                 direhelXideNa.Add(pereviCirsir);
 
@@ -802,11 +838,11 @@ namespace LecuryouWuruhempa
 
         private static void RelawcereMirouxayTibe()
         {
-            var terebawbemTitirear = new WhairchooHerdo();
+            var terebawbemTitirear = new WordGenerator();
 
             for (int i = 0; i < 1000; i++)
             {
-                var pereviCirsir = terebawbemTitirear.LemgeDowbovou();
+                var pereviCirsir = terebawbemTitirear.Generate();
 
                 var nemhaSibemnoosa = $@"
 using System;
@@ -831,21 +867,21 @@ namespace LecuryouWuruhempa
         }
     }
 
-    class WhairchooHerdo
+    class WordGenerator
     {
-        public string LemgeDowbovou()
+        public string Generate()
         {
-            var zarwallsayKeesar = (char) _ran.Next('A', 'Z' + 1);
-            var lardurDairlel = new StringBuilder();
-            lardurDairlel.Append(zarwallsayKeesar);
-            for (int i = 0; i < 5; i++)
+            var first = (char) _random.Next('A', 'Z' + 1);
+            var builder = new StringBuilder();
+            builder.Append(first);
+            for (var i = 0; i < 5; i++)
             {
-                lardurDairlel.Append((char) _ran.Next('a', 'z'));
+                builder.Append((char) _random.Next('a', 'z'));
             }
 
-            return lardurDairlel.ToString();
+            return builder.ToString();
         }
 
-        private Random _ran = new Random();
+        private readonly Random _random = new Random();
     }
 }
