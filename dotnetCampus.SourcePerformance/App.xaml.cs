@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using dotnetCampus.SourcePerformance.Framework;
 
 namespace dotnetCampus.SourcePerformance
 {
@@ -11,9 +12,7 @@ namespace dotnetCampus.SourcePerformance
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var assembly = typeof(Foo).Assembly;
-
-
+            Services.ExtensionManager.LoadExtensions();
             base.OnStartup(e);
         }
     }

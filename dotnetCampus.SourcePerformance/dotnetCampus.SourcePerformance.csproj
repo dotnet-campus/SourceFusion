@@ -57,6 +57,7 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Framework\ExtensionManager.cs" />
     <Compile Include="Framework\PerformanceCounter.cs" />
     <Compile Include="Framework\Services.cs" />
     <Page Include="MainWindow.xaml">
