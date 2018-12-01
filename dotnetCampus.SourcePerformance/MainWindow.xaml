@@ -9,9 +9,17 @@
     <Grid>
         <TextBlock x:Name="StartupTimeTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center"
                    FontSize="40" FontFamily="Microsoft YaHei" TextAlignment="Center">
-            <Run Text="启动时间" FontWeight="Thin" />
+            <Run Text="框架启动" FontWeight="Thin" />
             <LineBreak />
-            <Run x:Name="StartupTimeRun" FontSize="60" Text="……" />
+            <Run x:Name="FrameworkRun" Text="……" />
+            <LineBreak />
+            <Run Text="发现插件" FontWeight="Thin" />
+            <LineBreak />
+            <Run x:Name="ExtensionRun" FontSize="60" FontWeight="Bold" Text="……" />
+            <LineBreak />
+            <Run Text="窗口启动" FontWeight="Thin" />
+            <LineBreak />
+            <Run x:Name="CompletedRun" Text="……" />
         </TextBlock>
     </Grid>
 </Window>

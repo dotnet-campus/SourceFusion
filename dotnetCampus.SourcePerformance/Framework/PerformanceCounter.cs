@@ -16,11 +16,29 @@ namespace dotnetCampus.SourcePerformance.Framework
             }
         }
 
-        public TimeSpan Elapsed => _watch.Elapsed;
+        public TimeSpan FrameworkLoaded { get; private set; }
+        public TimeSpan ExtensionFound { get; private set; }
+        public TimeSpan Completed { get; private set; }
 
         public void Start()
         {
             _watch.Start();
+        }
+
+        public void Framework()
+        {
+            FrameworkLoaded = _watch.Elapsed;
+        }
+
+        public void Extension()
+        {
+            ExtensionFound = _watch.Elapsed;
+        }
+
+        public void Complete()
+        {
+            Completed = _watch.Elapsed;
+            _watch.Stop();
         }
     }
 }

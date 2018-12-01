@@ -15,8 +15,10 @@ namespace dotnetCampus.SourcePerformance
 
         private void OnContentRendered(object sender, EventArgs e)
         {
-            var elapsed = _counter.Elapsed;
-            StartupTimeRun.Text = elapsed.ToString();
+            _counter.Complete();
+            FrameworkRun.Text = _counter.FrameworkLoaded.ToString();
+            ExtensionRun.Text = (_counter.ExtensionFound - _counter.FrameworkLoaded).ToString();
+            CompletedRun.Text = (_counter.Completed - _counter.ExtensionFound).ToString();
         }
 
         private readonly PerformanceCounter _counter;

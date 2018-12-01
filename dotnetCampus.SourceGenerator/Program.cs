@@ -37,7 +37,7 @@ using dotnetCampus;
 namespace {@namespace}
 {{
     {attribute}
-    public class {@class}
+    public class {@class} : IInteresting
     {{
         public string Foo {{ get; set; }}
     }}

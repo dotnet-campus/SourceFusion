@@ -12,6 +12,7 @@ namespace dotnetCampus.SourcePerformance
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Services.PerformanceCounter.Framework();
             Services.ExtensionManager.LoadExtensions();
             base.OnStartup(e);
         }
