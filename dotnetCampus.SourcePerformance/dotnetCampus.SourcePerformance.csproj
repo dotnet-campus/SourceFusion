@@ -99,5 +99,15 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dotnetCampus.Core\dotnetCampus.Core.csproj">
+      <Project>{ae4fd05d-c1d5-4301-860f-5f5a54ba48cf}</Project>
+      <Name>dotnetCampus.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\dotnetCampus.Extension\dotnetCampus.Extension.csproj">
+      <Project>{fe1cb601-3baf-4930-994c-3b3874c31cc2}</Project>
+      <Name>dotnetCampus.Extension</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
