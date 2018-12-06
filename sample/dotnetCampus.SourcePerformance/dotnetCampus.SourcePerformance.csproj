@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWpf>True</UseWpf>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>dotnetCampus.SourcePerformance.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dotnetCampus.Core\dotnetCampus.Core.csproj" />
+    <ProjectReference Include="..\dotnetCampus.Extension\dotnetCampus.Extension.csproj" />
+  </ItemGroup>
+</Project>
