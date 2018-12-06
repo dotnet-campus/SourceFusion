@@ -1,21 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWpf>True</UseWpf>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
-    <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
     <StartupObject>dotnetCampus.SourcePerformance.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
-    <Page Include="**\*.xaml" Exclude="App.xaml" SubType="Designer" Generator="MSBuild:Compile" />
     <ProjectReference Include="..\dotnetCampus.Core\dotnetCampus.Core.csproj" />
     <ProjectReference Include="..\dotnetCampus.Extension\dotnetCampus.Extension.csproj" />
-    <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>
