@@ -12,7 +12,7 @@ namespace dotnetCampus.SourceGenerator
             foreach (var arg in args)
             {
                 var path = Path.GetFullPath(arg);
-                Generate(path, 20000, 100);
+                Generate(path, classCount: 20000, attributedCount: 100);
             }
         }
 
