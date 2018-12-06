@@ -5,7 +5,7 @@
     <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>codet</AssemblyName>
-    <PackageId>SourceFusion</PackageId>
+    <PackageId>dotnetCampus.SourceFusion</PackageId>
     <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
