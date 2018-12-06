@@ -26,7 +26,8 @@ namespace dotnetCampus.SourceGenerator
             {
                 var @namespace = generator.Generate();
                 var @class = generator.Generate();
-                var attribute = attributedCount-- > 0 ? "[Interesting]" : "";
+                var attribute = attributedCount-- > 0 ? @"
+    [Interesting]" : "";
 
                 var code = $@"
 using System;
@@ -35,15 +36,20 @@ using System.Text;
 using dotnetCampus;
 
 namespace {@namespace}
-{{
-    {attribute}
+{{{attribute}
     public class {@class} : IInteresting
     {{
         public string Foo {{ get; set; }}
     }}
 }}";
 
-                File.WriteAllText(Path.Combine(folder.FullName, @class + ".cs"), code);
+                var directory = Path.Combine(folder.FullName, (i % 100).ToString().PadLeft(2, '0'));
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                File.WriteAllText(Path.Combine(directory, @class + ".cs"), code);
             }
         }
 
