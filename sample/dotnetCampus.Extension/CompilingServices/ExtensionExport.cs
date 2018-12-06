@@ -10,7 +10,9 @@ namespace dotnetCampus.CompilingServices
         public IReadOnlyList<IInteresting> Interestings = Placeholder.Array<IInteresting>(context =>
         {
             return new CompileCodeSnippet(@"new {0}(),
-", context.Assembly.GetTypes().Where(type => type.Attributes.Any(x => x.Match("Interesting"))).Select(x => x.FullName));
+", context.Assembly.GetTypes()
+                .Where(type => type.Attributes.Any(x => x.Match("Interesting")))
+                .Select(x => x.FullName));
         });
     }
 }
