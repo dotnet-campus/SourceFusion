@@ -1,0 +1,25 @@
+﻿<Window x:Class="dotnetCampus.SourcePerformance.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:dotnetCampus.SourcePerformance"
+        mc:Ignorable="d" Height="450" Width="800"
+        Title="dotnetCampus.Performance">
+    <Grid>
+        <TextBlock x:Name="StartupTimeTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="40" FontFamily="Microsoft YaHei" TextAlignment="Center">
+            <Run Text="框架启动" FontWeight="Thin" />
+            <LineBreak />
+            <Run x:Name="FrameworkRun" Text="……" />
+            <LineBreak />
+            <Run Text="发现插件" FontWeight="Thin" />
+            <LineBreak />
+            <Run x:Name="ExtensionRun" FontSize="60" FontWeight="Bold" Text="……" />
+            <LineBreak />
+            <Run Text="窗口启动" FontWeight="Thin" />
+            <LineBreak />
+            <Run x:Name="CompletedRun" Text="……" />
+        </TextBlock>
+    </Grid>
+</Window>

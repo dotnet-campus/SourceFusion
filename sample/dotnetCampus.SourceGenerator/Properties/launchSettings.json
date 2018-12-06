@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "dotnetCampus.SourceGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": ".\\dotnetCampus.Extension\\Extensions",
+      "workingDirectory": ".."
+    }
+  }
+}
