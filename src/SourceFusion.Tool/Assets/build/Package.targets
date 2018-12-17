@@ -15,7 +15,8 @@
   <!--第一阶段，创建 SourceFusion 需要的文件夹-->
   <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
     <PropertyGroup>
-      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</SourceFusionWorkingFolder>
+      <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
       <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
       <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
