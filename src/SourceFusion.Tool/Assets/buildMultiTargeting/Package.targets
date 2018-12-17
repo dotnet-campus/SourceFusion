@@ -4,6 +4,6 @@
     <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj\$(Configuration)\$(TargetFramework)\</SourceFusionWorkingFolder>
   </PropertyGroup>
 
-  <Import Project="..\build\SourceFusion.targets" />
+  <Import Project="..\build\dotnetCampus.SourceFusion.targets" />
 
 </Project>
