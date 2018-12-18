@@ -1,16 +1,17 @@
 ﻿<Project>
 
-  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
-    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\net47\codet.exe</TransformCodeToolPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-    <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-    <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
-  </PropertyGroup>
+  <!--第二阶段，创建 SourceFusion 需要的文件夹-->
+  <Target Name="_SourceFusionEnsureToolPath" BeforeTargets="SourceFusionGenerateCode">
+    <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
+      <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\net47\codet.exe</TransformCodeToolPath>
+    </PropertyGroup>
+    <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
+      <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
+    </PropertyGroup>
+    <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
+      <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+    </PropertyGroup>
+  </Target>
 
   <!--第一阶段，创建 SourceFusion 需要的文件夹-->
   <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
