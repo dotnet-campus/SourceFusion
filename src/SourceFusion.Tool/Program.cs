@@ -18,7 +18,7 @@ namespace dotnetCampus.SourceFusion
         private static int Main(string[] args)
         {
             if (!Debugger.IsAttached
-                && args.Any(x => x.Equals("--DebugMode", StringComparison.CurrentCultureIgnoreCase)))
+                && args.Any(x => x.Equals("--debug-mode", StringComparison.CurrentCultureIgnoreCase)))
             {
                 Debugger.Launch();
             }

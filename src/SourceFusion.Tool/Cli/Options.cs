@@ -25,7 +25,7 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('r', Default = true, HelpText = "如果需要重新生成，则指定为 true。")]
         public bool RebuildRequired { get; set; }
 
-        [Option(Default = false, HelpText = "如果指定，将在启动编译时进入调试模式。")]
+        [Option("debug-mode", Default = false, HelpText = "如果指定，将在启动编译时进入调试模式。")]
         public bool DebugMode { get; set; }
     }
 }
