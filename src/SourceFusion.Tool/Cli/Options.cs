@@ -19,6 +19,9 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('f', Required = true, HelpText = "只分析指定（正则表达式）名称的文件。")]
         public string FilterFiles { get; set; }
 
+        [Option("define-constants", Required = true, HelpText = "指定条件编译符。")]
+        public string DefineConstants { get; set; }
+
         [Option('r', Default = true, HelpText = "如果需要重新生成，则指定为 true。")]
         public bool RebuildRequired { get; set; }
 
