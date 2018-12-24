@@ -49,13 +49,16 @@
   <!--第二阶段，进行重新编译测试-->
   <Target Name="_SourceFusionRebuildingTest" BeforeTargets="SourceFusionGenerateCode"
           Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
-    <PropertyGroup>
-      <SourceFusionRebuildRequired >true</SourceFusionRebuildRequired>
-    </PropertyGroup>
     <ItemGroup>
       <RebuildingTestLine Include="true" />
     </ItemGroup>
+    <CallTarget Targets="_SourceFusionRebuildingTestInitialize" />
     <WriteLinesToFile File="$(SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
+  </Target>
+  <Target Name="_SourceFusionRebuildingTestInitialize">
+    <PropertyGroup>
+      <SourceFusionRebuildRequired>true</SourceFusionRebuildRequired>
+    </PropertyGroup>
   </Target>
 
   <!--第三阶段，执行 SourceFusion-->
