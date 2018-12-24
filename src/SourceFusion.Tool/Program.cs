@@ -112,7 +112,11 @@ namespace dotnetCampus.SourceFusion
             {
                 if (error is UnknownOptionError uoe)
                 {
-                    Console.WriteLine($"error: SourceFusion 参数错误：错误的参数名称 {uoe.Token}。");
+                    Console.WriteLine($"error: SourceFusion 参数错误：不能识别的参数 {uoe.Token}。");
+                }
+                else if (error is MissingRequiredOptionError mroe)
+                {
+                    Console.WriteLine($"error: SourceFusion 参数错误：缺少必需的参数 {mroe.NameInfo.LongName}。");
                 }
                 else
                 {
