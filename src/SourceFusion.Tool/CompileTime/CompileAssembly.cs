@@ -14,11 +14,13 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// 创建编译找到程序集
         /// </summary>
         /// <param name="compileFiles"></param>
-        public CompileAssembly(IEnumerable<string> compileFiles)
+        /// <param name="preprocessorSymbols"></param>
+        public CompileAssembly(IEnumerable<string> compileFiles, string preprocessorSymbols)
         {
+            var symbols = preprocessorSymbols.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
             _compileFilesLazy = new Lazy<List<CompileFile>>
             (
-                () => compileFiles.Select(x => new CompileFile(x)).ToList(),
+                () => compileFiles.Select(x => new CompileFile(x, symbols)).ToList(),
                 LazyThreadSafetyMode.ExecutionAndPublication
             );
         }

@@ -17,12 +17,14 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// 创建 <see cref="CompileFile"/> 的新实例，通过此实例可以获取文件中的相关类型信息。
         /// </summary>
         /// <param name="fullName"></param>
-        public CompileFile(string fullName)
+        /// <param name="preprocessorSymbols"></param>
+        public CompileFile(string fullName, IEnumerable<string> preprocessorSymbols)
         {
             FullName = fullName;
             Name = Path.GetFileName(fullName);
             var originalText = File.ReadAllText(fullName);
-            _syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+            _syntaxTree = CSharpSyntaxTree.ParseText(originalText, new CSharpParseOptions(
+                LanguageVersion.Latest, DocumentationMode.None, SourceCodeKind.Regular, preprocessorSymbols));
 
             var compileTypeVisitor = new CompileTypeVisitor();
             compileTypeVisitor.Visit(_syntaxTree.GetRoot());

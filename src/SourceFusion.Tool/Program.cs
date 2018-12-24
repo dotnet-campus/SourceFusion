@@ -75,7 +75,7 @@ namespace dotnetCampus.SourceFusion
                     return 0;
                 }
 
-                var assembly = new CompileAssembly(compilingFiles);
+                var assembly = new CompileAssembly(compilingFiles, options.PreprocessorSymbols);
 
                 // 分析 IPlainCodeTransformer。
                 var transformer = new CodeTransformer(workingFolder, generatedCodeFolder, assembly);
