@@ -4,7 +4,7 @@ namespace dotnetCampus.SourceFusion.Cli
 {
     internal class Options
     {
-        [Option('p', Required = true, HelpText = "转换源码的工作路径。")]
+        [Value(0, HelpText = "转换源码的工作路径。")]
         public string WorkingFolder { get; set; }
 
         [Option('i', Required = true, HelpText = "SourceFusion 可以使用的临时文件夹路径。")]
@@ -19,7 +19,7 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('f', Required = true, HelpText = "只分析指定（正则表达式）名称的文件。")]
         public string FilterFiles { get; set; }
 
-        [Option("preprocessor-symbols", Required = true, HelpText = "指定条件编译符。")]
+        [Option('p', "preprocessor-symbols", Required = true, HelpText = "指定条件编译符。")]
         public string PreprocessorSymbols { get; set; }
 
         [Option('r', Default = true, HelpText = "如果需要重新生成，则指定为 true。")]
