@@ -9,7 +9,7 @@
       <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
     </PropertyGroup>
     <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-      <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.0\codet.dll</TransformCodeToolPath>
+      <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\codet.dll</TransformCodeToolPath>
     </PropertyGroup>
   </Target>
 
@@ -67,7 +67,7 @@
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; -p &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -r $(SourceFusionRebuildRequired)">
+          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -p $(DefineConstants) -r $(SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
     </Exec>

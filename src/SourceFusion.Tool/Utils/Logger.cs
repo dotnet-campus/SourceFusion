@@ -36,12 +36,12 @@ namespace dotnetCampus.SourceFusion.Utils
 
         public void Warning(string text)
         {
-            Message($"warning:{text}", ConsoleColor.Yellow);
+            Message($"warning: {text}", ConsoleColor.Yellow);
         }
 
         public void Error(string text)
         {
-            Message($"warning:{text}", ConsoleColor.Red);
+            Message($"error: {text}", ConsoleColor.Red);
         }
 
         public void Error(Exception exception)
@@ -50,7 +50,7 @@ namespace dotnetCampus.SourceFusion.Utils
             {
                 foreach (var error in ce.Errors)
                 {
-                    Error(ce);
+                    Error(error);
                 }
             }
             else if (exception is AggregateException ae)
