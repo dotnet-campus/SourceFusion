@@ -35,6 +35,9 @@ namespace dotnetCampus.SourceFusion
         public CompileCodeSnippet(string template, IEnumerable<(string, string, string, string)> placeholders)
             => _snippet = BuildSnippet(placeholders, v => string.Format(template, v.Item1, v.Item2, v.Item3, v.Item4));
 
+        public CompileCodeSnippet(string template, IEnumerable<(string, string, string, string, string)> placeholders)
+            => _snippet = BuildSnippet(placeholders, v => string.Format(template, v.Item1, v.Item2, v.Item3, v.Item4, v.Item5));
+
         /// <summary>
         /// 输出代码片段。
         /// </summary>

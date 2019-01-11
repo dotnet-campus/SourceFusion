@@ -12,14 +12,23 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// Initialize a new instance of the <see cref="CompileAttribute"/>.
         /// </summary>
         /// <param name="name">The identifier name of the Attribute.</param>
+        /// <param name="propertyValues"></param>
         public CompileAttribute(string name, IEnumerable<KeyValuePair<string, string>> propertyValues = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
+
             if (propertyValues != null)
             {
                 foreach (var pair in propertyValues)
                 {
-                    _propertyDictionary.Add(pair.Key, pair.Value);
+                    if (pair.Key == null)
+                    {
+                        _values.Add(pair.Value);
+                    }
+                    else
+                    {
+                        _propertyValues.Add(pair.Key, pair.Value);
+                    }
                 }
             }
         }
@@ -32,17 +41,20 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// <summary>
         /// Gets or sets the properties of the Attribute.
         /// </summary>
+        /// <param name="valueIndex">The value index name of the Attribute.</param>
+        /// <returns></returns>
+        public string this[int valueIndex] => _values.Count > valueIndex ? _values[valueIndex] : "";
+
+        /// <summary>
+        /// Gets or sets the properties of the Attribute.
+        /// </summary>
         /// <param name="propertyName">The property name of the Attribute.</param>
         /// <returns></returns>
-        public string this[string propertyName]
-        {
-            get => _propertyDictionary.TryGetValue(
+        public string this[string propertyName] =>
+            _propertyValues.TryGetValue(
                 propertyName ?? throw new ArgumentNullException(nameof(propertyName)), out var value)
                 ? value
                 : "";
-            internal set => _propertyDictionary
-                [propertyName ?? throw new ArgumentNullException(nameof(propertyName))] = value;
-        }
 
         /// <summary>
         /// Check whether this <see cref="CompileAttribute"/> indicate the runtime version of <typeparamref name="TAttribute"/>.
@@ -88,7 +100,8 @@ namespace dotnetCampus.SourceFusion.CompileTime
             return Name == attributeName;
         }
 
-        private readonly Dictionary<string, string> _propertyDictionary = new Dictionary<string, string>();
+        private readonly List<string> _values = new List<string>();
+        private readonly Dictionary<string, string> _propertyValues = new Dictionary<string, string>();
     }
 
     /// <summary>

@@ -213,7 +213,7 @@ namespace dotnetCampus.SourceFusion.Syntax
                         var property = a.NameEquals?.Name.Identifier.ToString();
                         var value = a.Expression.ToString();
                         return new KeyValuePair<string, string>(property, value);
-                    }).Where(pair => pair.Key != null)))
+                    })))
                 .Cast<ICompileAttribute>().ToArray();
         }
 
