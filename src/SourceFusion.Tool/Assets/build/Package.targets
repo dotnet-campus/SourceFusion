@@ -85,4 +85,19 @@
     <Message Text="编译时排除的文件：@(_ExcludedCompileFile)" />
   </Target>
 
+  <PropertyGroup>
+    <CleanDependsOn>$(CleanDependsOn);_SourceFusionClean</CleanDependsOn>
+  </PropertyGroup>
+
+  <!--清理 SourceFusion 计算所得的文件-->
+  <Target Name="_SourceFusionClean">
+    <PropertyGroup>
+      <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
+      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
+  </Target>
+
 </Project>
