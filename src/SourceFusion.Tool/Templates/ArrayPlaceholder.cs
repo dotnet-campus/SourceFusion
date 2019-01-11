@@ -3,7 +3,7 @@
 namespace dotnetCampus.SourceFusion.Templates
 {
     /// <summary>
-    /// 包含占位符在语法树中的信息。
+    /// 包含 <see cref="Placeholder.Array{T}"/> 占位符在语法树中的信息。
     /// </summary>
     internal class ArrayPlaceholder
     {
