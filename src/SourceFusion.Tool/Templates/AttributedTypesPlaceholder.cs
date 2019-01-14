@@ -10,21 +10,25 @@ namespace dotnetCampus.SourceFusion.Templates
     /// </summary>
     internal class AttributedTypesPlaceholder : PlaceholderInfo
     {
-        private readonly bool _useMetadata;
         private readonly string _baseType;
         private readonly string _attributeType;
 
-        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType,
-            bool useMetadata = false) : base(span)
+        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType) : base(span)
         {
             _baseType = baseType;
             _attributeType = attributeType;
         }
 
+        /// <summary>
+        /// 获取或设置用户是否使用了 <see cref="Placeholder.AttributedTypes{T, TAttribute}"/> 的返回值中提供的额外元数据。
+        /// 如果使用了额外的元数据，那么就必须生成这些元数据，否则就不要生成这些元数据。
+        /// </summary>
+        internal bool UseMetadata { get; set; }
+
         public override string Fill(CompilingContext context)
         {
             var collectedItems = CollectAttributedTypes(context);
-            return _useMetadata
+            return UseMetadata
                 // 如果使户使用了元数据，那么就生成更多的信息供用户调用。
                 ? $@"new (Type, new List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
             {{
