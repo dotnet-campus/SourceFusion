@@ -15,6 +15,15 @@ namespace dotnetCampus.SourceFusion
             Errors = errors.ToList();
         }
 
+        /// <summary>
+        /// 创建编译时异常
+        /// </summary>
+        /// <param name="errors"></param>
+        public CompilingException(params string[] errors)
+        {
+            Errors = errors;
+        }
+
         public IReadOnlyList<string> Errors { get; }
     }
 }

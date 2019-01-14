@@ -68,7 +68,7 @@ public static class PlaceholderImpl
         /// <param name="placeholder">包含表达式树中解析出来的占位符信息。</param>
         /// <param name="context">编译期代码执行所需的上下文信息。</param>
         /// <returns>占位符中的编译期代码执行后得到的代码片段字符串。</returns>
-        internal static string Execute(this ArrayPlaceholder placeholder, ICompilingContext context)
+        internal static string Invoke(this ArrayPlaceholder placeholder, ICompilingContext context)
         {
             var lambda = placeholder.Compile();
             var codeSnippet = lambda(context);

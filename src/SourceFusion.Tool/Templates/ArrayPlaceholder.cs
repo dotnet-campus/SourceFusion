@@ -5,7 +5,7 @@ namespace dotnetCampus.SourceFusion.Templates
     /// <summary>
     /// 包含 <see cref="Placeholder.Array{T}"/> 占位符在语法树中的信息。
     /// </summary>
-    internal class ArrayPlaceholder
+    internal class ArrayPlaceholder : PlaceholderInfo
     {
         /// <summary>
         /// 初始化 <see cref="ArrayPlaceholder"/> 的新实例。
@@ -16,8 +16,8 @@ namespace dotnetCampus.SourceFusion.Templates
         /// <param name="invocationBody">占位符中需要在编译期间执行的方法体。</param>
         internal ArrayPlaceholder(TextSpan span, string methodName,
             string invocationParameterName, string invocationBody, string returnType)
+            : base(span)
         {
-            Span = span;
             MethodName = methodName;
             InvocationParameterName = invocationParameterName;
             InvocationBody = invocationBody;
@@ -43,10 +43,23 @@ namespace dotnetCampus.SourceFusion.Templates
         /// 获取占位符的返回值单项类型。
         /// </summary>
         public string ReturnType { get; }
+    }
+
+    internal abstract class PlaceholderInfo
+    {
+        protected PlaceholderInfo(TextSpan span)
+        {
+            Span = span;
+        }
 
         /// <summary>
         /// 获取占位符在源代码文件中的文本区间。
         /// </summary>
         public TextSpan Span { get; }
+
+        public string Execute(CompilingContext context)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

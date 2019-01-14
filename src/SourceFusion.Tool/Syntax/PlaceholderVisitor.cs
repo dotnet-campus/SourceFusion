@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using dotnetCampus.SourceFusion.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,7 +16,7 @@ namespace dotnetCampus.SourceFusion.Syntax
         /// <summary>
         /// 在调用 <see cref="CSharpSyntaxRewriter.Visit"/> 方法后，可通过此属性获取从语法树中解析得到的占位符（<see cref="Placeholder"/>）信息。
         /// </summary>
-        internal IReadOnlyCollection<ArrayPlaceholder> Placeholders => _placeholders;
+        internal IReadOnlyCollection<PlaceholderInfo> Placeholders => _placeholders;
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -24,17 +26,56 @@ namespace dotnetCampus.SourceFusion.Syntax
                 var expression = memberAccessExpression.Expression.ToString();
                 if (expression == nameof(Placeholder) && memberAccessExpression.Name is GenericNameSyntax genericName)
                 {
+                    var textSpan = node.FullSpan;
+
                     // Placeholder 已确认，调用泛型方法已确认。
                     var methodName = genericName.Identifier.ToString();
-                    var returnType = ((IdentifierNameSyntax) genericName.TypeArgumentList.Arguments.First())
-                        .Identifier.ToString();
-                    if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression
-                        is SimpleLambdaExpressionSyntax lambdaExpression)
+
+                    switch (methodName)
                     {
-                        // 参数列表为 Lambda 表达式已确认。
-                        var parameter = lambdaExpression.Parameter.Identifier.ToString();
-                        var body = lambdaExpression.Body.ToString();
-                        _placeholders.Add(new ArrayPlaceholder(node.FullSpan, methodName, parameter, body, returnType));
+                        case nameof(Placeholder.Array):
+                        {
+                            var returnType = ((IdentifierNameSyntax) genericName.TypeArgumentList.Arguments.First())
+                                .Identifier.ToString();
+                            if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression
+                                is SimpleLambdaExpressionSyntax lambdaExpression)
+                            {
+                                // 参数列表为 Lambda 表达式已确认。
+                                var parameter = lambdaExpression.Parameter.Identifier.ToString();
+                                var body = lambdaExpression.Body.ToString();
+                                _placeholders.Add(new ArrayPlaceholder(textSpan, methodName, parameter, body,
+                                    returnType));
+                            }
+
+                            break;
+                        }
+                        case nameof(Placeholder.AttributedTypes):
+                        {
+                            var genericTypes = genericName.TypeArgumentList.Arguments
+                                .OfType<IdentifierNameSyntax>().Select(x=>x.Identifier.ToString()).ToList();
+                            // 这里的 2 是 AttributedTypes 方法的两个泛型参数，只要不是两个泛型参数就是错误。
+                            if (genericTypes.Count != 2)
+                            {
+                                throw new CompilingException("Placeholder.AttributedTypes<T, Attribute> 必须有两个类型参数。");
+                            }
+
+                            var attributeType = genericTypes[1];
+
+                            var returnType = ((IdentifierNameSyntax) genericName.TypeArgumentList.Arguments.First())
+                                .Identifier.ToString();
+                            if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression
+                                is SimpleLambdaExpressionSyntax lambdaExpression)
+                            {
+                                // 参数列表为 Lambda 表达式已确认。
+                                var parameter = lambdaExpression.Parameter.Identifier.ToString();
+                                var body = lambdaExpression.Body.ToString();
+                                // _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
+                            }
+
+                            break;
+                        }
+                        default:
+                            break;
                     }
                 }
             }
@@ -42,10 +83,10 @@ namespace dotnetCampus.SourceFusion.Syntax
             return base.VisitInvocationExpression(node);
         }
 
+
         /// <summary>
         /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
         /// </summary>
-        private readonly List<ArrayPlaceholder> _placeholders = new List<ArrayPlaceholder>();
-
+        private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
     }
 }
