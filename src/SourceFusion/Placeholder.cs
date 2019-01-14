@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace dotnetCampus.SourceFusion
 {
@@ -27,7 +26,7 @@ namespace dotnetCampus.SourceFusion
         public static extern T[] Array<T>(Func<ICompilingContext, string> compileTimeCodeGenerator);
 
         [CompileTimeMethod]
-        public static extern IReadOnlyList<(Type type, TAttribute attribute)> AttributedTypes<T, TAttribute>()
+        public static extern AttributedTypeMetadataCollection<T, TAttribute> AttributedTypes<T, TAttribute>()
             where TAttribute : Attribute;
     }
 }
