@@ -27,7 +27,7 @@ namespace dotnetCampus.SourceFusion
         public static extern T[] Array<T>(Func<ICompilingContext, string> compileTimeCodeGenerator);
 
         [CompileTimeMethod]
-        public static extern IReadOnlyList<(Func<T> creator, TAttribute attribute)> AttributedTypes<T, TAttribute>()
+        public static extern IReadOnlyList<(Type type, TAttribute attribute)> AttributedTypes<T, TAttribute>()
             where TAttribute : Attribute;
     }
 }
