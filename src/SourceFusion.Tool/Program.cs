@@ -60,7 +60,8 @@ namespace dotnetCampus.SourceFusion
         {
             try
             {
-                var (workingFolder, intermediateFolder, generatedCodeFolder, compilingFiles) = DeconstructPaths(options);
+                var (workingFolder, intermediateFolder, generatedCodeFolder, compilingFiles, referencingFiles) =
+                    DeconstructPaths(options);
                 var rebuildRequired = options.RebuildRequired;
                 var cachedExcludesListFile = Path.Combine(intermediateFolder, "Excludes.txt");
 
@@ -75,7 +76,7 @@ namespace dotnetCampus.SourceFusion
                     return 0;
                 }
 
-                var assembly = new CompileAssembly(compilingFiles, options.PreprocessorSymbols);
+                var assembly = new CompileAssembly(compilingFiles, referencingFiles, options.PreprocessorSymbols);
 
                 // 分析 IPlainCodeTransformer。
                 var transformer = new CodeTransformer(workingFolder, generatedCodeFolder, assembly);
@@ -132,27 +133,18 @@ namespace dotnetCampus.SourceFusion
             string workingFolder,
             string intermediateFolder,
             string generatedCodesFolder,
-            string[] compilingFiles)
+            string[] compilingFiles,
+            string[] referencingFiles)
             DeconstructPaths(Options options)
         {
             var workingFolder = Path.GetFullPath(options.WorkingFolder);
 
-            var intermediateFolder = Path.IsPathRooted(options.IntermediateFolder)
-                ? Path.GetFullPath(options.IntermediateFolder)
-                : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.IntermediateFolder));
+            var intermediateFolder = FullPath(options.IntermediateFolder);
+            var generatedCodesFolder = FullPath(options.GeneratedCodeFolder);
 
-            var generatedCodesFolder = Path.IsPathRooted(options.GeneratedCodeFolder)
-                ? Path.GetFullPath(options.GeneratedCodeFolder)
-                : Path.GetFullPath(Path.Combine(options.WorkingFolder, options.GeneratedCodeFolder));
-
-            var compilingFiles = File.ReadAllLines(options.CompilingFiles)
-                .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
-                .ToArray();
-
+            var compilingFiles = File.ReadAllLines(options.CompilingFiles).Select(FullPath).ToArray();
             var filterFiles = File.Exists(options.FilterFiles)
-                ? File.ReadAllLines(options.FilterFiles)
-                    .Select(x => Path.GetFullPath(Path.Combine(workingFolder, x)))
-                    .ToArray()
+                ? File.ReadAllLines(options.FilterFiles).Select(FullPath).ToArray()
                 : new string[0];
 
             // filterFiles 是仅需扫描的文件，用 compilingFiles 取一下交集，可以避免被移除的文件也加入编译范围。
@@ -160,7 +152,13 @@ namespace dotnetCampus.SourceFusion
                 ? compilingFiles.Intersect(filterFiles).ToArray()
                 : compilingFiles;
 
-            return (workingFolder, intermediateFolder, generatedCodesFolder, filteredCompilingFiles);
+            var referencingFiles = File.ReadAllLines(options.References).Select(FullPath).ToArray();
+
+            return (workingFolder, intermediateFolder, generatedCodesFolder, filteredCompilingFiles, referencingFiles);
+
+            string FullPath(string path) => Path.IsPathRooted(path)
+                ? Path.GetFullPath(path)
+                : Path.GetFullPath(Path.Combine(options.WorkingFolder, path));
         }
     }
 }

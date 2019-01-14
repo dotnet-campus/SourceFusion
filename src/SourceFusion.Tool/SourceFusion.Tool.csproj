@@ -47,5 +47,5 @@
       <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
     </ItemGroup>
   </Target>
-  
+
 </Project>

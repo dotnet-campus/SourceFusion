@@ -16,10 +16,12 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// <summary>
         /// 创建 <see cref="CompileFile"/> 的新实例，通过此实例可以获取文件中的相关类型信息。
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="fullName"></param>
         /// <param name="preprocessorSymbols"></param>
-        public CompileFile(string fullName, IEnumerable<string> preprocessorSymbols)
+        public CompileFile(CompilingContext context, string fullName, IEnumerable<string> preprocessorSymbols)
         {
+            _context = context;
             FullName = fullName;
             Name = Path.GetFileName(fullName);
             var originalText = File.ReadAllText(fullName);
@@ -53,9 +55,10 @@ namespace dotnetCampus.SourceFusion.CompileTime
         public Type[] Compile()
         {
             var assemblyName = $"{Name}.g";
-            return _syntaxTree.Compile(assemblyName);
+            return _syntaxTree.Compile(_context.References, assemblyName);
         }
 
         private readonly SyntaxTree _syntaxTree;
+        private readonly CompilingContext _context;
     }
 }

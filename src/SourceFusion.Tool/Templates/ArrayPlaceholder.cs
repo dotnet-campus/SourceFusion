@@ -53,7 +53,7 @@ namespace dotnetCampus.SourceFusion.Templates
 
         public override string Fill(CompilingContext context)
         {
-            var lambda = Compile();
+            var lambda = Compile(context);
             var codeSnippet = lambda(context);
             codeSnippet = $@"new {ReturnType}[]
 {{
@@ -77,13 +77,13 @@ public static class PlaceholderImpl
         /// 将占位符中的在编译期执行的 Lambda 表达式编译成可执行函数。
         /// </summary>
         /// <returns>用于调用占位符中编译期可执行代码的委托。</returns>
-        private Func<ICompilingContext, string> Compile()
+        private Func<ICompilingContext, string> Compile(CompilingContext context)
         {
             var builder = new StringBuilder(ClassTemplate)
                 .Replace("{parameterName}", InvocationParameterName)
                 .Replace("{body}", InvocationBody);
             var syntaxTree = CSharpSyntaxTree.ParseText(builder.ToString());
-            var types = syntaxTree.Compile("PlaceholderInvoking.g");
+            var types = syntaxTree.Compile(context.References, "PlaceholderInvoking.g");
             var placeholderImpl = types.First(x => x.Name == "PlaceholderImpl");
             var method = placeholderImpl.GetMethod("InvokePlaceholder");
             Debug.Assert(method != null, nameof(method) + " != null");
