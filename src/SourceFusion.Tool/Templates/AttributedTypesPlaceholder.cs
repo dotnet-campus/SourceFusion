@@ -13,5 +13,10 @@ namespace dotnetCampus.SourceFusion.Templates
         {
             _attributeType = attributeType;
         }
+
+        public override string Execute(CompilingContext context)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
