@@ -22,10 +22,10 @@ namespace dotnetCampus.SourceFusion.Templates
         public override string Fill(CompilingContext context)
         {
             var collectedItems = CollectAttributedTypes(context);
-            return $@"new (Func<{_baseType}>, {_attributeType})[]
+            return $@"new (Type, {_attributeType})[]
             {{
                 {string.Join(@",
-                ", collectedItems.Select(item => $@"(() => new {item.typeName}(), {item.attributeCreator})"))}
+                ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator})"))}
             }}";
         }
 
