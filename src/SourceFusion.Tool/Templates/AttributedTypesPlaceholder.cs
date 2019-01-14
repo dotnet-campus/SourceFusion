@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using dotnetCampus.SourceFusion.CompileTime;
 using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.SourceFusion.Templates
@@ -20,7 +21,7 @@ namespace dotnetCampus.SourceFusion.Templates
 
         public override string Fill(CompilingContext context)
         {
-            var collectedItems = CollectAttributedTypes();
+            var collectedItems = CollectAttributedTypes(context);
             return $@"new (Func<{_baseType}>, {_attributeType})[]
             {{
                 {string.Join(@",
@@ -32,9 +33,26 @@ namespace dotnetCampus.SourceFusion.Templates
             }}";
         }
 
-        private IEnumerable<(string values, Dictionary<string, string> properties)> CollectAttributedTypes()
+        private IEnumerable<(string values, Dictionary<string, string> properties)> CollectAttributedTypes(
+            CompilingContext context)
         {
+            var file = FindAttributeFile(context, _attributeType);
+
             return Enumerable.Empty<(string, Dictionary<string, string>)>();
+        }
+
+        private ICompileType FindAttributeFile(CompilingContext context, string typeName)
+        {
+            var attribute = new CompileAttribute(typeName);
+            var typeInCurrentAssembly = context.Assembly.GetTypes().FirstOrDefault(x => attribute.Match(x.Name));
+            if (typeInCurrentAssembly != null)
+            {
+                return typeInCurrentAssembly;
+            }
+
+            return new CompileFile(
+                @"D:\Developments\CVTE\EasiNote\Code\Core\EasiNote.Api\EditableProperty\ElementPropertyEditorAttribute.cs",
+                new[] {"DEBUG", "TRACE"}).Types.First();
         }
     }
 }
