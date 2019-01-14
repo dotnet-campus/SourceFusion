@@ -91,13 +91,12 @@ namespace dotnetCampus.SourceFusion.CompileTime
                 return true;
             }
 
-            var index = attributeName.LastIndexOf("Attribute", StringComparison.InvariantCulture);
-            if (index >= 0)
+            if (Name.EndsWith("Attribute"))
             {
-                attributeName = attributeName.Substring(0, index);
+                return Name == attributeName + "Attribute";
             }
 
-            return Name == attributeName;
+            return Name + "Attribute" == attributeName;
         }
 
         private readonly List<string> _values = new List<string>();
