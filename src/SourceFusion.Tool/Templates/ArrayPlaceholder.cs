@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using System;
+using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.SourceFusion.Templates
 {
@@ -59,7 +60,11 @@ namespace dotnetCampus.SourceFusion.Templates
 
         public string Execute(CompilingContext context)
         {
-            throw new System.NotImplementedException();
+            if (this is ArrayPlaceholder placeholder)
+            {
+                placeholder.Invoke(context);
+            }
+            throw new NotImplementedException();
         }
     }
 }

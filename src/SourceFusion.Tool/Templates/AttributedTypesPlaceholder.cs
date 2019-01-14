@@ -7,8 +7,11 @@ namespace dotnetCampus.SourceFusion.Templates
     /// </summary>
     internal class AttributedTypesPlaceholder : PlaceholderInfo
     {
-        public AttributedTypesPlaceholder(TextSpan span) : base(span)
+        private readonly string _attributeType;
+
+        public AttributedTypesPlaceholder(TextSpan span, string attributeType) : base(span)
         {
+            _attributeType = attributeType;
         }
     }
 }

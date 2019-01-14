@@ -69,7 +69,7 @@ namespace dotnetCampus.SourceFusion.Syntax
                                 // 参数列表为 Lambda 表达式已确认。
                                 var parameter = lambdaExpression.Parameter.Identifier.ToString();
                                 var body = lambdaExpression.Body.ToString();
-                                // _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
+                                _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
                             }
 
                             break;
