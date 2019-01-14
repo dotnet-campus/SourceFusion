@@ -55,7 +55,7 @@ namespace dotnetCampus.SourceFusion.Templates
         {
             var lambda = Compile();
             var codeSnippet = lambda(context);
-            codeSnippet = $@" new {ReturnType}[]
+            codeSnippet = $@"new {ReturnType}[]
 {{
 {codeSnippet}}}";
             return codeSnippet;

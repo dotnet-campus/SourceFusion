@@ -51,15 +51,16 @@ namespace dotnetCampus.SourceFusion.Syntax
                         case nameof(Placeholder.AttributedTypes):
                         {
                             var genericTypes = genericName.TypeArgumentList.Arguments
-                                .OfType<IdentifierNameSyntax>().Select(x => x.Identifier.ToString()).ToList();
+                                .Select(x => x.ToString()).ToList();
                             // 这里的 2 是 AttributedTypes 方法的两个泛型参数，只要不是两个泛型参数就是错误。
                             if (genericTypes.Count != 2)
                             {
                                 throw new CompilingException("Placeholder.AttributedTypes<T, Attribute> 必须有两个类型参数。");
                             }
 
+                            var baseType = genericTypes[0];
                             var attributeType = genericTypes[1];
-                            _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
+                            _placeholders.Add(new AttributedTypesPlaceholder(textSpan, baseType, attributeType));
 
                             break;
                         }
