@@ -33,7 +33,7 @@ namespace dotnetCampus.SourceFusion
             {
                 Console.WriteLine($"预编译耗时：{stopwatch.Elapsed}");
                 Console.WriteLine($"调试模式下已暂停，按任意键结束……");
-                Console.Read();
+                Console.ReadKey();
             }
 
             return exitCode;
