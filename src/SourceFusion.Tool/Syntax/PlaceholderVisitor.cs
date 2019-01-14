@@ -43,8 +43,7 @@ namespace dotnetCampus.SourceFusion.Syntax
                                 // 参数列表为 Lambda 表达式已确认。
                                 var parameter = lambdaExpression.Parameter.Identifier.ToString();
                                 var body = lambdaExpression.Body.ToString();
-                                _placeholders.Add(new ArrayPlaceholder(textSpan, methodName, parameter, body,
-                                    returnType));
+                                _placeholders.Add(new ArrayPlaceholder(textSpan, methodName, parameter, body, returnType));
                             }
 
                             break;
@@ -52,7 +51,7 @@ namespace dotnetCampus.SourceFusion.Syntax
                         case nameof(Placeholder.AttributedTypes):
                         {
                             var genericTypes = genericName.TypeArgumentList.Arguments
-                                .OfType<IdentifierNameSyntax>().Select(x=>x.Identifier.ToString()).ToList();
+                                .OfType<IdentifierNameSyntax>().Select(x => x.Identifier.ToString()).ToList();
                             // 这里的 2 是 AttributedTypes 方法的两个泛型参数，只要不是两个泛型参数就是错误。
                             if (genericTypes.Count != 2)
                             {
@@ -60,22 +59,12 @@ namespace dotnetCampus.SourceFusion.Syntax
                             }
 
                             var attributeType = genericTypes[1];
-
-                            var returnType = ((IdentifierNameSyntax) genericName.TypeArgumentList.Arguments.First())
-                                .Identifier.ToString();
-                            if (node.ArgumentList.Arguments.FirstOrDefault()?.Expression
-                                is SimpleLambdaExpressionSyntax lambdaExpression)
-                            {
-                                // 参数列表为 Lambda 表达式已确认。
-                                var parameter = lambdaExpression.Parameter.Identifier.ToString();
-                                var body = lambdaExpression.Body.ToString();
-                                _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
-                            }
+                            _placeholders.Add(new AttributedTypesPlaceholder(textSpan, attributeType));
 
                             break;
                         }
                         default:
-                            break;
+                            throw new CompilingException($"Placeholder 中不包含名为 {methodName} 的方法。");
                     }
                 }
             }
