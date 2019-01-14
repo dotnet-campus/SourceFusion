@@ -10,10 +10,12 @@ namespace dotnetCampus.SourceFusion.Templates
     /// </summary>
     internal class AttributedTypesPlaceholder : PlaceholderInfo
     {
+        private readonly bool _useMetadata;
         private readonly string _baseType;
         private readonly string _attributeType;
 
-        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType) : base(span)
+        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType,
+            bool useMetadata = false) : base(span)
         {
             _baseType = baseType;
             _attributeType = attributeType;
@@ -22,7 +24,15 @@ namespace dotnetCampus.SourceFusion.Templates
         public override string Fill(CompilingContext context)
         {
             var collectedItems = CollectAttributedTypes(context);
-            return $@"new (Type, {_attributeType})[]
+            return _useMetadata
+                // 如果使户使用了元数据，那么就生成更多的信息供用户调用。
+                ? $@"new (Type, new List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
+            {{
+                {string.Join(@",
+                ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator}, () => new {item.typeName}()"))}
+            }}"
+                // 如果用户没有使用元数据，那么就直接返回类型声明的返回值。
+                : $@"new (Type, {_attributeType})[]
             {{
                 {string.Join(@",
                 ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator})"))}
