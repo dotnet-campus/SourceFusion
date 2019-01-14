@@ -18,7 +18,7 @@ namespace dotnetCampus.SourceFusion.Templates
             _attributeType = attributeType;
         }
 
-        public override string Execute(CompilingContext context)
+        public override string Fill(CompilingContext context)
         {
             var collectedItems = CollectAttributedTypes();
             return $@"new (Func<{_baseType}>, {_attributeType})[]

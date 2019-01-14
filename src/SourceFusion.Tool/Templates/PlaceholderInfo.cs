@@ -14,6 +14,6 @@ namespace dotnetCampus.SourceFusion.Templates
         /// </summary>
         public TextSpan Span { get; }
 
-        public abstract string Execute(CompilingContext context);
+        public abstract string Fill(CompilingContext context);
     }
 }

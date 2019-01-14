@@ -51,7 +51,7 @@ namespace dotnetCampus.SourceFusion.Templates
         /// </summary>
         public string ReturnType { get; }
 
-        public override string Execute(CompilingContext context)
+        public override string Fill(CompilingContext context)
         {
             var lambda = Compile();
             var codeSnippet = lambda(context);

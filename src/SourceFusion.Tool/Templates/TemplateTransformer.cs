@@ -61,7 +61,7 @@ namespace dotnetCampus.SourceFusion.Templates
             var placeholders = visitor.Placeholders;
             foreach (var placeholder in placeholders)
             {
-                var actualText = placeholder.Execute(_compilingContext);
+                var actualText = placeholder.Fill(_compilingContext);
 
                 builder.Append(originalText.Substring(currentTextPosition, placeholder.Span.Start));
                 builder.Append(actualText);
