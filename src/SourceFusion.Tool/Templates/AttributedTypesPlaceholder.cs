@@ -25,35 +25,29 @@ namespace dotnetCampus.SourceFusion.Templates
             return $@"new (Func<{_baseType}>, {_attributeType})[]
             {{
                 {string.Join(@",
-            ", collectedItems.Select(item => $@"    (() => new object(), new {_attributeType}({item.values})
-                {{
-                    {string.Join(@",
-            ", item.properties.Select(p => $@"        {p.Key} = {p.Value}"))}
-                }}"))}
+                ", collectedItems.Select(item => $@"(() => new {item.typeName}(), {item.attributeCreator})"))}
             }}";
         }
 
-        private IEnumerable<(string values, Dictionary<string, string> properties)> CollectAttributedTypes(
+        private IEnumerable<(string typeName, string attributeCreator)> CollectAttributedTypes(
             CompilingContext context)
         {
-            var attribute = new CompileAttribute(_attributeType);
-            var typeInCurrentAssembly = context.Assembly.GetTypes().FirstOrDefault(x => attribute.Match(x.Name));
+            IEnumerable<(ICompileType type, CompileAttribute attribute)> collected =
+                from type in context.Assembly.GetTypes()
+                let attribute = (CompileAttribute) type.Attributes.FirstOrDefault(a => a.Match(_attributeType))
+                where attribute != null
+                select (type, attribute);
 
-            if (typeInCurrentAssembly == null)
-            {
-                // 此特性不是本程序集中定义的特性，需要使用反射访问。
-            }
-            else
-            {
-                // 此特性是本程序集中定义的特性，需要使用 Roslyn 访问。
-            }
-
-            return Enumerable.Empty<(string, Dictionary<string, string>)>();
+            return collected.Select(x => (x.type.FullName, ToCreator(x.attribute)));
         }
 
-        //private IEnumerable<(string values, Dictionary<string, string> properties)> CollectByReflection(string typeName)
-        //{
-            
-        //}
+        private string ToCreator(CompileAttribute attribute)
+        {
+            return $@"new {_attributeType}({string.Join(", ", attribute.GetValues())})
+                {{
+                    {string.Join(@",
+                    ", attribute.GetProperties().Select(x => $"{x.property} = {x.value}"))}
+                }}";
+        }
     }
 }

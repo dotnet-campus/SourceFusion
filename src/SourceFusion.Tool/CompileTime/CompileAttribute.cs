@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace dotnetCampus.SourceFusion.CompileTime
 {
@@ -55,6 +56,10 @@ namespace dotnetCampus.SourceFusion.CompileTime
                 propertyName ?? throw new ArgumentNullException(nameof(propertyName)), out var value)
                 ? value
                 : "";
+
+        public IEnumerable<string> GetValues() => _values;
+
+        public IEnumerable<(string property, string value)> GetProperties() => _propertyValues.Select(x=>(x.Key,x.Value));
 
         /// <summary>
         /// Check whether this <see cref="CompileAttribute"/> indicate the runtime version of <typeparamref name="TAttribute"/>.
