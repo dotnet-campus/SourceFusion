@@ -19,10 +19,13 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('f', "filter-files", Required = true, HelpText = "只分析指定（正则表达式）名称的文件。")]
         public string FilterFiles { get; set; }
 
+        [Option('r', "references", Required = true, HelpText = "项目所引用的其他 dll 文件。")]
+        public string References { get; set; }
+
         [Option('p', "preprocessor-symbols", Required = true, HelpText = "指定条件编译符。")]
         public string PreprocessorSymbols { get; set; }
 
-        [Option('r', "rebuild", Default = true, HelpText = "如果需要重新生成，则指定为 true。")]
+        [Option("rebuild", Default = true, HelpText = "如果需要重新生成，则指定为 true。")]
         public bool RebuildRequired { get; set; }
 
         [Option("debug-mode", Default = false, HelpText = "如果指定，将在启动编译时进入调试模式。")]

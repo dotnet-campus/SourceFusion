@@ -50,6 +50,11 @@ namespace dotnetCampus.SourceFusion.Templates
                 return typeInCurrentAssembly;
             }
 
+            // 这里可以有很多种找法，但哪一种都很麻烦：
+            // 1. 使用 Roslyn 提供的 SymbolFinder 来加载解决方案和项目，初步估计每个项目需要增加 30s+ 的编译时间；
+            // 2. 去查找解决方案中所有项目里的文件，可能不准，可能找不到；
+            // 3. 试图加载所有 EN 引用的程序集，通过反射去找，这会限制 SourceFusion 的目标框架。
+
             return new CompileFile(
                 @"D:\Developments\CVTE\EasiNote\Code\Core\EasiNote.Api\EditableProperty\ElementPropertyEditorAttribute.cs",
                 new[] {"DEBUG", "TRACE"}).Types.First();
