@@ -51,7 +51,7 @@
     <PropertyGroup>
       <SourceFusionReferenceArgsFile Condition=" '$(SourceFusionReferenceArgsFile)' == '' ">$(SourceFusionToolsFolder)ReferenceArgs.txt</SourceFusionReferenceArgsFile>
     </PropertyGroup>
-    <WriteLinesToFile File="$(SourceFusionReferenceArgsFile)" Lines="@(Reference)" Overwrite="True" />
+    <WriteLinesToFile File="$(SourceFusionReferenceArgsFile)" Lines="@(ReferencePath)" Overwrite="True" />
   </Target>
 
   <!--第二阶段，进行重新编译测试-->
