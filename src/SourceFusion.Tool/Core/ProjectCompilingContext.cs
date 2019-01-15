@@ -118,7 +118,7 @@ namespace dotnetCampus.SourceFusion.Core
                 }
                 else
                 {
-                    currentValue = $@"{currentValue}
+                    currentValue = currentValue == null ? line.Trim() : $@"{currentValue}
 {line.Trim()}";
                 }
             }
