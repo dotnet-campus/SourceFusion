@@ -65,7 +65,7 @@ namespace dotnetCampus.SourceFusion.Templates
             var visitor = new PlaceholderVisitor();
             visitor.Visit(syntaxTree.GetRoot());
 
-            var builder = new StringBuilder();
+            var builder = new StringBuilder(AssemblyInfo.GeneratedCodeComment);
             var currentTextPosition = 0;
 
             var placeholders = visitor.Placeholders;

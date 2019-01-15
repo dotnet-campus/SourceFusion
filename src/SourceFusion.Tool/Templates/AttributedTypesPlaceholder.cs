@@ -33,7 +33,7 @@ namespace dotnetCampus.SourceFusion.Templates
             var collectedItems = CollectAttributedTypes(context);
             return _useMetadata
                 // 如果使户使用了元数据，那么就生成更多的信息供用户调用。
-                ? $@"new List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
+                ? $@"new System.Collections.Generic.List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
             {{
                 {string.Join(@",
                 ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator}, () => new {item.typeName}())"))}
