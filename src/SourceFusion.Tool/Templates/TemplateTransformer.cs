@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Syntax;
@@ -11,6 +13,9 @@ namespace dotnetCampus.SourceFusion.Templates
 {
     internal class TemplateTransformer
     {
+        private readonly Regex _usingRegex = new Regex(@"using\sdotnetCampus\.SourceFusion[\.\w]*;\r?\n");
+        private readonly Regex _attributeRegex = new Regex(@"\[CompileTimeTemplate\]");
+
         internal TemplateTransformer(string workingFolder, string generatedCodeFolder, CompileAssembly assembly)
         {
             _workingFolder = workingFolder;
@@ -49,8 +54,13 @@ namespace dotnetCampus.SourceFusion.Templates
 
         private string TransformTemplate(CompileFile assemblyFile)
         {
-            // 读取文件，解析其语法树。
+            // 读取文件，去掉非期望字符。
             var originalText = File.ReadAllText(assemblyFile.FullName);
+            originalText = _usingRegex.Replace(originalText, "");
+            originalText = originalText.Replace("[CompileTimeTemplate]",
+                $@"[System.CodeDom.Compiler.GeneratedCode(""{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product}"", ""{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}"")]");
+
+            // 解析其语法树。
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
 
             var visitor = new PlaceholderVisitor();
