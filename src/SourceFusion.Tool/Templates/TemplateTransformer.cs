@@ -57,7 +57,7 @@ namespace dotnetCampus.SourceFusion.Templates
             // 读取文件，去掉非期望字符。
             var originalText = File.ReadAllText(assemblyFile.FullName);
             originalText = _usingRegex.Replace(originalText, "");
-            originalText = originalText.Replace("[CompileTimeTemplate]", AssemblyInfo.GeneratedCodeComment);
+            originalText = originalText.Replace("[CompileTimeTemplate]", AssemblyInfo.GeneratedCodeAttribute);
 
             // 解析其语法树。
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
