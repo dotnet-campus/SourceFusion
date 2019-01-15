@@ -18,7 +18,7 @@ namespace dotnetCampus.SourceFusion.Core
             PreprocessorSymbols = options.PreprocessorSymbols;
 
             // 初始化项目属性。
-            _projectProperties = Deserialize(options.ProjectPropertyFile);
+            _projectProperties = Deserialize(FullPath(options.ProjectPropertyFile));
 
             // 初始化编译文件和引用。
             // filterFiles 是仅需扫描的文件，用 compilingFiles 取一下交集，可以避免被移除的文件也加入编译范围。
@@ -104,7 +104,7 @@ namespace dotnetCampus.SourceFusion.Core
                 {
                     if (currentKey != null)
                     {
-                        keyValue[currentKey] = currentValue;
+                        keyValue[currentKey] = currentValue ?? "";
                     }
 
                     currentKey = null;
@@ -125,7 +125,7 @@ namespace dotnetCampus.SourceFusion.Core
 
             if (currentKey != null)
             {
-                keyValue[currentKey] = currentValue;
+                keyValue[currentKey] = currentValue ?? "";
             }
 
             return keyValue;

@@ -33,17 +33,20 @@
   <Target Name="_SourceFusionWriteArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
       <SourceFusionProjectPropertyFile Condition=" '$(SourceFusionProjectPropertyFile)' == '' ">$(SourceFusionToolsFolder)CommandArgs.txt</SourceFusionProjectPropertyFile>
+      <_SourceFusionCommandArgCompile>@(Compile)</_SourceFusionCommandArgCompile>
+      <_SourceFusionCommandArgPrecompileFilter>@(PrecompileFilter)</_SourceFusionCommandArgPrecompileFilter>
+      <_SourceFusionCommandArgReferencePath>@(ReferencePath)</_SourceFusionCommandArgReferencePath>
     </PropertyGroup>
     <ItemGroup>
       <SourceFusionCommandArgLine Include=">" />
       <SourceFusionCommandArgLine Include="Compile" />
-      <SourceFusionCommandArgLine Include="$(Compile)" />
+      <SourceFusionCommandArgLine Include="$(_SourceFusionCommandArgCompile)" />
       <SourceFusionCommandArgLine Include=">" />
       <SourceFusionCommandArgLine Include="PrecompileFilter" />
-      <SourceFusionCommandArgLine Include="$(PrecompileFilter)" />
+      <SourceFusionCommandArgLine Include="$(_SourceFusionCommandArgPrecompileFilter)" />
       <SourceFusionCommandArgLine Include=">" />
       <SourceFusionCommandArgLine Include="ReferencePath" />
-      <SourceFusionCommandArgLine Include="$(ReferencePath)" />
+      <SourceFusionCommandArgLine Include="$(_SourceFusionCommandArgReferencePath)" />
       <SourceFusionCommandArgLine Include=">" />
     </ItemGroup>
     <WriteLinesToFile File="$(SourceFusionProjectPropertyFile)" Lines="@(SourceFusionCommandArgLine)" Overwrite="True" />
