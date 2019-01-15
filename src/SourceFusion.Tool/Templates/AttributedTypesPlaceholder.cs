@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
@@ -15,27 +14,29 @@ namespace dotnetCampus.SourceFusion.Templates
         private readonly string _baseType;
         private readonly string _attributeType;
 
-        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType) : base(span)
-        {
-            _baseType = baseType;
-            _attributeType = attributeType;
-        }
-
         /// <summary>
         /// 获取或设置用户是否使用了 <see cref="Placeholder.AttributedTypes{T, TAttribute}"/> 的返回值中提供的额外元数据。
         /// 如果使用了额外的元数据，那么就必须生成这些元数据，否则就不要生成这些元数据。
         /// </summary>
-        internal bool UseMetadata { get; set; }
+        private readonly bool _useMetadata;
+
+        public AttributedTypesPlaceholder(TextSpan span, string baseType, string attributeType, bool useMetadata)
+            : base(span)
+        {
+            _baseType = baseType;
+            _attributeType = attributeType;
+            _useMetadata = useMetadata;
+        }
 
         public override string Fill(CompilingContext context)
         {
             var collectedItems = CollectAttributedTypes(context);
-            return UseMetadata
+            return _useMetadata
                 // 如果使户使用了元数据，那么就生成更多的信息供用户调用。
-                ? $@"new (Type, new List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
+                ? $@"new List<(Type Type, {_attributeType} Attribute, Func<{_baseType}> Creator)>
             {{
                 {string.Join(@",
-                ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator}, () => new {item.typeName}()"))}
+                ", collectedItems.Select(item => $@"(typeof({item.typeName}), {item.attributeCreator}, () => new {item.typeName}())"))}
             }}"
                 // 如果用户没有使用元数据，那么就直接返回类型声明的返回值。
                 : $@"new (Type, {_attributeType})[]

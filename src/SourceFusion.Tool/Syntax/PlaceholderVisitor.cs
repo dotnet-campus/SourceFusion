@@ -23,7 +23,7 @@ namespace dotnetCampus.SourceFusion.Syntax
         {
             if (node.Expression is MemberAccessExpressionSyntax memberAccessExpression)
             {
-                // 取出 Placeholder.Array 片段。
+                // 取出 Placeholder.MethodName 片段。
                 var expression = memberAccessExpression.Expression.ToString();
                 if (expression == nameof(Placeholder) && memberAccessExpression.Name is GenericNameSyntax genericName)
                 {
@@ -61,13 +61,16 @@ namespace dotnetCampus.SourceFusion.Syntax
 
                             var baseType = genericTypes[0];
                             var attributeType = genericTypes[1];
-                            _placeholders.Add(new AttributedTypesPlaceholder(textSpan, baseType, attributeType));
+                            _placeholders.Add(new AttributedTypesPlaceholder(textSpan, baseType, attributeType,
+                                _isNextPlaceholderAssigned));
 
                             break;
                         }
                         default:
                             throw new CompilingException($"Placeholder 中不包含名为 {methodName} 的方法。");
                     }
+
+                    _isNextPlaceholderAssigned = false;
                 }
             }
 
@@ -76,14 +79,13 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         public override SyntaxNode VisitEqualsValueClause(EqualsValueClauseSyntax node)
         {
-            //if (node.Expression is MemberAccessExpressionSyntax memberAccessExpression)
-            //{
-            //    // 取出 Placeholder.Array 片段。
-            //    var expression = memberAccessExpression.Expression.ToString();
-            //    if (expression == nameof(Placeholder) && memberAccessExpression.Name is GenericNameSyntax genericName)
-            //    {
-            //    }
-            //}
+            if (node.Value is InvocationExpressionSyntax invocation
+                && invocation.Expression is MemberAccessExpressionSyntax memberAccessExpression
+                && memberAccessExpression.Expression.ToString() == nameof(Placeholder))
+            {
+                // 当这个赋值操作的等号右边是 Placeholder 的时候，标记此时正在使用 Placeholder 赋值。
+                _isNextPlaceholderAssigned = true;
+            }
 
             return base.VisitEqualsValueClause(node);
         }
