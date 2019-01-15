@@ -13,11 +13,13 @@ namespace dotnetCampus.SourceFusion.Templates
 {
     internal class TemplateTransformer
     {
+        private readonly ProjectCompilingContext _context;
         private readonly Regex _usingRegex = new Regex(@"using\sdotnetCampus\.SourceFusion[\.\w]*;\r?\n");
-        private readonly Regex _attributeRegex = new Regex(@"\[CompileTimeTemplate\]");
+        private readonly Regex _projectPropertyRegex = new Regex(@"\$\((?<propertyName>[_\w]+)\)");
 
         internal TemplateTransformer(ProjectCompilingContext context)
         {
+            _context = context;
             _workingFolder = context.WorkingFolder;
             _generatedCodeFolder = context.GeneratedCodeFolder;
             _assembly = context.Assembly;
@@ -56,8 +58,14 @@ namespace dotnetCampus.SourceFusion.Templates
         {
             // 读取文件，去掉非期望字符。
             var originalText = File.ReadAllText(assemblyFile.FullName);
-            originalText = _usingRegex.Replace(originalText, "");
             originalText = originalText.Replace("[CompileTimeTemplate]", AssemblyInfo.GeneratedCodeAttribute);
+            originalText = _usingRegex.Replace(originalText, "");
+            foreach (Match match in _projectPropertyRegex.Matches(originalText))
+            {
+                var propertyName = match.Groups["propertyName"].Value;
+                var propertyValue = _context.GetProperty(propertyName);
+                originalText = originalText.Replace(match.Value, propertyValue);
+            }
 
             // 解析其语法树。
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);

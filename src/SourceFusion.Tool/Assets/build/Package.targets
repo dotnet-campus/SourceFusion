@@ -36,6 +36,9 @@
     </PropertyGroup>
     <ItemGroup>
       <SourceFusionCommandArgLine Include=">" />
+      <SourceFusionCommandArgLine Include="RootNamespace" />
+      <SourceFusionCommandArgLine Include="$(RootNamespace)" />
+      <SourceFusionCommandArgLine Include=">" />
       <SourceFusionCommandArgLine Include="Compile" />
       <SourceFusionCommandArgLine Include="@(Compile)" />
       <SourceFusionCommandArgLine Include=">" />
