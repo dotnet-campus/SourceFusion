@@ -75,7 +75,7 @@
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompileArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -r &quot;$(SourceFusionReferenceArgsFile)&quot; -p $(DefineConstants) --rebuild $(SourceFusionRebuildRequired) --debug-mode">
+          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompileArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -r &quot;$(SourceFusionReferenceArgsFile)&quot; -p $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
     </Exec>
