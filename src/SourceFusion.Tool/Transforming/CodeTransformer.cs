@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using dotnetCampus.SourceFusion.CompileTime;
+using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Properties;
 
 namespace dotnetCampus.SourceFusion.Transforming
@@ -17,14 +18,12 @@ namespace dotnetCampus.SourceFusion.Transforming
         /// <summary>
         /// 创建用于转换源码的 <see cref="CodeTransformer"/>。
         /// </summary>
-        /// <param name="workingFolder">转换源码的工作路径。</param>
-        /// <param name="generatedCodeFolder">中间文件的生成路径（文件夹，相对路径）。</param>
-        /// <param name="assembly">需要分析源码转换的程序集。</param>
-        internal CodeTransformer(string workingFolder, string generatedCodeFolder, CompileAssembly assembly)
+        /// <param name="context">项目工作区上下文信息。</param>
+        internal CodeTransformer(ProjectCompilingContext context)
         {
-            _workingFolder = workingFolder;
-            _generatedCodeFolder = generatedCodeFolder;
-            _assembly = assembly;
+            _workingFolder = context.WorkingFolder;
+            _generatedCodeFolder = context.GeneratedCodeFolder;
+            _assembly = context.Assembly;
         }
         
         /// <summary>

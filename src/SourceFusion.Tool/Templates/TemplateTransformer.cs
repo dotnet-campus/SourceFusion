@@ -16,12 +16,12 @@ namespace dotnetCampus.SourceFusion.Templates
         private readonly Regex _usingRegex = new Regex(@"using\sdotnetCampus\.SourceFusion[\.\w]*;\r?\n");
         private readonly Regex _attributeRegex = new Regex(@"\[CompileTimeTemplate\]");
 
-        internal TemplateTransformer(string workingFolder, string generatedCodeFolder, CompileAssembly assembly)
+        internal TemplateTransformer(ProjectCompilingContext context)
         {
-            _workingFolder = workingFolder;
-            _generatedCodeFolder = generatedCodeFolder;
-            _assembly = assembly;
-            _compilingContext = new CompilingContext(assembly);
+            _workingFolder = context.WorkingFolder;
+            _generatedCodeFolder = context.GeneratedCodeFolder;
+            _assembly = context.Assembly;
+            _compilingContext = new CompilingContext(context.Assembly);
         }
 
         public IEnumerable<string> Transform()

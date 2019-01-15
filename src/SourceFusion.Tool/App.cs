@@ -1,9 +1,7 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using dotnetCampus.SourceFusion.Cli;
-using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Templates;
 using dotnetCampus.SourceFusion.Transforming;
@@ -41,10 +39,9 @@ namespace dotnetCampus.SourceFusion
 
         private void RunCore()
         {
-            var (workingFolder, intermediateFolder, generatedCodeFolder, compilingFiles, referencingFiles) =
-                DeconstructPaths(_options);
+            var context = new ProjectCompilingContext(_options);
             var rebuildRequired = _options.RebuildRequired;
-            var cachedExcludesListFile = Path.Combine(intermediateFolder, "Excludes.txt");
+            var cachedExcludesListFile = Path.Combine(context.ToolsFolder, "Excludes.txt");
 
             // 如果可以差量编译，那么检测之前已经生成的文件，然后将其直接输出。
             if (!rebuildRequired && File.Exists(cachedExcludesListFile))
@@ -58,18 +55,16 @@ namespace dotnetCampus.SourceFusion
                 return;
             }
 
-            var assembly = new CompileAssembly(compilingFiles, referencingFiles, _options.PreprocessorSymbols);
-
             // 分析 IPlainCodeTransformer。
-            var transformer = new CodeTransformer(workingFolder, generatedCodeFolder, assembly);
+            var transformer = new CodeTransformer(context);
             var excludes = transformer.Transform();
 
             // 分析 CompileTimeTemplate。
-            var templateTransformer = new TemplateTransformer(workingFolder, generatedCodeFolder, assembly);
+            var templateTransformer = new TemplateTransformer(context);
             var templateExcludes = templateTransformer.Transform();
 
             var toExcludes = excludes.Union(templateExcludes)
-                .Select(x => PathEx.MakeRelativePath(workingFolder, x)).ToArray();
+                .Select(x => PathEx.MakeRelativePath(context.WorkingFolder, x)).ToArray();
 
             foreach (var exclude in toExcludes)
             {
@@ -77,41 +72,6 @@ namespace dotnetCampus.SourceFusion
             }
 
             File.WriteAllLines(cachedExcludesListFile, toExcludes, Encoding.UTF8);
-        }
-
-        [Pure]
-        private static (
-            string workingFolder,
-            string intermediateFolder,
-            string generatedCodesFolder,
-            string[] compilingFiles,
-            string[] referencingFiles)
-            DeconstructPaths(Options options)
-        {
-            var workingFolder = Path.GetFullPath(options.WorkingFolder);
-
-            var intermediateFolder = FullPath(options.IntermediateFolder);
-            var generatedCodesFolder = FullPath(options.GeneratedCodeFolder);
-
-            var compilingFiles = File.ReadAllLines(options.CompilingFiles).Select(FullPath).ToArray();
-            var filterFiles = File.Exists(options.FilterFiles)
-                ? File.ReadAllLines(options.FilterFiles).Select(FullPath).ToArray()
-                : new string[0];
-
-            // filterFiles 是仅需扫描的文件，用 compilingFiles 取一下交集，可以避免被移除的文件也加入编译范围。
-            var filteredCompilingFiles = filterFiles.Any()
-                ? compilingFiles.Intersect(filterFiles).ToArray()
-                : compilingFiles;
-
-            var referencingFiles = File.Exists(options.References)
-                ? File.ReadAllLines(options.References).Select(FullPath).ToArray()
-                : new string[0];
-
-            return (workingFolder, intermediateFolder, generatedCodesFolder, filteredCompilingFiles, referencingFiles);
-
-            string FullPath(string path) => Path.IsPathRooted(path)
-                ? Path.GetFullPath(path)
-                : Path.GetFullPath(Path.Combine(options.WorkingFolder, path));
         }
     }
 }
