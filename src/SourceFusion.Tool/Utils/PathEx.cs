@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Utils
 {
     internal static class PathEx
     {
