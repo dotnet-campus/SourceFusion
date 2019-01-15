@@ -103,7 +103,9 @@ namespace dotnetCampus.SourceFusion
                 ? compilingFiles.Intersect(filterFiles).ToArray()
                 : compilingFiles;
 
-            var referencingFiles = File.ReadAllLines(options.References).Select(FullPath).ToArray();
+            var referencingFiles = File.Exists(options.References)
+                ? File.ReadAllLines(options.References).Select(FullPath).ToArray()
+                : new string[0];
 
             return (workingFolder, intermediateFolder, generatedCodesFolder, filteredCompilingFiles, referencingFiles);
 
