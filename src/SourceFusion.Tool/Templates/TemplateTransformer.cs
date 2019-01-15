@@ -81,12 +81,12 @@ namespace dotnetCampus.SourceFusion.Templates
             {
                 var actualText = placeholder.Fill(_compilingContext);
 
-                builder.Append(originalText.Substring(currentTextPosition, placeholder.Span.Start));
+                builder.Append(originalText.Substring(currentTextPosition, placeholder.Span.Start - currentTextPosition));
                 builder.Append(actualText);
                 currentTextPosition = placeholder.Span.End;
             }
 
-            builder.Append(originalText.Substring(currentTextPosition, originalText.Length - currentTextPosition));
+            builder.Append(originalText.Substring(currentTextPosition));
 
             var targetText = builder.ToString();
             var fileName = Path.GetFileNameWithoutExtension(assemblyFile.FullName);
