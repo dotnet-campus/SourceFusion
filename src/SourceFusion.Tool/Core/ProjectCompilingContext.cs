@@ -35,7 +35,14 @@ namespace dotnetCampus.SourceFusion.Core
             Assembly = new CompileAssembly(CompilingFiles, References, PreprocessorSymbols);
         }
 
+        /// <summary>
+        /// 获取当前的工作路径，通常是项目文件所在的文件夹。
+        /// </summary>
         public string WorkingFolder { get; }
+
+        /// <summary>
+        /// 获取此程序可以使用的与 .targets 文件进行数据交换的文件夹，也可用于存放中间文件或缓存。
+        /// </summary>
         public string ToolsFolder { get; }
         public string GeneratedCodeFolder { get; }
         public IReadOnlyList<string> CompilingFiles { get; }
@@ -43,25 +50,48 @@ namespace dotnetCampus.SourceFusion.Core
         public string PreprocessorSymbols { get; }
         public CompileAssembly Assembly { get; }
 
-        public string this[string property] => GetProperty(property);
-
+        /// <summary>
+        /// 获取项目属性。如果项目没有定义这个属性，那么会得到空字符串。
+        /// 这相当于 $(PropertyName)。
+        /// </summary>
+        /// <param name="propertyName">属性的名称。</param>
+        /// <returns>属性的值。</returns>
         public string GetProperty(string propertyName) => _projectProperties.TryGetValue(
             propertyName ?? throw new ArgumentNullException(nameof(propertyName)), out var value)
             ? value
             : "";
 
+        /// <summary>
+        /// 获取项目的集合。如果项目没有定义这个集合，那么会得到空字符串数组。
+        /// 这相当于 @(ItemName)。
+        /// </summary>
+        /// <param name="itemName"></param>
+        /// <returns></returns>
         public string[] GetItems(string itemName) =>
             _projectProperties.TryGetValue(itemName ?? throw new ArgumentNullException(nameof(itemName)), out var value)
                 ? value.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
                 : new string[0];
 
+        /// <summary>
+        /// 包含从属性文件中获取的所有的来自项目的属性和集合。
+        /// </summary>
         private readonly Dictionary<string, string> _projectProperties;
 
+        /// <summary>
+        /// 将路径转换为绝对路径，如果路径是相对路径，则转换时将相对于当前工作路径进行转换。
+        /// </summary>
+        /// <param name="path">相对或绝对路径。</param>
+        /// <returns>经过格式化的绝对路径。</returns>
         private string FullPath(string path) => Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(WorkingFolder, path));
 
-        private Dictionary<string, string> Deserialize(string propertyFile)
+        /// <summary>
+        /// 解析用于存储项目各种属性的文件，并得到项目的各种属性和集合。
+        /// </summary>
+        /// <param name="propertyFile">收集所有属性的文件。</param>
+        /// <returns>从文件中得到的所有属性的字典。</returns>
+        private static Dictionary<string, string> Deserialize(string propertyFile)
         {
             var keyValue = new Dictionary<string, string>();
             var lines = File.ReadAllLines(propertyFile);
