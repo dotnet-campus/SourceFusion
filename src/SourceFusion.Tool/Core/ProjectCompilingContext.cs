@@ -69,7 +69,7 @@ namespace dotnetCampus.SourceFusion.Core
         /// <returns></returns>
         public string[] GetItems(string itemName) =>
             _projectProperties.TryGetValue(itemName ?? throw new ArgumentNullException(nameof(itemName)), out var value)
-                ? value.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
+                ? value.Split(new[] {';', '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries)
                 : new string[0];
 
         /// <summary>
