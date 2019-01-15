@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
+using dotnetCampus.SourceFusion.Properties;
 using dotnetCampus.SourceFusion.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -57,8 +57,7 @@ namespace dotnetCampus.SourceFusion.Templates
             // 读取文件，去掉非期望字符。
             var originalText = File.ReadAllText(assemblyFile.FullName);
             originalText = _usingRegex.Replace(originalText, "");
-            originalText = originalText.Replace("[CompileTimeTemplate]",
-                $@"[System.CodeDom.Compiler.GeneratedCode(""{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product}"", ""{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}"")]");
+            originalText = originalText.Replace("[CompileTimeTemplate]", AssemblyInfo.GeneratedCodeComment);
 
             // 解析其语法树。
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
