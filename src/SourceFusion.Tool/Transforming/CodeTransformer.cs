@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using dotnetCampus.SourceFusion.CompileTime;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Transforming
 {
     /// <summary>
     /// 为编译时提供源码转换。

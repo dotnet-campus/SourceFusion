@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using dotnetCampus.SourceFusion.Core;
+using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.SourceFusion.Templates
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Core
 {
     public class CompilingException : Exception
     {

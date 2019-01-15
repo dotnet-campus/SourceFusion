@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using dotnetCampus.SourceFusion.CompileTime;
+using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 

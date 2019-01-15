@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using dotnetCampus.SourceFusion.CompileTime;
+using dotnetCampus.SourceFusion.Core;
 using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.SourceFusion.Templates

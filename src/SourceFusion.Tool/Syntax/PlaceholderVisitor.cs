@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -73,10 +74,29 @@ namespace dotnetCampus.SourceFusion.Syntax
             return base.VisitInvocationExpression(node);
         }
 
+        public override SyntaxNode VisitEqualsValueClause(EqualsValueClauseSyntax node)
+        {
+            //if (node.Expression is MemberAccessExpressionSyntax memberAccessExpression)
+            //{
+            //    // 取出 Placeholder.Array 片段。
+            //    var expression = memberAccessExpression.Expression.ToString();
+            //    if (expression == nameof(Placeholder) && memberAccessExpression.Name is GenericNameSyntax genericName)
+            //    {
+            //    }
+            //}
+
+            return base.VisitEqualsValueClause(node);
+        }
 
         /// <summary>
         /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
         /// </summary>
         private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
+
+        /// <summary>
+        /// 在查找的过程中，如果发现了一个 <see cref="Placeholder"/> 被赋值给了某个对象或者被用作其他用途，那么就进行标记。
+        /// 这样，在实际 <see cref="Placeholder"/> 的解析过程中就可以使用到这个值进行某些特殊的判断。
+        /// </summary>
+        private bool _isNextPlaceholderAssigned;
     }
 }

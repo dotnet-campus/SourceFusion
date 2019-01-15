@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using dotnetCampus.SourceFusion.CompileTime;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Core
 {
     /// <summary>
     /// <see cref="T:SourceFusion.ICompilingContext" /> 的基础实现，包含编译期代码执行的上下文。
