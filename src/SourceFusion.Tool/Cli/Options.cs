@@ -10,7 +10,7 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('t', "tool-folder", Required = true, HelpText = "SourceFusion 可以使用的临时文件夹路径。")]
         public string ToolFolder { get; set; }
 
-        [Option('g', "generated-code-folder", Required = true, HelpText = "SourceFusion 生成的新源码文件所在的文件夹。")]
+        [Option('c', "generated-code-folder", Required = true, HelpText = "SourceFusion 生成的新源码文件所在的文件夹。")]
         public string GeneratedCodeFolder { get; set; }
 
         [Option('p', "project-property-file", Required = true, HelpText = "一个文件，包含项目的各种所需属性和集合。")]
