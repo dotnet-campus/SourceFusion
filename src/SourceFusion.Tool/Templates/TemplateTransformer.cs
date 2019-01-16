@@ -9,6 +9,7 @@ using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Properties;
 using dotnetCampus.SourceFusion.Syntax;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace dotnetCampus.SourceFusion.Templates
@@ -70,7 +71,9 @@ namespace dotnetCampus.SourceFusion.Templates
             }
 
             // 解析其语法树。
-            var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
+            var symbols = _context.PreprocessorSymbols.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            var syntaxTree = CSharpSyntaxTree.ParseText(originalText, new CSharpParseOptions(
+                LanguageVersion.Latest, DocumentationMode.None, SourceCodeKind.Regular, symbols));
 
             // 访问语法节点。
             var visitor = new PlaceholderVisitor();
