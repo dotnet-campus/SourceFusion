@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.SourceFusion.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.SourceFusion.Syntax
 {
@@ -18,6 +18,11 @@ namespace dotnetCampus.SourceFusion.Syntax
         /// 在调用 <see cref="CSharpSyntaxRewriter.Visit"/> 方法后，可通过此属性获取从语法树中解析得到的占位符（<see cref="Placeholder"/>）信息。
         /// </summary>
         internal IReadOnlyCollection<PlaceholderInfo> Placeholders => _placeholders;
+
+        /// <summary>
+        /// 在调用 <see cref="CSharpSyntaxRewriter.Visit"/> 方法后，可通过此属性获取此文件的所有命名空间 using 信息。
+        /// </summary>
+        internal IReadOnlyCollection<(string @namespace, TextSpan span)> Namespaces => _namespaces;
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -90,10 +95,21 @@ namespace dotnetCampus.SourceFusion.Syntax
             return base.VisitEqualsValueClause(node);
         }
 
+        public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+        {
+            _namespaces.Add((node.ToFullString().Replace("using ", "").Replace(";", "").Trim(), node.Span));
+            return base.VisitUsingDirective(node);
+        }
+
         /// <summary>
         /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于在语法树访问期间添加占位符信息。
         /// </summary>
         private readonly List<PlaceholderInfo> _placeholders = new List<PlaceholderInfo>();
+
+        /// <summary>
+        /// 在 <see cref="PlaceholderVisitor"/> 内部使用，用于修改命名空间信息。
+        /// </summary>
+        private readonly List<(string @namespace, TextSpan span)> _namespaces = new List<(string, TextSpan)>();
 
         /// <summary>
         /// 在查找的过程中，如果发现了一个 <see cref="Placeholder"/> 被赋值给了某个对象或者被用作其他用途，那么就进行标记。

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -71,35 +72,87 @@ namespace dotnetCampus.SourceFusion.Templates
             // 解析其语法树。
             var syntaxTree = CSharpSyntaxTree.ParseText(originalText);
 
+            // 访问语法节点。
             var visitor = new PlaceholderVisitor();
             visitor.Visit(syntaxTree.GetRoot());
 
+            // 初始化字符串。
             var builder = new StringBuilder(AssemblyInfo.GeneratedCodeComment);
             var namespaceIndex = builder.Length;
             var currentTextPosition = 0;
 
+            // 替换占位符。
             var placeholders = visitor.Placeholders;
             foreach (var placeholder in placeholders)
             {
                 var actualText = placeholder.Fill(_compilingContext);
 
-                builder.Append(originalText.Substring(currentTextPosition, placeholder.Span.Start - currentTextPosition));
+                builder.Append(
+                    originalText.Substring(currentTextPosition, placeholder.Span.Start - currentTextPosition));
                 builder.Append(actualText);
                 currentTextPosition = placeholder.Span.End;
             }
 
+            // 把文件剩余的部分拼接起来。
             builder.Append(originalText.Substring(currentTextPosition));
 
-            var requiredNamespaces = string.Concat(
-                placeholders.SelectMany(x => x.RequiredNamespaces).Select(x=>$"using {x};{Environment.NewLine}").Distinct());
+            // 去掉原来的命名空间，添加上新补充的命名空间。
+            var requiredNamespaces = string.Join(Environment.NewLine, placeholders
+                .SelectMany(x => x.RequiredNamespaces)
+                .Union(visitor.Namespaces.Select(x => x.@namespace))
+                .Distinct()
+                .OrderBy(s => s, new SystemFirstNamespaceComparer())
+                .Select(x => $"using {x};"));
+            var namespaceStart = visitor.Namespaces.Min(x => x.span.Start);
+            var namespaceEnd = visitor.Namespaces.Max(x => x.span.End);
+            builder.Remove(namespaceIndex, namespaceEnd - namespaceStart);
             builder.Insert(namespaceIndex, requiredNamespaces);
 
+            // 将新的代码写入到文件。
             var targetText = builder.ToString();
             var fileName = Path.GetFileNameWithoutExtension(assemblyFile.FullName);
             var targetFile = Path.Combine(_generatedCodeFolder, $"{fileName}.g.cs");
             File.WriteAllText(targetFile, targetText);
 
             return assemblyFile.FullName;
+        }
+
+        internal class SystemFirstNamespaceComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                if (x is null && y is null)
+                {
+                    return 0;
+                }
+
+                if (x is null)
+                {
+                    return -1;
+                }
+
+                if (y is null)
+                {
+                    return 1;
+                }
+
+                if (x.StartsWith("System") && y.StartsWith("System"))
+                {
+                    return string.Compare(x, y, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
+                }
+
+                if (x.StartsWith("System"))
+                {
+                    return -1;
+                }
+
+                if (y.StartsWith("System"))
+                {
+                    return 1;
+                }
+
+                return string.Compare(x, y, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
+            }
         }
     }
 }
