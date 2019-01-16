@@ -185,15 +185,24 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         private CompileType GetCompileType(TypeDeclarationSyntax type)
         {
-            var identifier = VisitToken(type.Identifier);
+            // 获取类型的名称。
+            var identifier = type.Identifier.ValueText;
 
+            // 对于内部类，将父类的名称叠加到前面。
+            var parent = type.Parent;
+            while (parent is ClassDeclarationSyntax cds)
+            {
+                identifier = $"{cds.Identifier.ValueText}.{identifier}";
+                parent = cds.Parent;
+            }
+
+            // 添加基类列表。
             var baseTypeList = new List<string>();
             if (type.BaseList != null)
             {
                 foreach (var temp in type.BaseList.Types)
                 {
                     var name = temp.Type.ToString();
-
                     baseTypeList.Add(name);
                 }
             }
@@ -203,7 +212,7 @@ namespace dotnetCampus.SourceFusion.Syntax
 
             return new CompileType
             (
-                identifier.ValueText,
+                identifier,
                 _namespace,
                 attributeLists,
                 baseTypeList,
