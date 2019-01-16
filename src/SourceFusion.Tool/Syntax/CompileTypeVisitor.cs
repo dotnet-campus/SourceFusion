@@ -28,9 +28,26 @@ namespace dotnetCampus.SourceFusion.Syntax
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
-            var name = node.Name.ToString();
+            if (node.StaticKeyword.Value != null)
+            {
+                // 形如 using static System.Math;
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add($"static {name}");
+            }
+            else if (node.Alias != null)
+            {
+                // 形如 using Math = System.Math;
+                var alias = node.Alias.ToFullString();
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add($"{alias}{name}");
+            }
+            else
+            {
+                // 形如 using System;
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add(name);
+            }
 
-            UsingNamespaceList.Add(name);
             return base.VisitUsingDirective(node);
         }
 

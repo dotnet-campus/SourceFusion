@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,6 +75,7 @@ namespace dotnetCampus.SourceFusion.Templates
             visitor.Visit(syntaxTree.GetRoot());
 
             var builder = new StringBuilder(AssemblyInfo.GeneratedCodeComment);
+            var namespaceIndex = builder.Length;
             var currentTextPosition = 0;
 
             var placeholders = visitor.Placeholders;
@@ -87,6 +89,10 @@ namespace dotnetCampus.SourceFusion.Templates
             }
 
             builder.Append(originalText.Substring(currentTextPosition));
+
+            var requiredNamespaces = string.Concat(
+                placeholders.SelectMany(x => x.RequiredNamespaces).Select(x=>$"using {x};{Environment.NewLine}").Distinct());
+            builder.Insert(namespaceIndex, requiredNamespaces);
 
             var targetText = builder.ToString();
             var fileName = Path.GetFileNameWithoutExtension(assemblyFile.FullName);

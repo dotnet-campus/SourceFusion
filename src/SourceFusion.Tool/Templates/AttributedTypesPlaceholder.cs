@@ -47,15 +47,24 @@ namespace dotnetCampus.SourceFusion.Templates
         }
 
         private IEnumerable<(string typeName, string attributeCreator)> CollectAttributedTypes(
-            CompilingContext context)
+            ICompilingContext context)
         {
-            IEnumerable<(ICompileType type, CompileAttribute attribute)> collected =
+            var collected =
                 from type in context.Assembly.GetTypes()
                 let attribute = (CompileAttribute) type.Attributes.FirstOrDefault(a => a.Match(_attributeType))
                 where attribute != null
                 select (type, attribute);
 
-            return collected.Select(x => (x.type.FullName, ToCreator(x.attribute)));
+            foreach (var (type, attribute) in collected)
+            {
+                if (attribute.GetValues().Union(attribute.GetProperties().Select(x => x.value))
+                    .Any(x => x.Contains("typeof")))
+                {
+                    RequireNamespaces(type.UsingNamespaceList.Union(new[] {type.Namespace}));
+                }
+
+                yield return (type.FullName, ToCreator(attribute));
+            }
         }
 
         private string ToCreator(CompileAttribute attribute)
