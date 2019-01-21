@@ -17,6 +17,7 @@ namespace dotnetCampus.SourceFusion.CompileTime
         public CompileAttribute(string name, IEnumerable<KeyValuePair<string, string>> propertyValues = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Attribute 不能使用空白字符串创建。", nameof(name));
 
             if (propertyValues != null)
             {
