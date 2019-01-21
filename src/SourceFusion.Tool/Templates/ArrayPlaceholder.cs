@@ -62,16 +62,18 @@ namespace dotnetCampus.SourceFusion.Templates
             return codeSnippet;
         }
 
-        private const string ClassTemplate = @"using System;
+        private const string PlaceholderClassName = "PlaceholderLambdaRunner";
+
+        private static readonly string ClassTemplate = $@"using System;
 using System.Linq;
 using dotnetCampus.SourceFusion;
 using dotnetCampus.SourceFusion.CompileTime;
 
-public static class PlaceholderImpl
-{
-    public static string InvokePlaceholder(ICompilingContext {parameterName})
-    {body}
-}
+public static class {PlaceholderClassName}
+{{
+    public static string InvokePlaceholder(ICompilingContext {{parameterName}})
+    {{body}}
+}}
 ";
 
         /// <summary>
@@ -85,7 +87,7 @@ public static class PlaceholderImpl
                 .Replace("{body}", InvocationBody);
             var syntaxTree = CSharpSyntaxTree.ParseText(builder.ToString());
             var types = syntaxTree.Compile(context.References, "PlaceholderInvoking.g");
-            var placeholderImpl = types.First(x => x.Name == "PlaceholderImpl");
+            var placeholderImpl = types.First(x => x.Name == PlaceholderClassName);
             var method = placeholderImpl.GetMethod("InvokePlaceholder");
             Debug.Assert(method != null, nameof(method) + " != null");
             var func = (Func<ICompilingContext, string>) method.CreateDelegate(typeof(Func<ICompilingContext, string>));
