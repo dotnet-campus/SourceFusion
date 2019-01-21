@@ -35,6 +35,7 @@
       <SourceFusionProjectPropertyFile Condition=" '$(SourceFusionProjectPropertyFile)' == '' ">$(SourceFusionToolsFolder)CommandArgs.txt</SourceFusionProjectPropertyFile>
     </PropertyGroup>
     <ItemGroup>
+      <!--这里正在按格式编写配置文件，配置文件尚未开源，所以暂时没有名字。-->
       <SourceFusionCommandArgLine Include=">" />
       <SourceFusionCommandArgLine Include="RootNamespace" />
       <SourceFusionCommandArgLine Include="$(RootNamespace)" />
