@@ -17,8 +17,12 @@ namespace dotnetCampus.SourceFusion.Templates
     internal class TemplateTransformer
     {
         private readonly ProjectCompilingContext _context;
-        private readonly Regex _usingRegex = new Regex(@"using\sdotnetCampus\.SourceFusion[\.\w]*;\r?\n");
-        private readonly Regex _projectPropertyRegex = new Regex(@"\$\((?<propertyName>[_\w]+)\)");
+
+        private readonly Regex _usingRegex = new Regex(@"using\sdotnetCampus\.SourceFusion[\.\w]*;\r?\n",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private readonly Regex _projectPropertyRegex = new Regex(@"\$\((?<propertyName>[_\w]+)\)",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         internal TemplateTransformer(ProjectCompilingContext context)
         {
