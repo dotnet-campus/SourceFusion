@@ -24,5 +24,9 @@ namespace dotnetCampus.SourceFusion
         /// </remarks>
         [CompileTimeMethod]
         public static extern T[] Array<T>(Func<ICompilingContext, string> compileTimeCodeGenerator);
+
+        [CompileTimeMethod]
+        public static extern AttributedTypeMetadataCollection<T, TAttribute> AttributedTypes<T, TAttribute>()
+            where TAttribute : Attribute;
     }
 }

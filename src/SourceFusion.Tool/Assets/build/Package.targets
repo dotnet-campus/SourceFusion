@@ -14,7 +14,7 @@
   </Target>
 
   <!--第一阶段，创建 SourceFusion 需要的文件夹-->
-  <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteCompilingArgs;_SourceFusionWriteFilterArgs">
+  <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteArgs">
     <PropertyGroup>
       <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
       <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
@@ -29,21 +29,28 @@
     <MakeDir Directories="@(SourceFusionDirectory)" ContinueOnError="false" />
   </Target>
 
-  <!--第二阶段，写入 SourceFusion 需要的命令行参数 Compile-->
-  <Target Name="_SourceFusionWriteCompilingArgs" BeforeTargets="SourceFusionGenerateCode">
+  <!--第二阶段，写入 SourceFusion 需要的命令行参数-->
+  <Target Name="_SourceFusionWriteArgs" BeforeTargets="SourceFusionGenerateCode">
     <PropertyGroup>
-      <SourceFusionCompilingArgsFile Condition=" '$(SourceFusionCompilingArgsFile)' == '' ">$(SourceFusionToolsFolder)CompilingArgs.txt</SourceFusionCompilingArgsFile>
+      <SourceFusionProjectPropertyFile Condition=" '$(SourceFusionProjectPropertyFile)' == '' ">$(SourceFusionToolsFolder)CommandArgs.txt</SourceFusionProjectPropertyFile>
     </PropertyGroup>
-    <WriteLinesToFile File="$(SourceFusionCompilingArgsFile)" Lines="@(Compile)" Overwrite="True" />
-  </Target>
-
-  <!--第二阶段，写入 SourceFusion 需要的命令行参数 PrecompileFilter-->
-  <Target Name="_SourceFusionWriteFilterArgs" BeforeTargets="SourceFusionGenerateCode">
-    <PropertyGroup>
-      <SourceFusionFilterArgsFile Condition=" '$(SourceFusionFilterArgsFile)' == '' ">$(SourceFusionToolsFolder)FilterArgs.txt</SourceFusionFilterArgsFile>
-      <PrecompileFilter Condition=" '$(PrecompileFilter)' == '' ">*.cs</PrecompileFilter>
-    </PropertyGroup>
-    <WriteLinesToFile File="$(SourceFusionFilterArgsFile)" Lines="@(PrecompileFilter)" Overwrite="True" />
+    <ItemGroup>
+      <!--这里正在按格式编写配置文件，配置文件尚未开源，所以暂时没有名字。-->
+      <SourceFusionCommandArgLine Include=">" />
+      <SourceFusionCommandArgLine Include="RootNamespace" />
+      <SourceFusionCommandArgLine Include="$(RootNamespace)" />
+      <SourceFusionCommandArgLine Include=">" />
+      <SourceFusionCommandArgLine Include="Compile" />
+      <SourceFusionCommandArgLine Include="@(Compile)" />
+      <SourceFusionCommandArgLine Include=">" />
+      <SourceFusionCommandArgLine Include="PrecompileFilter" />
+      <SourceFusionCommandArgLine Include="@(PrecompileFilter)" />
+      <SourceFusionCommandArgLine Include=">" />
+      <SourceFusionCommandArgLine Include="ReferencePath" />
+      <SourceFusionCommandArgLine Include="@(ReferencePath)" />
+      <SourceFusionCommandArgLine Include=">" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(SourceFusionProjectPropertyFile)" Lines="@(SourceFusionCommandArgLine)" Overwrite="True" />
   </Target>
 
   <!--第二阶段，进行重新编译测试-->
@@ -62,12 +69,12 @@
   </Target>
 
   <!--第三阶段，执行 SourceFusion-->
-  <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile">
+  <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile;ResolveAssemblyReference">
     <PropertyGroup>
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -i $(SourceFusionToolsFolder) -g $(SourceFusionGeneratedCodeFolder) -c &quot;$(SourceFusionCompilingArgsFile)&quot; -f &quot;$(SourceFusionFilterArgsFile)&quot; -p $(DefineConstants) -r $(SourceFusionRebuildRequired)">
+          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -t $(SourceFusionToolsFolder) -c $(SourceFusionGeneratedCodeFolder) -p &quot;$(SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
     </Exec>
@@ -83,6 +90,21 @@
       <Compile Remove="@(_ExcludedCompileFile)" />
     </ItemGroup>
     <Message Text="编译时排除的文件：@(_ExcludedCompileFile)" />
+  </Target>
+
+  <PropertyGroup>
+    <CleanDependsOn>$(CleanDependsOn);_SourceFusionClean</CleanDependsOn>
+  </PropertyGroup>
+
+  <!--清理 SourceFusion 计算所得的文件-->
+  <Target Name="_SourceFusionClean">
+    <PropertyGroup>
+      <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
+      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
   </Target>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using dotnetCampus.SourceFusion.Core;
 
 namespace dotnetCampus.SourceFusion.Utils
 {

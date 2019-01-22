@@ -20,6 +20,13 @@
         bool Match(string attributeName);
 
         /// <summary>
+        /// Gets or sets the indexed properties of the Attribute.
+        /// </summary>
+        /// <param name="valueIndex">The property index of the Attribute.</param>
+        /// <returns></returns>
+        string this[int valueIndex] { get; }
+
+        /// <summary>
         /// Gets or sets the properties of the Attribute.
         /// </summary>
         /// <param name="propertyName">The property name of the Attribute.</param>

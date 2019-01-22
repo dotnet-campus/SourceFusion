@@ -28,9 +28,26 @@ namespace dotnetCampus.SourceFusion.Syntax
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
-            var name = node.Name.ToString();
+            if (node.StaticKeyword.Value != null)
+            {
+                // 形如 using static System.Math;
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add($"static {name}");
+            }
+            else if (node.Alias != null)
+            {
+                // 形如 using Math = System.Math;
+                var alias = node.Alias.ToFullString();
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add($"{alias}{name}");
+            }
+            else
+            {
+                // 形如 using System;
+                var name = node.Name.ToString();
+                UsingNamespaceList.Add(name);
+            }
 
-            UsingNamespaceList.Add(name);
             return base.VisitUsingDirective(node);
         }
 
@@ -168,15 +185,24 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         private CompileType GetCompileType(TypeDeclarationSyntax type)
         {
-            var identifier = VisitToken(type.Identifier);
+            // 获取类型的名称。
+            var identifier = type.Identifier.ValueText;
 
+            // 对于内部类，将父类的名称叠加到前面。
+            var parent = type.Parent;
+            while (parent is ClassDeclarationSyntax cds)
+            {
+                identifier = $"{cds.Identifier.ValueText}.{identifier}";
+                parent = cds.Parent;
+            }
+
+            // 添加基类列表。
             var baseTypeList = new List<string>();
             if (type.BaseList != null)
             {
                 foreach (var temp in type.BaseList.Types)
                 {
                     var name = temp.Type.ToString();
-
                     baseTypeList.Add(name);
                 }
             }
@@ -186,7 +212,7 @@ namespace dotnetCampus.SourceFusion.Syntax
 
             return new CompileType
             (
-                identifier.ValueText,
+                identifier,
                 _namespace,
                 attributeLists,
                 baseTypeList,
@@ -213,7 +239,7 @@ namespace dotnetCampus.SourceFusion.Syntax
                         var property = a.NameEquals?.Name.Identifier.ToString();
                         var value = a.Expression.ToString();
                         return new KeyValuePair<string, string>(property, value);
-                    }).Where(pair => pair.Key != null)))
+                    })))
                 .Cast<ICompileAttribute>().ToArray();
         }
 

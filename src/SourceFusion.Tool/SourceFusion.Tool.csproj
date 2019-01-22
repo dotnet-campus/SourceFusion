@@ -5,8 +5,9 @@
     <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>codet</AssemblyName>
-    <PackageId>dotnetCampus.SourceFusion</PackageId>
     <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
+    <Product>dotnetCampus.SourceFusion</Product>
+    <PackageId>dotnetCampus.SourceFusion</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <Description>
@@ -16,10 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="All" />
     <PackageReference Include="System.Memory" Version="4.5.1" PrivateAssets="All" />
@@ -27,6 +24,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceFusion\SourceFusion.Core.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="*.DotSettings" />
   </ItemGroup>
   
   <ItemGroup>
@@ -47,5 +48,5 @@
       <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
     </ItemGroup>
   </Target>
-  
+
 </Project>

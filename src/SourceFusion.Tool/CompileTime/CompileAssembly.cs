@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using dotnetCampus.SourceFusion.Core;
 
 namespace dotnetCampus.SourceFusion.CompileTime
 {
@@ -15,17 +16,22 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// </summary>
         /// <param name="compileFiles"></param>
         /// <param name="preprocessorSymbols"></param>
-        public CompileAssembly(IEnumerable<string> compileFiles, string preprocessorSymbols)
+        public CompileAssembly(IEnumerable<string> compileFiles, IEnumerable<string> references,
+            string preprocessorSymbols)
         {
+            References = references as IReadOnlyList<string>
+                         ?? references?.ToList()
+                         ?? throw new ArgumentNullException(nameof(references));
             var symbols = preprocessorSymbols.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
             _compileFilesLazy = new Lazy<List<CompileFile>>
             (
-                () => compileFiles.Select(x => new CompileFile(x, symbols)).ToList(),
+                () => compileFiles.Select(x => new CompileFile(new CompilingContext(this), x, symbols)).ToList(),
                 LazyThreadSafetyMode.ExecutionAndPublication
             );
         }
 
         public IReadOnlyCollection<CompileFile> Files => _compileFilesLazy.Value;
+        public IReadOnlyList<string> References { get; }
 
         public ICompileType[] GetTypes()
         {
