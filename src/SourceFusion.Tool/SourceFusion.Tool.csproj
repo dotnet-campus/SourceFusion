@@ -9,7 +9,6 @@
         <Product>dotnetCampus.SourceFusion</Product>
         <PackageId>dotnetCampus.SourceFusion</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <DevelopmentDependency>true</DevelopmentDependency>
         <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
         <Description>
             使代码在编译期执行，以提升运行时效率。
