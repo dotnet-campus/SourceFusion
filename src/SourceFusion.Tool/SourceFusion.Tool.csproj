@@ -1,53 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>codet</AssemblyName>
-    <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
-    <Product>dotnetCampus.SourceFusion</Product>
-    <PackageId>dotnetCampus.SourceFusion</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
-    <Description>
-      使代码在编译期执行，以提升运行时效率。
-      SourceFusion 提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
-    </Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AssemblyName>codet</AssemblyName>
+        <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
+        <Product>dotnetCampus.SourceFusion</Product>
+        <PackageId>dotnetCampus.SourceFusion</PackageId>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+        <Description>
+            使代码在编译期执行，以提升运行时效率。
+            SourceFusion 提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
+        </Description>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.3.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="All" />
-    <PackageReference Include="System.Memory" Version="4.5.1" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SourceFusion\SourceFusion.Core.csproj" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="*.DotSettings" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
-    <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
-  </ItemGroup>
-
-  <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
-      <!-- 将 SourceFusion 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->
-      <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
-
-      <!-- 将 SourceFusion.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
-      <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
-      <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
+        <PackageReference Include="CommandLineParser" Version="2.3.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="All" />
+        <PackageReference Include="System.Memory" Version="4.5.1" PrivateAssets="All" />
     </ItemGroup>
-  </Target>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SourceFusion\SourceFusion.Core.csproj" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="*.DotSettings" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
+        <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+    </ItemGroup>
+
+    <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
+        <ItemGroup>
+            <!-- 将 SourceFusion 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->
+            <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+            <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
+            <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
+            <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
+
+            <!-- 将 SourceFusion.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
+            <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
+            <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
+        </ItemGroup>
+    </Target>
 
 </Project>
