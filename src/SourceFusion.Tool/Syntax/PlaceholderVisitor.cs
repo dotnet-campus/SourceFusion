@@ -97,7 +97,7 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
-            _namespaces.Add((node.ToFullString().Replace("using ", "").Replace(";", "").Trim(), node.Span));
+            _namespaces.Add((node.ToString().Replace("using ", "").Replace(";", "").Trim(), node.Span));
             return base.VisitUsingDirective(node);
         }
 
