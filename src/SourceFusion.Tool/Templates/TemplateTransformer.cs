@@ -143,6 +143,9 @@ namespace dotnetCampus.SourceFusion.Templates
                     return 1;
                 }
 
+                x = x.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).First(s => !s.StartsWith("#"));
+                y = y.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).First(s => !s.StartsWith("#"));
+
                 if (x.StartsWith("System") && y.StartsWith("System"))
                 {
                     return string.Compare(x, y, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
