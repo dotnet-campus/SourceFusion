@@ -69,7 +69,7 @@
   </Target>
 
   <!--第三阶段，执行 SourceFusion-->
-  <Target Name="SourceFusionGenerateCode" BeforeTargets="CoreCompile;ResolveAssemblyReference">
+  <Target Name="SourceFusionGenerateCode" BeforeTargets="_IncludeSourceFusionGeneratedCode">
     <PropertyGroup>
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
@@ -81,7 +81,7 @@
   </Target>
 
   <!--第四阶段，使用 SourceFusion 生成的新源码-->
-  <Target Name="_IncludeSourceFusionGeneratedCode" Condition="$(_ExitCodeOfSourceFusion) == '0' " AfterTargets="SourceFusionGenerateCode">
+  <Target Name="_IncludeSourceFusionGeneratedCode" Condition="$(_ExitCodeOfSourceFusion) == '0' " BeforeTargets="CoreCompile;ResolveAssemblyReference">
     <CreateItem Include="$(_OutputOfSourceFusionGenerateCode)">
       <Output TaskParameter="Include" ItemName="_ExcludedCompileFile" />
     </CreateItem>
