@@ -1,26 +1,24 @@
 ﻿<Project>
 
   <!--第二阶段，创建 SourceFusion 需要的文件夹-->
-  <Target Name="_SourceFusionEnsureToolPath" BeforeTargets="SourceFusionGenerateCode">
-    <PropertyGroup Condition=" $(IsInDemoToolDebugMode) == 'True' ">
-      <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\net47\codet.exe</TransformCodeToolPath>
-    </PropertyGroup>
+  <Target Name="_SourceFusionEnsureToolPath">
     <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
       <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
     </PropertyGroup>
     <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
       <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\codet.dll</TransformCodeToolPath>
     </PropertyGroup>
-  </Target>
-
-  <!--第一阶段，创建 SourceFusion 需要的文件夹-->
-  <Target Name="_SourceFusionCreateDirectories" BeforeTargets="_SourceFusionWriteArgs">
     <PropertyGroup>
-      <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
-      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
+      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
       <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
       <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
+  </Target>
+
+  <!--第一阶段，创建 SourceFusion 需要的文件夹-->
+  <Target Name="_SourceFusionCreateDirectories"
+          DependsOnTargets="_SourceFusionEnsureToolPath">
     <ItemGroup>
       <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)" />
       <SourceFusionDirectory Include="$(SourceFusionToolsFolder)" />
@@ -30,7 +28,8 @@
   </Target>
 
   <!--第二阶段，写入 SourceFusion 需要的命令行参数-->
-  <Target Name="_SourceFusionWriteArgs" BeforeTargets="SourceFusionGenerateCode">
+  <Target Name="_SourceFusionWriteArgs"
+          DependsOnTargets="_SourceFusionCreateDirectories">
     <PropertyGroup>
       <SourceFusionProjectPropertyFile Condition=" '$(SourceFusionProjectPropertyFile)' == '' ">$(SourceFusionToolsFolder)CommandArgs.txt</SourceFusionProjectPropertyFile>
     </PropertyGroup>
@@ -54,14 +53,17 @@
   </Target>
 
   <!--第二阶段，进行重新编译测试-->
-  <Target Name="_SourceFusionRebuildingTest" BeforeTargets="SourceFusionGenerateCode"
-          Inputs="$(MSBuildProjectFullPath)" Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
+  <Target Name="_SourceFusionRebuildingTest"
+          DependsOnTargets="_SourceFusionCreateDirectories"
+          Inputs="$(MSBuildProjectFullPath)"
+          Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
     <ItemGroup>
       <RebuildingTestLine Include="true" />
     </ItemGroup>
     <CallTarget Targets="_SourceFusionRebuildingTestInitialize" />
     <WriteLinesToFile File="$(SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
   </Target>
+
   <Target Name="_SourceFusionRebuildingTestInitialize">
     <PropertyGroup>
       <SourceFusionRebuildRequired>true</SourceFusionRebuildRequired>
@@ -69,29 +71,37 @@
   </Target>
 
   <!--第三阶段，执行 SourceFusion-->
-  <Target Name="SourceFusionGenerateCode" BeforeTargets="_IncludeSourceFusionGeneratedCode">
+  <Target Name="_SourceFusionGenerateCode"
+          DependsOnTargets="_SourceFusionWriteArgs;_SourceFusionRebuildingTest">
     <PropertyGroup>
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
           Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -t $(SourceFusionToolsFolder) -c $(SourceFusionGeneratedCodeFolder) -p &quot;$(SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
-      <Output TaskParameter="ConsoleOutput" PropertyName="_OutputOfSourceFusionGenerateCode" />
-      <Output TaskParameter="ExitCode" PropertyName="_ExitCodeOfSourceFusion" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="_SourceFusionOutputOfGenerateCode" />
+      <Output TaskParameter="ExitCode" PropertyName="_SourceFusionMainExitCode" />
     </Exec>
   </Target>
 
   <!--第四阶段，使用 SourceFusion 生成的新源码-->
-  <Target Name="_IncludeSourceFusionGeneratedCode" Condition="$(_ExitCodeOfSourceFusion) == '0' " BeforeTargets="CoreCompile;ResolveAssemblyReference">
-    <CreateItem Include="$(_OutputOfSourceFusionGenerateCode)">
-      <Output TaskParameter="Include" ItemName="_ExcludedCompileFile" />
+  <Target Name="_SourceFusionIncludeGeneratedCode"
+          DependsOnTargets="_SourceFusionGenerateCode"
+          BeforeTargets="CoreCompile">
+    <CreateItem Include="$(_SourceFusionOutputOfGenerateCode)">
+      <Output TaskParameter="Include" ItemName="_SourceFusionExcludedCompileFile" />
     </CreateItem>
     <ItemGroup>
-      <Compile Include="$(SourceFusionGeneratedCodeFolder)\*.cs" />
-      <Compile Remove="@(_ExcludedCompileFile)" />
+      <_SourceFusionIncludedCompileFile Include="$(SourceFusionGeneratedCodeFolder)\*.cs" />
+      <Compile Include="@(_SourceFusionIncludedCompileFile)" />
+      <Compile Remove="@(_SourceFusionExcludedCompileFile)" />
     </ItemGroup>
-    <Message Text="编译时排除的文件：@(_ExcludedCompileFile)" />
+    <Message Condition=" '$(SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="引入新的文件：@(_SourceFusionIncludedCompileFile)" />
+    <Message Condition=" '$(SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
+    <Message Condition=" '$(SourceFusionRebuildRequired)' != 'true' " Text="引入新的文件：@(_SourceFusionIncludedCompileFile)" />
+    <Message Condition=" '$(SourceFusionRebuildRequired)' != 'true' " Text="排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
   </Target>
 
+  <!--添加清理 SourceFusion 的依赖-->
   <PropertyGroup>
     <CleanDependsOn>$(CleanDependsOn);_SourceFusionClean</CleanDependsOn>
   </PropertyGroup>
@@ -99,12 +109,13 @@
   <!--清理 SourceFusion 计算所得的文件-->
   <Target Name="_SourceFusionClean">
     <PropertyGroup>
-      <_DefaultSourceFusionWorkingFolder Condition="'$(_DefaultSourceFusionWorkingFolder)' == ''">obj\$(Configuration)\</_DefaultSourceFusionWorkingFolder>
-      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_DefaultSourceFusionWorkingFolder)</SourceFusionWorkingFolder>
+      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
+      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
       <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
       <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
     <RemoveDir Directories="$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
+    <Message Text="清理文件夹：$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
   </Target>
 
 </Project>
