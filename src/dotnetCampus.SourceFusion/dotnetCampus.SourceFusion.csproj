@@ -26,6 +26,11 @@
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Assets\src\**" />
+    <None Include="Assets\src\**" />
+  </ItemGroup>
 
   <!-- 在编译工具项目中，可以使用各种工具库；但目标项目中，就期待不要安装任何依赖。 -->
   <PropertyGroup Condition=" '$(IsBuildingCompilingTool)' == 'True' ">
@@ -59,10 +64,14 @@
   <!-- 在编译结束后将生成的可执行程序放到 Tools 文件夹中，使得 Assets 文件夹的目录结构与 NuGet 包非常相似，便于 Sample 项目进行及时的 NuGet 包调试。 -->
   <Target Name="_SourceFusionCopyOutputToDebuggableFolder" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_SourceFusionToCopyFiles Include="$(OutputPath)net48\**" />
+      <_SourceFusionToCopyToolFiles Include="$(OutputPath)net48\**" />
+      <_SourceFusionToCopySourceFiles Include="SourceFusion\**" />
     </ItemGroup>
-    <Message Text="复制文件用于调试：@(_SourceFusionToCopyFiles)" />
-    <Copy SourceFiles="@(_SourceFusionToCopyFiles)" DestinationFolder="Assets\tools" />
+    <Copy SourceFiles="@(_SourceFusionToCopyToolFiles)" DestinationFolder="Assets\tools" />
+    <Copy SourceFiles="@(_SourceFusionToCopySourceFiles)" DestinationFolder="Assets\src" />
+    <Message Text="复制文件用于调试：" />
+    <Message Text="  工具：@(_SourceFusionToCopyToolFiles)" />
+    <Message Text="  源码：@(_SourceFusionToCopySourceFiles)" />
   </Target>
 
 </Project>
