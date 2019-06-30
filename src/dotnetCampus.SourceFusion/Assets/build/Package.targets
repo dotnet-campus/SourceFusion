@@ -4,6 +4,10 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   
+  <PropertyGroup>
+    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
+  </PropertyGroup>
+  
   <!-- 计算所有编译目标所需的各种属性和参数。 -->
   <Target Name="_SourceFusionEvaluateProperties">
     <PropertyGroup>
@@ -127,9 +131,9 @@
       <Compile Remove="@(_SourceFusionIncludedCompileFile)" />
       <Compile Include="@(_SourceFusionExcludedCompileFile)" />
     </ItemGroup>
-    <Message Text="6.1 还原编译过程中对文件替换的修改（这可以避免 Visual Studio 认为原来的文件已被弃用导致不做代码分析）" />
+    <Message Text="7.1 还原编译过程中对文件替换的修改（这可以避免 Visual Studio 认为原来的文件已被弃用导致不做代码分析）" />
   </Target>
-  
+
   <!-- 标记 SourceFusion 提供的 API 源码。
        实际上这些源代码仅供 Visual Studio 源代码分析使用，不会真正进入项目。
        因此，我们仅仅标记有哪些文件而已，无需将其加入 CoreCompile。 -->
@@ -143,7 +147,23 @@
     </ItemGroup>
     <Message Text="5.2 标记 API 相关的源码：@(_SourceFusionCompile)" />
   </Target>
-  
+
+  <!-- 当生成 WPF 临时项目时，不会自动 Import NuGet 中的 props 和 targets 文件，这使得在临时项目中你现在看到的整个文件都不会参与编译。
+       然而，我们可以通过欺骗的方式在主项目中通过 _GeneratedCodeFiles 集合将需要编译的文件传递到临时项目中以间接参与编译。
+       WPF 临时项目不会 Import NuGet 中的 props 和 targets 可能是 WPF 的 Bug，也可能是刻意如此。
+       所以我们通过一个属性开关 `ShouldFixNuGetImportingBugForWpfProjects` 来决定是否修复这个错误。-->
+  <Target Name="_SourceFusionImportInWpfTempProject"
+          AfterTargets="MarkupCompilePass1"
+          BeforeTargets="GenerateTemporaryTargetAssembly"
+          DependsOnTargets="$(_SourceFusionImportInWpfTempProjectDependsOn)"
+          Condition=" '$(ShouldFixNuGetImportingBugForWpfProjects)' == 'True' ">
+    <ItemGroup>
+      <_GeneratedCodeFiles Include="@(_SourceFusionAllCompile)" />
+    </ItemGroup>
+    <Message Text="6. 正在协助组织 WPF 临时项目编译文件：" />
+    <Message Text="   @(_SourceFusionAllCompile)" />
+  </Target>
+
   <!-- 引入 SourceFusion 提供的 API 源码。
        实际上这些源代码仅供 Visual Studio 源代码分析使用，不会真正进入项目。
        因此，我们仅在 AfterBuild 的时候将其引入即可，无需加入 CoreCompile。 -->
@@ -153,7 +173,7 @@
     <ItemGroup>
       <Compile Include="@(_SourceFusionCompile)" />
     </ItemGroup>
-    <Message Text="6.2 假装引入 API 相关的源码：@(_SourceFusionCompile)" />
+    <Message Text="7.2 假装引入 API 相关的源码：@(_SourceFusionCompile)" />
   </Target>
 
   <!-- 添加清理 SourceFusion 的依赖。 -->
