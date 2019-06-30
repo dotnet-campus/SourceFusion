@@ -141,9 +141,9 @@
     <ItemGroup>
       <_SourceFusionCompile Include="$(_SourceFusionSourceFolder)**\*.cs" />
       <_SourceFusionAllCompile Include="@(_SourceFusionCompile)" />
-      <Compile Include="@(_ENSdkCompile)" />
+      <Compile Include="@(_SourceFusionCompile)" />
     </ItemGroup>
-    <Message Text="5.2 引用 API 相关的源码：@(_ENSdkCompile)" />
+    <Message Text="5.2 引用 API 相关的源码：@(_SourceFusionCompile)" />
   </Target>
 
   <!-- 当生成 WPF 临时项目时，不会自动 Import NuGet 中的 props 和 targets 文件，这使得在临时项目中你现在看到的整个文件都不会参与编译。
