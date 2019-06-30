@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace dotnetCampus.SourceFusion.Placeholders
 {
-    public class AttributedTypeMetadataCollection<T, TAttribute> : Collection<AttributedTypeMetadata<T, TAttribute>>
+    internal class AttributedTypeMetadataCollection<T, TAttribute> : Collection<AttributedTypeMetadata<T, TAttribute>>
         where TAttribute : Attribute
     {
         public static implicit operator List<(Type, TAttribute)>(

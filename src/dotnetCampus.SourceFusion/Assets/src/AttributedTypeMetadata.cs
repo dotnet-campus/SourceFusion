@@ -2,7 +2,7 @@
 
 namespace dotnetCampus.SourceFusion.Placeholders
 {
-    public class AttributedTypeMetadata<T, TAttribute> where TAttribute : Attribute
+    internal class AttributedTypeMetadata<T, TAttribute> where TAttribute : Attribute
     {
         internal AttributedTypeMetadata(Type type, Func<T> creator, TAttribute attribute)
         {

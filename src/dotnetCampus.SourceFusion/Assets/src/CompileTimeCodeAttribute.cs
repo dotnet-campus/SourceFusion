@@ -7,7 +7,7 @@ namespace dotnetCampus.SourceFusion.Attributes
     /// 标记此类型仅在编译期间使用。注意：编译完毕后此类型将从目标程序集中消失。
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class CompileTimeCodeAttribute : Attribute
+    internal sealed class CompileTimeCodeAttribute : Attribute
     {
         /// <summary>
         /// 获取要转换的所有文件。

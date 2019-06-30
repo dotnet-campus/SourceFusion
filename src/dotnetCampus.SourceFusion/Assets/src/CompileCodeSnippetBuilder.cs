@@ -2,7 +2,7 @@
 
 namespace dotnetCampus.SourceFusion
 {
-    public class CompileCodeSnippetBuilder
+    internal class CompileCodeSnippetBuilder
     {
         private ICompilingContext _context;
 

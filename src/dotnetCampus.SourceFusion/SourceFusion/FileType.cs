@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion
 {
-    public enum FileType
+    internal enum FileType
     {
         None,
         Auto,

@@ -5,7 +5,7 @@ namespace dotnetCampus.SourceFusion.CompileTime
     /// <summary>
     /// 编译时的类型
     /// </summary>
-    public interface ICompileType : ICompileMember
+    internal interface ICompileType : ICompileMember
     {
         /// <summary>
         /// 类型的命名空间

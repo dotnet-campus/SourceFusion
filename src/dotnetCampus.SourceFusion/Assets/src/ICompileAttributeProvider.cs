@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion.CompileTime
 {
-    public interface ICompileAttributeProvider
+    internal interface ICompileAttributeProvider
     {
         ICompileAttribute[] Attributes { get; }
     }

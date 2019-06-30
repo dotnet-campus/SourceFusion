@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion
 {
-    public interface IPlainCodeTransformer
+    internal interface IPlainCodeTransformer
     {
         string Transform(string originalText, TransformingContext context);
     }
