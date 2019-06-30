@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28606.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02D03DE5-1A19-4002-92BD-0E3DC61A53C4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41B6AF7A-C4D6-42F4-A1D2-A2E4271B2FD3}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
@@ -12,11 +10,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.SourceFusion", "src\dotnetCampus.SourceFusion\dotnetCampus.SourceFusion.csproj", "{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.SourceFusion.Sample", "sample\dotnetCampus.SourceFusion.Sample\dotnetCampus.SourceFusion.Sample.csproj", "{772088C0-433C-4DB1-ADC6-591C4AB6804E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B26B6EF7-513B-458C-ACF3-27C977FCA0FD} = {B26B6EF7-513B-458C-ACF3-27C977FCA0FD}
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tests", "tests\SourceFusion.Tests\SourceFusion.Tests.csproj", "{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.SourceFusion", "src\dotnetCampus.SourceFusion\dotnetCampus.SourceFusion.csproj", "{B26B6EF7-513B-458C-ACF3-27C977FCA0FD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{826EDC25-A00D-4362-B6E6-E8910E2C0616}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tests", "tests\SourceFusion.Tests\SourceFusion.Tests.csproj", "{AE7FE8AF-7682-4E5F-95C6-59262A05403E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,20 +25,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{772088C0-433C-4DB1-ADC6-591C4AB6804E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{772088C0-433C-4DB1-ADC6-591C4AB6804E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{772088C0-433C-4DB1-ADC6-591C4AB6804E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{772088C0-433C-4DB1-ADC6-591C4AB6804E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B26B6EF7-513B-458C-ACF3-27C977FCA0FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B26B6EF7-513B-458C-ACF3-27C977FCA0FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B26B6EF7-513B-458C-ACF3-27C977FCA0FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B26B6EF7-513B-458C-ACF3-27C977FCA0FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE7FE8AF-7682-4E5F-95C6-59262A05403E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE7FE8AF-7682-4E5F-95C6-59262A05403E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE7FE8AF-7682-4E5F-95C6-59262A05403E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE7FE8AF-7682-4E5F-95C6-59262A05403E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B} = {02D03DE5-1A19-4002-92BD-0E3DC61A53C4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22702A10-22E1-4670-8FCA-9581202E6CAB}

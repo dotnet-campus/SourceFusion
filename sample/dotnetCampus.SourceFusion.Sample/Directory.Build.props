@@ -1,0 +1,9 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <ShouldFixNuGetImportingBugForWpfProjects>False</ShouldFixNuGetImportingBugForWpfProjects>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\dotnetCampus.SourceFusion\Assets\build\Package.props" />
+
+</Project>

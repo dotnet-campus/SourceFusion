@@ -1,4 +1,3 @@
-#if DEBUG
 using System;
 using System.Linq;
 
@@ -52,4 +51,3 @@ namespace dotnetCampus.SourceFusion.Tests
         }
     }
 }
-#endif

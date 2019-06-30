@@ -1,0 +1,5 @@
+﻿<Project>
+
+  <Import Project="..\..\src\dotnetCampus.SourceFusion\Assets\build\Package.targets" />
+  
+</Project>
