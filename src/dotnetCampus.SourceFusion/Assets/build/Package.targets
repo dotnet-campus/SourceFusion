@@ -5,7 +5,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionEvaluateIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
+    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionIncludeGeneratedCode;_SourceFusionEvaluateIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
   </PropertyGroup>
   
   <!-- 计算所有编译目标所需的各种属性和参数。 -->
