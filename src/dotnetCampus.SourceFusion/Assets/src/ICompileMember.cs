@@ -2,7 +2,7 @@
 
 namespace dotnetCampus.SourceFusion.CompileTime
 {
-    internal interface ICompileMember : ICompileAttributeProvider
+    public interface ICompileMember : ICompileAttributeProvider
     {
         string Name { get; }
 
@@ -10,7 +10,7 @@ namespace dotnetCampus.SourceFusion.CompileTime
     }
 
     [Flags]
-    internal enum MemberModifiers
+    public enum MemberModifiers
     {
         Unset = 0,
         Private = 1,

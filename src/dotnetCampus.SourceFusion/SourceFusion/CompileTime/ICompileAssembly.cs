@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion.CompileTime
 {
-    internal interface ICompileAssembly
+    public interface ICompileAssembly
     {
         ICompileType[] GetTypes();
     }

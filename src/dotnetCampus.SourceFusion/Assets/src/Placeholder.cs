@@ -7,7 +7,7 @@ namespace dotnetCampus.SourceFusion
     /// <summary>
     /// 在编写期提供编译后才能确认的代码的占位符。
     /// </summary>
-    internal static class Placeholder
+    public static class Placeholder
     {
         /// <summary>
         /// 返回类型为 <typeparamref name="T"/>[] 的占位符。

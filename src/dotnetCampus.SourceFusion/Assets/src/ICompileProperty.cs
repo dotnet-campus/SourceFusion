@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion.CompileTime
 {
-    internal interface ICompileProperty : ICompileMember
+    public interface ICompileProperty : ICompileMember
     {
     }
 }

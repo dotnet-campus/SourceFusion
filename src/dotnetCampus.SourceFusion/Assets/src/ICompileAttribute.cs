@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.SourceFusion.CompileTime
 {
-    internal interface ICompileAttribute
+    public interface ICompileAttribute
     {
         /// <summary>
         /// 获取此特性在代码中书写的名称。

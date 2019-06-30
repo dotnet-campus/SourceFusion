@@ -8,7 +8,7 @@ namespace dotnetCampus.SourceFusion
     /// <summary>
     /// 为编译期生成代码提供代码片段生成功能。
     /// </summary>
-    internal class CompileCodeSnippet
+    public class CompileCodeSnippet
     {
         /// <summary>
         /// 获取生成的代码片段。
