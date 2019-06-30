@@ -5,7 +5,7 @@
         <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>codet</AssemblyName>
-        <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
+        <RootNamespace>dotnetCampus</RootNamespace>
         <Product>dotnetCampus.SourceFusion</Product>
         <PackageId>dotnetCampus.SourceFusion</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -33,6 +33,10 @@
     <ItemGroup>
         <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
         <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="SourceFusion\" />
     </ItemGroup>
 
     <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
