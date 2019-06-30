@@ -123,7 +123,7 @@
     <Message Condition=" '$(_SourceFusionRebuildRequired)' != 'true' " Text="    排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
   </Target>
 
-  <!-- 使用 SourceFusion 生成的新源码。 -->
+  <!-- 将中间生成过程中替换的源代码文件还原回去，这样 Visual Studio 中就不会以为原来的源代码文件是杂项文件了。 -->
   <Target Name="_SourceFusionRestoreGeneratedCode"
           DependsOnTargets="_SourceFusionIncludeGeneratedCode"
           AfterTargets="AfterBuild">
@@ -131,6 +131,7 @@
       <Compile Remove="@(_SourceFusionIncludedCompileFile)" />
       <Compile Include="@(_SourceFusionExcludedCompileFile)" />
     </ItemGroup>
+    <Message Text="7. 还原编译过程中对文件替换的修改（这可以避免 Visual Studio 认为原来的文件已被弃用导致不做代码分析）" />
   </Target>
   
   <!-- 引入 SourceFusion 提供的 API 源码。 -->
