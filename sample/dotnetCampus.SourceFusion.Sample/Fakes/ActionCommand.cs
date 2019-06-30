@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace dotnetCampus.SourceFusion.Sample.Fakes
+namespace dotnetCampus.Sample.Fakes
 {
     /// <summary>
     /// 这是一个纯测试用类，没有任何用途。
@@ -57,7 +57,8 @@ namespace dotnetCampus.SourceFusion.Sample.Fakes
         public async Task ExecuteAsync(object parameter)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            Execute((T)parameter);
+            var t = (T)parameter;
+            Execute(t);
         }
 
         void ICommand.Execute(object parameter)

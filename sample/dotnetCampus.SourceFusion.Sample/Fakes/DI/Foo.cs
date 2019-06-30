@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.SourceFusion.Sample.Fakes.DI
+﻿namespace dotnetCampus.Sample.Fakes.DI
 {
     [Export]
     internal class Foo : IFoo

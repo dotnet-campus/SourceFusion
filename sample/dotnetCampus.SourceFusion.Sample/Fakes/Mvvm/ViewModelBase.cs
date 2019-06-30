@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.SourceFusion.Sample.Fakes.Mvvm
+﻿namespace dotnetCampus.Sample.Fakes.Mvvm
 {
     public abstract class ViewModelBase
     {

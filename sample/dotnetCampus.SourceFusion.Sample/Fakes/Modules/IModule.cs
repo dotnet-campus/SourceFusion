@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.SourceFusion.Sample.Fakes.Modules
+﻿namespace dotnetCampus.Sample.Fakes.Modules
 {
     public interface IModule
     {

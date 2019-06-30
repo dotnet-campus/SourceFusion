@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using dotnetCampus.SourceFusion.Attributes;
 using dotnetCampus.SourceFusion.Sample.Fakes.Modules;
+using dotnetCampus.Sample.Fakes.Modules;
 
-namespace dotnetCampus.SourceFusion.Sample.Constants
+namespace dotnetCampus.Sample.Constants
 {
     [CompileTimeTemplate]
     internal static class ModuleCollector

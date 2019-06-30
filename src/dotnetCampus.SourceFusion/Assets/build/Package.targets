@@ -122,6 +122,16 @@
     <Message Condition=" '$(_SourceFusionRebuildRequired)' != 'true' " Text="    引入新的文件：@(_SourceFusionIncludedCompileFile)" />
     <Message Condition=" '$(_SourceFusionRebuildRequired)' != 'true' " Text="    排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
   </Target>
+
+  <!-- 使用 SourceFusion 生成的新源码。 -->
+  <Target Name="_SourceFusionRestoreGeneratedCode"
+          DependsOnTargets="_SourceFusionIncludeGeneratedCode"
+          AfterTargets="AfterBuild">
+    <ItemGroup>
+      <Compile Remove="@(_SourceFusionIncludedCompileFile)" />
+      <Compile Include="@(_SourceFusionExcludedCompileFile)" />
+    </ItemGroup>
+  </Target>
   
   <!-- 引入 SourceFusion 提供的 API 源码。 -->
   <Target Name="_SourceFusionIncludeSourceFiles"

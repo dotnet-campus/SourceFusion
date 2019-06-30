@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.SourceFusion.Sample.Fakes.DI
+﻿namespace dotnetCampus.Sample.Fakes.DI
 {
     internal interface IFoo
     {
