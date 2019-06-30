@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using dotnetCampus.SourceFusion.Attributes;
-using dotnetCampus.SourceFusion.Sample.Fakes.Modules;
 using dotnetCampus.Sample.Fakes.Modules;
+using dotnetCampus.SourceFusion;
 
 namespace dotnetCampus.Sample.Constants
 {
