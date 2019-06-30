@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Placeholders
 {
     public class AttributedTypeMetadata<T, TAttribute> where TAttribute : Attribute
     {

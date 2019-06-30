@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Placeholders
 {
     public class AttributedTypeMetadataCollection<T, TAttribute> : Collection<AttributedTypeMetadata<T, TAttribute>>
         where TAttribute : Attribute

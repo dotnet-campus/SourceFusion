@@ -35,10 +35,6 @@
         <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="SourceFusion\" />
-    </ItemGroup>
-
     <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
         <ItemGroup>
             <!-- 将 SourceFusion 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->

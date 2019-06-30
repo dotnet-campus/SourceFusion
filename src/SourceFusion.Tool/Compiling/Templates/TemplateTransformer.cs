@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using dotnetCampus.Compiling.CompileTime;
 using dotnetCampus.Compiling.Core;
 using dotnetCampus.Compiling.Syntax;
-using dotnetCampus.SourceFusion;
+using dotnetCampus.SourceFusion.Attributes;
 using dotnetCampus.SourceFusion.Properties;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

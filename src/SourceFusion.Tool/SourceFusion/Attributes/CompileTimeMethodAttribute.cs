@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Attributes
 {
     /// <inheritdoc />
     /// <summary>

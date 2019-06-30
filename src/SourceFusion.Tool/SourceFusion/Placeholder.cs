@@ -1,4 +1,6 @@
 ﻿using System;
+using dotnetCampus.SourceFusion.Attributes;
+using dotnetCampus.SourceFusion.Placeholders;
 
 namespace dotnetCampus.SourceFusion
 {

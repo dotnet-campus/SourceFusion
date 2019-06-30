@@ -7,6 +7,7 @@ using System.Text;
 using dotnetCampus.Compiling.CompileTime;
 using dotnetCampus.Compiling.Core;
 using dotnetCampus.SourceFusion;
+using dotnetCampus.SourceFusion.Attributes;
 using dotnetCampus.SourceFusion.Properties;
 
 namespace dotnetCampus.Compiling.Transforming

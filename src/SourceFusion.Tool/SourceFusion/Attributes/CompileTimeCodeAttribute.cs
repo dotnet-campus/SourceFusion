@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace dotnetCampus.SourceFusion
+namespace dotnetCampus.SourceFusion.Attributes
 {
     /// <summary>
     /// 标记此类型仅在编译期间使用。注意：编译完毕后此类型将从目标程序集中消失。
