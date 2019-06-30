@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.SourceFusion.Tests.Fakes.Modules
+﻿namespace dotnetCampus.SourceFusion.Sample.Fakes.Modules
 {
     [Module]
     public class FooModule : IModule
