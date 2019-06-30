@@ -1,89 +1,110 @@
 ﻿<Project>
 
-  <!--第二阶段，创建 SourceFusion 需要的文件夹-->
-  <Target Name="_SourceFusionEnsureToolPath">
-    <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-      <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
-    </PropertyGroup>
-    <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-      <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\codet.dll</TransformCodeToolPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
+  </PropertyGroup>
+  
+  <!-- 计算所有编译目标所需的各种属性和参数。 -->
+  <Target Name="_SourceFusionEvaluateProperties">
     <PropertyGroup>
-      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
-      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
-      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
-      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
+      <_SourceFusionRoot>$(MSBuildThisFileDirectory)..\</_SourceFusionRoot>
+      <_SourceFusionSourceFolder>$(_SourceFusionRoot)src\</_SourceFusionSourceFolder>
+      <_SourceFusionToolPath>$(_SourceFusionRoot)tools\dotnetCampus.SourceFusion.exe</_SourceFusionToolPath>
+      <_SourceFusionWorkingFolder>$(IntermediateOutputPath)SourceFusion\</_SourceFusionWorkingFolder>
+      <_SourceFusionToolsFolder>$(_SourceFusionWorkingFolder)Tools\</_SourceFusionToolsFolder>
+      <_SourceFusionGeneratedCodeFolder>$(_SourceFusionWorkingFolder)GeneratedCodes\</_SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
+    <Message Text="1.1 初始化 SourceFusion 全部属性" />
   </Target>
-
-  <!--第一阶段，创建 SourceFusion 需要的文件夹-->
-  <Target Name="_SourceFusionCreateDirectories"
-          DependsOnTargets="_SourceFusionEnsureToolPath">
+  
+  <!-- 避免依赖传递。 -->
+  <Target Name="_SourceFusionPrivateAssets"
+          BeforeTargets="CollectPackageReferences">
     <ItemGroup>
-      <SourceFusionDirectory Include="$(SourceFusionWorkingFolder)" />
-      <SourceFusionDirectory Include="$(SourceFusionToolsFolder)" />
-      <SourceFusionDirectory Include="$(SourceFusionGeneratedCodeFolder)" />
+      <PackageReference Update="dotnetCampus.SourceFusion" PrivateAssets="all" />
     </ItemGroup>
-    <MakeDir Directories="@(SourceFusionDirectory)" ContinueOnError="false" />
+    <Message Text="1.2 避免依赖传递" />
   </Target>
 
-  <!--第二阶段，写入 SourceFusion 需要的命令行参数-->
+  <!-- 创建 SourceFusion 需要的文件夹。 -->
+  <Target Name="_SourceFusionEnsureDirectories"
+          DependsOnTargets="_SourceFusionEvaluateProperties">
+    <ItemGroup>
+      <_SourceFusionCreatedDirectory Include="$(_SourceFusionWorkingFolder)" />
+      <_SourceFusionCreatedDirectory Include="$(_SourceFusionToolsFolder)" />
+      <_SourceFusionCreatedDirectory Include="$(_SourceFusionGeneratedCodeFolder)" />
+    </ItemGroup>
+    <MakeDir Directories="@(_SourceFusionCreatedDirectory)" ContinueOnError="false" />
+    <Message Text="2. 创建 SourceFusion 需要的文件夹：" />
+    <Message Text="   @(_SourceFusionCreatedDirectory)" />
+  </Target>
+
+  <!-- 写入 SourceFusion 需要的命令行参数。 -->
   <Target Name="_SourceFusionWriteArgs"
-          DependsOnTargets="_SourceFusionCreateDirectories">
+          DependsOnTargets="_SourceFusionEnsureDirectories">
     <PropertyGroup>
-      <SourceFusionProjectPropertyFile Condition=" '$(SourceFusionProjectPropertyFile)' == '' ">$(SourceFusionToolsFolder)CommandArgs.txt</SourceFusionProjectPropertyFile>
+      <_SourceFusionProjectPropertyFile>$(_SourceFusionToolsFolder)CommandArgs.txt</_SourceFusionProjectPropertyFile>
     </PropertyGroup>
     <ItemGroup>
       <!--这里正在按格式编写配置文件，配置文件尚未开源，所以暂时没有名字。-->
-      <SourceFusionCommandArgLine Include=">" />
-      <SourceFusionCommandArgLine Include="RootNamespace" />
-      <SourceFusionCommandArgLine Include="$(RootNamespace)" />
-      <SourceFusionCommandArgLine Include=">" />
-      <SourceFusionCommandArgLine Include="Compile" />
-      <SourceFusionCommandArgLine Include="@(Compile)" />
-      <SourceFusionCommandArgLine Include=">" />
-      <SourceFusionCommandArgLine Include="PrecompileFilter" />
-      <SourceFusionCommandArgLine Include="@(PrecompileFilter)" />
-      <SourceFusionCommandArgLine Include=">" />
-      <SourceFusionCommandArgLine Include="ReferencePath" />
-      <SourceFusionCommandArgLine Include="@(ReferencePath)" />
-      <SourceFusionCommandArgLine Include=">" />
+      <_SourceFusionCommandArgLine Include=">" />
+      <_SourceFusionCommandArgLine Include="RootNamespace" />
+      <_SourceFusionCommandArgLine Include="$(RootNamespace)" />
+      <_SourceFusionCommandArgLine Include=">" />
+      <_SourceFusionCommandArgLine Include="Compile" />
+      <_SourceFusionCommandArgLine Include="@(Compile)" />
+      <_SourceFusionCommandArgLine Include=">" />
+      <_SourceFusionCommandArgLine Include="PrecompileFilter" />
+      <_SourceFusionCommandArgLine Include="@(PrecompileFilter)" />
+      <_SourceFusionCommandArgLine Include=">" />
+      <_SourceFusionCommandArgLine Include="ReferencePath" />
+      <_SourceFusionCommandArgLine Include="@(ReferencePath)" />
+      <_SourceFusionCommandArgLine Include=">" />
     </ItemGroup>
-    <WriteLinesToFile File="$(SourceFusionProjectPropertyFile)" Lines="@(SourceFusionCommandArgLine)" Overwrite="True" />
+    <WriteLinesToFile File="$(_SourceFusionProjectPropertyFile)" Lines="@(_SourceFusionCommandArgLine)" Overwrite="True" />
+    <Message Text="3.1 写入编译器所需的命令行参数：" />
+    <Message Text="    $(_SourceFusionProjectPropertyFile)" />
+    <Message Text="    @(_SourceFusionCommandArgLine)" />
   </Target>
 
-  <!--第二阶段，进行重新编译测试-->
+  <!-- 进行重新编译测试。 -->
   <Target Name="_SourceFusionRebuildingTest"
-          DependsOnTargets="_SourceFusionCreateDirectories"
+          DependsOnTargets="_SourceFusionEnsureDirectories"
           Inputs="$(MSBuildProjectFullPath)"
-          Outputs="$(SourceFusionToolsFolder)RebuildingTest.txt">
+          Outputs="$(_SourceFusionToolsFolder)RebuildingTest.txt">
     <ItemGroup>
-      <RebuildingTestLine Include="true" />
+      <_SourceFusionRebuildingTestLine Include="true" />
     </ItemGroup>
     <CallTarget Targets="_SourceFusionRebuildingTestInitialize" />
-    <WriteLinesToFile File="$(SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(RebuildingTestLine)" Overwrite="True" />
+    <WriteLinesToFile File="$(_SourceFusionToolsFolder)RebuildingTest.txt" Lines="@(_SourceFusionRebuildingTestLine)" Overwrite="True" />
+    <Message Text="3.2 检测全量编译与差量编译" />
   </Target>
-
   <Target Name="_SourceFusionRebuildingTestInitialize">
     <PropertyGroup>
-      <SourceFusionRebuildRequired>true</SourceFusionRebuildRequired>
+      <_SourceFusionRebuildRequired>true</_SourceFusionRebuildRequired>
     </PropertyGroup>
+    <Message Text="    检测到本次编译为全量编译 True" />
   </Target>
 
-  <!--第三阶段，执行 SourceFusion-->
+  <!-- 执行 SourceFusion 核心编译过程。 -->
   <Target Name="_SourceFusionGenerateCode"
           DependsOnTargets="_SourceFusionWriteArgs;_SourceFusionRebuildingTest">
     <PropertyGroup>
-      <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
+      <_SourceFusionRebuildRequired Condition="'$(_SourceFusionRebuildRequired)' == ''">false</_SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -t $(SourceFusionToolsFolder) -c $(SourceFusionGeneratedCodeFolder) -p &quot;$(SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
+          Command="&quot;$(_SourceFusionToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -t $(_SourceFusionToolsFolder) -c $(_SourceFusionGeneratedCodeFolder) -p &quot;$(_SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(_SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_SourceFusionOutputOfGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_SourceFusionMainExitCode" />
     </Exec>
+    <Message Text="4. 执行核心编译" />
   </Target>
 
-  <!--第四阶段，使用 SourceFusion 生成的新源码-->
+  <!-- 使用 SourceFusion 生成的新源码。 -->
   <Target Name="_SourceFusionIncludeGeneratedCode"
           DependsOnTargets="_SourceFusionGenerateCode"
           BeforeTargets="CoreCompile">
@@ -91,31 +112,61 @@
       <Output TaskParameter="Include" ItemName="_SourceFusionExcludedCompileFile" />
     </CreateItem>
     <ItemGroup>
-      <_SourceFusionIncludedCompileFile Include="$(SourceFusionGeneratedCodeFolder)\*.cs" />
+      <_SourceFusionIncludedCompileFile Include="$(_SourceFusionGeneratedCodeFolder)\*.cs" />
       <Compile Include="@(_SourceFusionIncludedCompileFile)" />
       <Compile Remove="@(_SourceFusionExcludedCompileFile)" />
     </ItemGroup>
-    <Message Condition=" '$(SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="引入新的文件：@(_SourceFusionIncludedCompileFile)" />
-    <Message Condition=" '$(SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
-    <Message Condition=" '$(SourceFusionRebuildRequired)' != 'true' " Text="引入新的文件：@(_SourceFusionIncludedCompileFile)" />
-    <Message Condition=" '$(SourceFusionRebuildRequired)' != 'true' " Text="排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
+    <Message Text="5.1 使用编译生成的源代码：" />
+    <Message Condition=" '$(_SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="    引入新的文件：@(_SourceFusionIncludedCompileFile)" />
+    <Message Condition=" '$(_SourceFusionRebuildRequired)' == 'true' " Importance="High" Text="    排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
+    <Message Condition=" '$(_SourceFusionRebuildRequired)' != 'true' " Text="    引入新的文件：@(_SourceFusionIncludedCompileFile)" />
+    <Message Condition=" '$(_SourceFusionRebuildRequired)' != 'true' " Text="    排除旧的文件：@(_SourceFusionExcludedCompileFile)" />
+  </Target>
+  
+  <!-- 引入 SourceFusion 提供的 API 源码。 -->
+  <Target Name="_SourceFusionIncludeSourceFiles"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="_SourceFusionEvaluateProperties">
+    <ItemGroup>
+      <_SourceFusionCompile Include="$(_SourceFusionSourceFolder)**\*.cs" />
+      <_SourceFusionAllCompile Include="@(_SourceFusionCompile)" />
+      <Compile Include="@(_ENSdkCompile)" />
+    </ItemGroup>
+    <Message Text="5.2 引用 API 相关的源码：@(_ENSdkCompile)" />
   </Target>
 
-  <!--添加清理 SourceFusion 的依赖-->
+  <!-- 当生成 WPF 临时项目时，不会自动 Import NuGet 中的 props 和 targets 文件，这使得在临时项目中你现在看到的整个文件都不会参与编译。
+       然而，我们可以通过欺骗的方式在主项目中通过 _GeneratedCodeFiles 集合将需要编译的文件传递到临时项目中以间接参与编译。
+       WPF 临时项目不会 Import NuGet 中的 props 和 targets 可能是 WPF 的 Bug，也可能是刻意如此。
+       所以我们通过一个属性开关 `ShouldFixNuGetImportingBugForWpfProjects` 来决定是否修复这个错误。-->
+  <Target Name="_SourceFusionImportInWpfTempProject"
+          AfterTargets="MarkupCompilePass1"
+          BeforeTargets="GenerateTemporaryTargetAssembly"
+          DependsOnTargets="$(_SourceFusionImportInWpfTempProjectDependsOn)"
+          Condition=" '$(ShouldFixNuGetImportingBugForWpfProjects)' == 'True' ">
+    <ItemGroup>
+      <_GeneratedCodeFiles Include="@(_SourceFusionAllCompile)" />
+    </ItemGroup>
+    <Message Text="6. 正在协助组织 WPF 临时项目编译文件：" />
+    <Message Text="   @(_SourceFusionAllCompile)" />
+  </Target>
+
+  <!-- 添加清理 SourceFusion 的依赖。 -->
   <PropertyGroup>
     <CleanDependsOn>$(CleanDependsOn);_SourceFusionClean</CleanDependsOn>
   </PropertyGroup>
 
-  <!--清理 SourceFusion 计算所得的文件-->
-  <Target Name="_SourceFusionClean">
-    <PropertyGroup>
-      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
-      <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
-      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
-      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
-    </PropertyGroup>
-    <RemoveDir Directories="$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
-    <Message Text="清理文件夹：$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
+  <!-- 清理 SourceFusion 计算所得的文件。 -->
+  <Target Name="_SourceFusionClean"
+          DependsOnTargets="_SourceFusionEvaluateProperties">
+    <ItemGroup>
+      <_SourceFusionDeletedDirectory Include="$(_SourceFusionToolsFolder)" />
+      <_SourceFusionDeletedDirectory Include="$(_SourceFusionGeneratedCodeFolder)" />
+      <_SourceFusionDeletedDirectory Include="$(_SourceFusionWorkingFolder)" />
+    </ItemGroup>
+    <RemoveDir Directories="@(_SourceFusionDeletedDirectory)" />
+    <Message Text="清理文件夹：" />
+    <Message Text="  @(_SourceFusionDeletedDirectory)" />
   </Target>
 
 </Project>
