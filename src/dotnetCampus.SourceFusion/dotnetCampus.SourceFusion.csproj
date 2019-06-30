@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net48;net45</TargetFrameworks>
+    <TargetFrameworks>net48;net45;netcoreapp2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>dotnetCampus</RootNamespace>
     <Authors>dotnet-campus</Authors>
@@ -21,31 +20,49 @@
       使代码在编译期执行，以提升运行时效率。
       提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
     </Description>
+    <IsBuildingCompilingTool Condition=" '$(TargetFramework)' == 'net48' ">True</IsBuildingCompilingTool>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+
+  <!-- 在编译工具项目中，可以使用各种工具库；但目标项目中，就期待不要安装任何依赖。 -->
+  <PropertyGroup Condition=" '$(IsBuildingCompilingTool)' == 'True' ">
+    <OutputType>Exe</OutputType>
+    <StartupObject>dotnetCampus.Compiling.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(IsBuildingCompilingTool)' == 'True' ">
     <PackageReference Include="CommandLineParser" Version="2.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="All" />
     <PackageReference Include="System.Memory" Version="4.5.1" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
-    <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+  <!-- 目标项目中，将 NuGet 包文件夹和编译工具文件夹移除。 -->
+  <ItemGroup Condition=" '$(IsBuildingCompilingTool)' != 'True' ">
+    <Compile Remove="Assets\**" />
+    <Compile Remove="Compiling\**" />
   </ItemGroup>
 
-  <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
+  <!-- 组织 NuGet 包。 -->
+  <Target Name="_SourceFusionMakeNuGetPackage" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
-      <!-- 将 SourceFusion 生成的类库作为引用加入到安装此 NuGet 包的项目中。 -->
-      <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\netstandard2.0\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\netstandard2.0" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.dll" Visible="False" Pack="True" PackagePath="lib\net45" />
-      <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
-
-      <!-- 将 SourceFusion.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
-      <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
-      <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
+      <None Include="Assets\build\Package.props" Pack="True" PackagePath="build\$(PackageId).props" />
+      <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
+      <None Include="Assets\buildMultiTargeting\Package.props" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).props" />
+      <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+      <None Include="SourceFusion\**" Pack="True" PackagePath="src" />
+      <None Include="$(OutputPath)net48\**" Pack="True" PackagePath="tools" />
     </ItemGroup>
+  </Target>
+
+  <!-- 在编译结束后将生成的可执行程序放到 Tools 文件夹中，使得 Assets 文件夹的目录结构与 NuGet 包非常相似，便于 Sample 项目进行及时的 NuGet 包调试。 -->
+  <Target Name="_SourceFusionCopyOutputToDebuggableFolder" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_SourceFusionToCopyFiles Include="$(OutputPath)net48\**" />
+    </ItemGroup>
+    <Message Text="复制文件用于调试：@(_SourceFusionToCopyFiles)" />
+    <Copy SourceFiles="@(_SourceFusionToCopyFiles)" DestinationFolder="Assets\tools" />
   </Target>
 
 </Project>
