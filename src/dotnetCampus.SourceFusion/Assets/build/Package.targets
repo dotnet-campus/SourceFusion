@@ -5,7 +5,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
+    <_SourceFusionImportInWpfTempProjectDependsOn>_SourceFusionEvaluateIncludeSourceFiles</_SourceFusionImportInWpfTempProjectDependsOn>
   </PropertyGroup>
   
   <!-- 计算所有编译目标所需的各种属性和参数。 -->
@@ -143,7 +143,6 @@
     <ItemGroup>
       <_SourceFusionCompile Include="$(_SourceFusionSourceFolder)**\*.cs" />
       <_SourceFusionAllCompile Include="@(_SourceFusionCompile)" />
-      <Compile Include="@(_SourceFusionCompile)" />
     </ItemGroup>
     <Message Text="5.2 标记 API 相关的源码：@(_SourceFusionCompile)" />
   </Target>
