@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28606.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02D03DE5-1A19-4002-92BD-0E3DC61A53C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41B6AF7A-C4D6-42F4-A1D2-A2E4271B2FD3}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+		build\Version.props = build\Version.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.SourceFusion", "src\dotnetCampus.SourceFusion\dotnetCampus.SourceFusion.csproj", "{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tests", "tests\SourceFusion.Tests\SourceFusion.Tests.csproj", "{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{826EDC25-A00D-4362-B6E6-E8910E2C0616}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83CFE243-CFC9-450A-8D3B-42FAB6176E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B0CBA05D-EBFF-4144-AC2C-5F615936C63B} = {02D03DE5-1A19-4002-92BD-0E3DC61A53C4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22702A10-22E1-4670-8FCA-9581202E6CAB}
+	EndGlobalSection
+EndGlobal

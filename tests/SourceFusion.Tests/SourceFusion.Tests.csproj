@@ -13,8 +13,4 @@
     <PackageReference Include="MSTestEnhancer" Version="1.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\SourceFusion\SourceFusion.Core.csproj" />
-  </ItemGroup>
-
 </Project>
