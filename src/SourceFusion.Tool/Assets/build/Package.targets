@@ -114,7 +114,12 @@
       <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
       <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
-    <RemoveDir Directories="$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
+    <ItemGroup>
+      <_SourceFusionFilesToDelete Include="$(SourceFusionToolsFolder)*" />
+      <_SourceFusionFilesToDelete Include="$(SourceFusionGeneratedCodeFolder)*" />
+    </ItemGroup>
+    <!-- 仅仅删除文件夹中的文件，因为怀疑直接删除文件夹会触发 Windows 10 中的某个 bug，导致无法删除。 -->
+    <Delete Files="$(_SourceFusionFilesToDelete)" />
     <Message Text="清理文件夹：$(SourceFusionToolsFolder);$(SourceFusionGeneratedCodeFolder)" />
   </Target>
 
