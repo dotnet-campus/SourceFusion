@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>codet</AssemblyName>
         <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
@@ -44,8 +44,8 @@
             <None Include="..\SourceFusion\bin\$(Configuration)\net45\SourceFusion.Core.pdb" Visible="False" Pack="True" PackagePath="lib\net45" />
 
             <!-- 将 SourceFusion.Tools 的全部依赖加入到此 NuGet 包中以便程序能在目标项目中执行。 -->
-            <None Include="$(OutputPath)net47\*.*" Exclude="$(OutputPath)net47\codet.exe;$(OutputPath)net47\codet.pdb" Pack="True" PackagePath="tools\net47" />
-            <None Include="$(OutputPath)netcoreapp2.1\*.*" Exclude="$(OutputPath)netcoreapp2.1\codet.dll;$(OutputPath)netcoreapp2.1\codet.pdb;$(OutputPath)netcoreapp2.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp2.1" />
+            <None Include="$(OutputPath)net48\*.*" Exclude="$(OutputPath)net48\codet.exe;$(OutputPath)net48\codet.pdb" Pack="True" PackagePath="tools\net48" />
+            <None Include="$(OutputPath)netcoreapp3.1\*.*" Exclude="$(OutputPath)netcoreapp3.1\codet.dll;$(OutputPath)netcoreapp3.1\codet.pdb;$(OutputPath)netcoreapp3.1\codet.runtimeconfig.json" Pack="True" PackagePath="tools\netcoreapp3.1" />
         </ItemGroup>
     </Target>
 
