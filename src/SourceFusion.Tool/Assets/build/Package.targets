@@ -2,11 +2,16 @@
 
   <!--第二阶段，创建 SourceFusion 需要的文件夹-->
   <Target Name="_SourceFusionEnsureToolPath">
+    <PropertyGroup>
+      <!-- 我们使用 $(MSBuildRuntimeType) 来判断编译器是 .NET Core 的还是 .NET Framework 的。-->
+      <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' == 'Core'">True</UseDotNetCore>
+      <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' != 'Core'">False</UseDotNetCore>
+    </PropertyGroup>
     <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-      <TransformCodeToolPath>$(MSBuildThisFileDirectory)..\tools\net47\codet.exe</TransformCodeToolPath>
+      <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)..\tools\net47\codet.exe&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-      <TransformCodeToolPath>dotnet $(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\codet.dll</TransformCodeToolPath>
+      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\codet.dll&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup>
       <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
@@ -77,7 +82,7 @@
       <SourceFusionRebuildRequired Condition="'$(SourceFusionRebuildRequired)' == ''">false</SourceFusionRebuildRequired>
     </PropertyGroup>
     <Exec ConsoleToMSBuild="True"
-          Command="&quot;$(TransformCodeToolPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; -t $(SourceFusionToolsFolder) -c $(SourceFusionGeneratedCodeFolder) -p &quot;$(SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
+          Command="$(TransformCodeToolCommand) &quot;$(MSBuildProjectDirectory)&quot; -t $(SourceFusionToolsFolder) -c $(SourceFusionGeneratedCodeFolder) -p &quot;$(SourceFusionProjectPropertyFile)&quot; -s $(DefineConstants) --rebuild $(SourceFusionRebuildRequired)">
       <Output TaskParameter="ConsoleOutput" PropertyName="_SourceFusionOutputOfGenerateCode" />
       <Output TaskParameter="ExitCode" PropertyName="_SourceFusionMainExitCode" />
     </Exec>
