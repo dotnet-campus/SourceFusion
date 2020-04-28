@@ -8,16 +8,16 @@
       <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' != 'Core'">False</UseDotNetCore>
     </PropertyGroup>
     <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
-      <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)..\tools\net48\codet.exe&quot;</TransformCodeToolCommand>
+      <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)../tools/net48/codet.exe&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)..\tools\netcoreapp3.1\codet.dll&quot;</TransformCodeToolCommand>
+      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)../tools/netcoreapp3.1/codet.dll&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup>
-      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
+      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj/$(Configuration)/</_SourceFusionDefaultWorkingFolder>
       <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
-      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
-      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
+      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools/</SourceFusionToolsFolder>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes/</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
   </Target>
 
@@ -96,7 +96,7 @@
       <Output TaskParameter="Include" ItemName="_SourceFusionExcludedCompileFile" />
     </CreateItem>
     <ItemGroup>
-      <_SourceFusionIncludedCompileFile Include="$(SourceFusionGeneratedCodeFolder)\*.cs" />
+      <_SourceFusionIncludedCompileFile Include="$(SourceFusionGeneratedCodeFolder)/*.cs" />
       <Compile Include="@(_SourceFusionIncludedCompileFile)" />
       <Compile Remove="@(_SourceFusionExcludedCompileFile)" />
     </ItemGroup>
@@ -114,10 +114,10 @@
   <!--清理 SourceFusion 计算所得的文件-->
   <Target Name="_SourceFusionClean">
     <PropertyGroup>
-      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj\$(Configuration)\</_SourceFusionDefaultWorkingFolder>
+      <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj/$(Configuration)/</_SourceFusionDefaultWorkingFolder>
       <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">$(_SourceFusionDefaultWorkingFolder)</SourceFusionWorkingFolder>
-      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools\</SourceFusionToolsFolder>
-      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes\</SourceFusionGeneratedCodeFolder>
+      <SourceFusionToolsFolder>$(SourceFusionWorkingFolder)SourceFusion.Tools/</SourceFusionToolsFolder>
+      <SourceFusionGeneratedCodeFolder>$(SourceFusionWorkingFolder)SourceFusion.GeneratedCodes/</SourceFusionGeneratedCodeFolder>
     </PropertyGroup>
     <ItemGroup>
       <_SourceFusionFilesToDelete Include="$(SourceFusionToolsFolder)*" />
