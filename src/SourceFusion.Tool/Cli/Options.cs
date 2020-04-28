@@ -23,7 +23,7 @@ namespace dotnetCampus.SourceFusion.Cli
         [Option('r', "rebuild", HelpText = "如果需要重新生成，则指定为 true。")]
         public string _rebuildRequired { get; set; }
 
-        public bool RebuildRequired => _rebuildRequired.Equals("true", StringComparison.OrdinalIgnoreCase);
+        public bool RebuildRequired => _rebuildRequired?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
 
         [Option("debug-mode", HelpText = "如果指定，将在启动编译时进入调试模式。")]
         public bool DebugMode { get; set; }
