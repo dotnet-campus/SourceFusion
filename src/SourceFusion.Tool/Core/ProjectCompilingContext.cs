@@ -82,9 +82,24 @@ namespace dotnetCampus.SourceFusion.Core
         /// </summary>
         /// <param name="path">相对或绝对路径。</param>
         /// <returns>经过格式化的绝对路径。</returns>
-        private string FullPath(string path) => Path.IsPathRooted(path)
-            ? Path.GetFullPath(path)
-            : Path.GetFullPath(Path.Combine(WorkingFolder, path));
+        private string FullPath(string path)
+        {
+            // 在 Windows 下，`/` 和 `\` 都是合理的路径分割符；
+            // 在 Linux 下，`/` 是合理的路径分割符，`\` 是合理的文件名。
+            // 
+            // 因为 VsProjectSystem 中无论在什么平台都传入 `\` 作为路径分割符，
+            // 所以我们所有从 csproj 中收集到的路径都是用 `\` 分割，所有 Linux 系统里从 `Path` 得到的路径都是 `/` 分割。
+            // 因此，我们必须将所有的 `/` 和 `\` 都格式化为系统相关才可以在各系统下正常工作。
+            // 
+            // 详见：https://blog.walterlv.com/post/format-mixed-path-seperators-to-platform-special
+
+            var fullPath = Path.IsPathRooted(path)
+                ? Path.GetFullPath(path)
+                : Path.GetFullPath(Path.Combine(WorkingFolder, path));
+            return fullPath
+                .Replace('/', Path.DirectorySeparatorChar)
+                .Replace('\\', Path.DirectorySeparatorChar);
+        }
 
         /// <summary>
         /// 解析用于存储项目各种属性的文件，并得到项目的各种属性和集合。
