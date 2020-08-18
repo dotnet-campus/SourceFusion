@@ -14,7 +14,7 @@
             使代码在编译期执行，以提升运行时效率。
             SourceFusion 提供了一套编译期代码执行框架，以便将运行时可能耗时的操作提前到编译期执行。
         </Description>
-        <LangVersion>lastest</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
