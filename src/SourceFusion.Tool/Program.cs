@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using CommandLine;
+using dotnetCampus.Cli;
+using dotnetCampus.Cli.Standard;
 using dotnetCampus.SourceFusion.Cli;
 using dotnetCampus.SourceFusion.Utils;
 
@@ -24,8 +25,10 @@ namespace dotnetCampus.SourceFusion
 
             var stopwatch = Stopwatch.StartNew();
 
-            var exitCode = Parser.Default.ParseArguments<Options>(args)
-                .MapResult(Run, HandleError);
+            var exitCode = dotnetCampus.Cli.CommandLine.Parse(args)
+                .AddStandardHandlers()
+                .AddHandler<Options>(Run)
+                .Run();
 
             stopwatch.Stop();
             if (Debugger.IsAttached && !Console.IsInputRedirected)
@@ -66,25 +69,25 @@ namespace dotnetCampus.SourceFusion
             Console.WriteLine($"error: SourceFusion 未观察的任务异常：{e.Exception}");
         }
 
-        private static int HandleError(IEnumerable<Error> errors)
-        {
-            foreach (var error in errors)
-            {
-                if (error is UnknownOptionError uoe)
-                {
-                    Console.WriteLine($"error: SourceFusion 参数错误：不能识别的参数 {uoe.Token}。");
-                }
-                else if (error is MissingRequiredOptionError mroe)
-                {
-                    Console.WriteLine($"error: SourceFusion 参数错误：缺少必需的参数 {mroe.NameInfo.LongName}。");
-                }
-                else
-                {
-                    Console.WriteLine($"error: SourceFusion 参数错误：{error}");
-                }
-            }
+        //private static int HandleError(IEnumerable<Error> errors)
+        //{
+        //    foreach (var error in errors)
+        //    {
+        //        if (error is UnknownOptionError uoe)
+        //        {
+        //            Console.WriteLine($"error: SourceFusion 参数错误：不能识别的参数 {uoe.Token}。");
+        //        }
+        //        else if (error is MissingRequiredOptionError mroe)
+        //        {
+        //            Console.WriteLine($"error: SourceFusion 参数错误：缺少必需的参数 {mroe.NameInfo.LongName}。");
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine($"error: SourceFusion 参数错误：{error}");
+        //        }
+        //    }
 
-            return 0;
-        }
+        //    return 0;
+        //}
     }
 }
