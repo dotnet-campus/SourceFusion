@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\dotnetCampus.TelescopeTask\Assets\build\Package.targets" />
+</Project>

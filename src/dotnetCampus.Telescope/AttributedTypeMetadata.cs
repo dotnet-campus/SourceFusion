@@ -9,7 +9,7 @@ namespace dotnetCampus.Telescope
     {
         private readonly Func<TBaseClassOrInterface> _instanceCreator;
 
-        internal AttributedTypeMetadata(Type realType, TAttribute attribute, Func<TBaseClassOrInterface> instanceCreator)
+        public AttributedTypeMetadata(Type realType, TAttribute attribute, Func<TBaseClassOrInterface> instanceCreator)
         {
             RealType = realType ?? throw new ArgumentNullException(nameof(realType));
             Attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));

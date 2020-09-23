@@ -1,0 +1,10 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <_DefaultSourceFusionWorkingFolder>obj/$(Configuration)/$(TargetFramework)/</_DefaultSourceFusionWorkingFolder>
+    <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj/$(Configuration)/$(TargetFramework)/</SourceFusionWorkingFolder>
+  </PropertyGroup>
+
+  <Import Project="../build/dotnetCampus.TelescopeTask.targets" />
+
+</Project>

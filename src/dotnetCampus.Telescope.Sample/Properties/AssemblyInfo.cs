@@ -7,4 +7,4 @@ using System.Threading.Tasks;
 using dotnetCampus.Telescope;
 using dotnetCampus.Telescope.Sample;
 
-[assembly: MarkExport(typeof(IDemo), typeof(DemoAttribute))]
+[assembly: MarkExport(typeof(dotnetCampus.Telescope.Sample.IDemo), typeof(DemoAttribute))]

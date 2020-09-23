@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
+using static dotnetCampus.Telescope.InternalContracts;
+
 namespace dotnetCampus.Telescope
 {
     /// <summary>
@@ -79,7 +81,7 @@ namespace dotnetCampus.Telescope
                 throw new ArgumentNullException(nameof(assembly));
             }
 
-            var exportType = assembly.GetType($"{typeof(AttributedTypes).Namespace}.__AttributedTypesExport__");
+            var exportType = assembly.GetType(AttributedTypesExportFullClassName);
             return exportType is { } && Activator.CreateInstance(exportType) is ICompileTimeAttributedTypesExporter<TBaseClassOrInterface, TAttribute> exporter
                 ? LoadFromExporter(exporter)
                 : Enumerable.Empty<AttributedTypeMetadata<TBaseClassOrInterface, TAttribute>>();

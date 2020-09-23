@@ -25,6 +25,16 @@ namespace dotnetCampus.SourceFusion.Syntax
         /// </summary>
         internal IReadOnlyList<ICompileType> Types => _types;
 
+        /// <summary>
+        ///     所有找到的类型
+        /// </summary>
+        internal IReadOnlyList<string> UsingNamespaceList => _usingNamespaceList;
+
+        /// <summary>
+        ///     所有找到的类型
+        /// </summary>
+        internal IReadOnlyList<ICompileAttribute> AssemblyAttributes => _assemblyAttributes;
+
         /// <inheritdoc />
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
@@ -32,23 +42,34 @@ namespace dotnetCampus.SourceFusion.Syntax
             {
                 // 形如 using static System.Math;
                 var name = node.Name.ToString();
-                UsingNamespaceList.Add($"static {name}");
+                _usingNamespaceList.Add($"static {name}");
             }
             else if (node.Alias != null)
             {
                 // 形如 using Math = System.Math;
                 var alias = node.Alias.ToFullString();
                 var name = node.Name.ToString();
-                UsingNamespaceList.Add($"{alias}{name}");
+                _usingNamespaceList.Add($"{alias}{name}");
             }
             else
             {
                 // 形如 using System;
                 var name = node.Name.ToString();
-                UsingNamespaceList.Add(name);
+                _usingNamespaceList.Add(name);
             }
 
             return base.VisitUsingDirective(node);
+        }
+
+        public override SyntaxNode VisitCompilationUnit(CompilationUnitSyntax node)
+        {
+            var attributes = GetCompileAttributeList(SyntaxFactory.List(node.ChildNodes().OfType<AttributeListSyntax>()));
+            foreach (var attribute in attributes)
+            {
+                _assemblyAttributes.Add(attribute);
+            }
+
+            return base.VisitCompilationUnit(node);
         }
 
         /// <summary>
@@ -180,6 +201,10 @@ namespace dotnetCampus.SourceFusion.Syntax
 
         private readonly List<ICompileType> _types = new List<ICompileType>();
 
+        private readonly List<string> _usingNamespaceList = new List<string>();
+
+        private readonly List<ICompileAttribute> _assemblyAttributes = new List<ICompileAttribute>();
+
         private CompileType _lastType;
         private string _namespace;
 
@@ -216,11 +241,9 @@ namespace dotnetCampus.SourceFusion.Syntax
                 _namespace,
                 attributeLists,
                 baseTypeList,
-                UsingNamespaceList
+                _usingNamespaceList
             );
         }
-
-        private List<string> UsingNamespaceList { get; } = new List<string>();
 
         private ICompileAttribute[] GetCompileAttributeList(SyntaxList<AttributeListSyntax> attributeList)
         {

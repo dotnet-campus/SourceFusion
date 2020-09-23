@@ -12,7 +12,7 @@ namespace dotnetCampus.SourceFusion.Core
         internal ProjectCompilingContext(Options options)
         {
             // 初始化基础属性。
-            WorkingFolder = Path.GetFullPath(options.WorkingFolder);
+            WorkingFolder = Path.GetFullPath(options.WorkingDirectory);
             ToolsFolder = FullPath(options.ToolFolder);
             GeneratedCodeFolder = FullPath(options.GeneratedCodeFolder);
             PreprocessorSymbols = options.PreprocessorSymbols;

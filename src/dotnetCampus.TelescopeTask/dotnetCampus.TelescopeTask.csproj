@@ -1,16 +1,43 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.0-alpha</Version>
+    <DevelopmentToolPath>bin\$(Configuration)\</DevelopmentToolPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" />
+    <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" PrivateAssets="all" />
+    <PackageReference Include="dotnetCampus.Configurations" Version="1.2.9" />
+    <PackageReference Include="dotnetCampus.MSBuildUtils.Source" Version="1.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="Walterlv.IO.PackageManagement" Version="5.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\SourceFusion.Tool\CompileTime\*.cs" Link="CompileTime\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SourceFusion.Tool\Core\*.cs" Link="Core\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SourceFusion.Tool\Syntax\CompileTypeVisitor.cs" Link="Syntax\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SourceFusion.Tool\Syntax\SyntaxTreeCompilingExtensions.cs" Link="Syntax\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SourceFusion\CompileTime\*.cs" Link="CompileTime\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SourceFusion\ICompilingContext.cs" Link="CompileTime\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\dotnetCampus.Telescope\InternalContracts.cs" Link="Core\%(RecursiveDir)%(FileName)%(Extension)" />
+  </ItemGroup>
+
+  <!-- 在编译结束后将生成的可执行程序放到 Tools 文件夹中，使得 Assets 文件夹的目录结构与 NuGet 包非常相似，便于 Sample 项目进行及时的 NuGet 包调试。 -->
+  <Target Name="_TelescopeCopyOutputToDebuggableFolder" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_TelescopeToCopyFiles Include="$(DevelopmentToolPath)**" />
+    </ItemGroup>
+    <Message Text="拷贝 Telescope 所需工具文件：@(_TelescopeToCopyFiles)" />
+    <Copy SourceFiles="@(_TelescopeToCopyFiles)" DestinationFolder="Assets\tools\%(RecursiveDir)" SkipUnchangedFiles="True" />
+  </Target>
 
 </Project>
