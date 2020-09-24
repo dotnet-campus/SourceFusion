@@ -14,7 +14,7 @@
       <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)..\tools\netcoreapp3.1\dotnetCampus.TelescopeTask.dll&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup>
-      <_TelescopeSourceDefaultWorkingFolder Condition="'$(_TelescopeSourceDefaultWorkingFolder)' == ''">obj\$(Configuration)/</_TelescopeSourceDefaultWorkingFolder>
+      <_TelescopeSourceDefaultWorkingFolder Condition="'$(_TelescopeSourceDefaultWorkingFolder)' == ''">obj\$(Configuration)\$(TargetFramework)\</_TelescopeSourceDefaultWorkingFolder>
       <TelescopeSourceWorkingFolder Condition="'$(TelescopeSourceWorkingFolder)' == ''">$(_TelescopeSourceDefaultWorkingFolder)</TelescopeSourceWorkingFolder>
       <TelescopeSourceToolsFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.Tools\</TelescopeSourceToolsFolder>
       <TelescopeSourceGeneratedCodeFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.GeneratedCodes\</TelescopeSourceGeneratedCodeFolder>

@@ -63,11 +63,14 @@ namespace dotnetCampus.TelescopeTask.Tasks
                 .SelectMany(x => x.Types)
                 .Where(x => markedExports.FindIndex(m => x.Attributes.Any(x => x.Match(m.AttributeName))) >= 0)
                 .SelectMany(x => x.UsingNamespaceList)
-                .Concat(assembly.Files.SelectMany(x => x.UsingNamespaceList))
+                .Concat(assembly.Files
+                    .Where(x => x.AssemblyAttributes.Any(x => x.Match("MarkExport")))
+                    .SelectMany(x => x.UsingNamespaceList))
                 .Distinct(StringComparer.Ordinal)
+                .Where(x => !x.Contains('='))
                 .OrderBy(x => x);
             var exportedClass = BuildClassImplementation(exportedInterfaces, exportedMethodCodes, exportedFileUsings);
-            return exportedClass;
+            return exportedClass.Trim();
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace dotnetCampus.TelescopeTask.Tasks
         /// <returns>typeof 字符串的 Type 部分。</returns>
         private static string GuessTypeNameByTypeOfSyntax(string typeofSyntaxString)
         {
-            var match = Regex.Match(typeofSyntaxString, @"typeof\(([\w_]+\.)*(?<name>[\w_]+)\)",
+            var match = Regex.Match(typeofSyntaxString, @"typeof\((?<name>([\w_]+\.)*[\w_]+)\)",
                 RegexOptions.CultureInvariant,
                 TimeSpan.FromSeconds(1));
             return match.Success ? match.Groups["name"].Value : typeofSyntaxString;
