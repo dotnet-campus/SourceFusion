@@ -45,7 +45,7 @@ namespace dotnetCampus.Telescope
                 IEnumerable<AttributedTypeMetadata<TBaseClassOrInterface, TAttribute>>? metadataList = null;
                 try
                 {
-                    LoadFromAssembly<TBaseClassOrInterface, TAttribute>(assembly);
+                    metadataList = LoadFromAssembly<TBaseClassOrInterface, TAttribute>(assembly);
                 }
                 catch (Exception ex)
                 {

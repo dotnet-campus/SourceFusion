@@ -5,6 +5,6 @@
     <SourceFusionWorkingFolder Condition="'$(SourceFusionWorkingFolder)' == ''">obj/$(Configuration)/$(TargetFramework)/</SourceFusionWorkingFolder>
   </PropertyGroup>
 
-  <Import Project="../build/dotnetCampus.TelescopeTask.targets" />
+  <Import Project="../build/dotnetCampus.TelescopeSource.targets" />
 
 </Project>

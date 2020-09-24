@@ -20,13 +20,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Telescope", "src\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj", "{556913DF-6532-4532-B514-2D1184ADC75B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope", "src\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj", "{556913DF-6532-4532-B514-2D1184ADC75B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{78213588-C3B8-4E86-A19B-73DECD1ABA7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Telescope.Sample", "src\dotnetCampus.Telescope.Sample\dotnetCampus.Telescope.Sample.csproj", "{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.Sample", "src\dotnetCampus.Telescope.Sample\dotnetCampus.Telescope.Sample.csproj", "{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.TelescopeTask", "src\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj", "{09FF40A1-C13C-4D29-93B2-7A7C34D15694}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.TelescopeTask", "src\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj", "{09FF40A1-C13C-4D29-93B2-7A7C34D15694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Telescope.NuGet", "src\dotnetCampus.Telescope.NuGet\dotnetCampus.Telescope.NuGet.csproj", "{84DA7EE9-B511-407E-A510-DF390C742F0D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{09FF40A1-C13C-4D29-93B2-7A7C34D15694} = {09FF40A1-C13C-4D29-93B2-7A7C34D15694}
+		{556913DF-6532-4532-B514-2D1184ADC75B} = {556913DF-6532-4532-B514-2D1184ADC75B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +64,10 @@ Global
 		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

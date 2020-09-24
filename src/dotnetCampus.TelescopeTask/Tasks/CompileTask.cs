@@ -32,6 +32,10 @@ namespace dotnetCampus.TelescopeTask.Tasks
 
             // 收集并生成类。
             var code = GenerateAttributedTypesExportCode(context.Assembly);
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                return;
+            }
 
             // 将生成的类（编译单元）写入到文件中。
             PackageDirectory.Create(context.GeneratedCodeFolder);
@@ -52,6 +56,12 @@ namespace dotnetCampus.TelescopeTask.Tasks
                     AttributeName = GuessTypeNameByTypeOfSyntax(x[1])
                 })
                 .ToList();
+
+            // 未标记任何导出，于是不生成类型。
+            if (markedExports.Count == 0)
+            {
+                return "";
+            }
 
             // 寻找并导出所有类，加入到接口列表/方法列表中，并生成类。
             var exportedInterfaces = markedExports.Select(x => $@"ICompileTimeAttributedTypesExporter<{x.BaseClassOrInterfaceName}, {x.AttributeName}>");
