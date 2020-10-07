@@ -1,3 +1,3 @@
 ﻿<Project>
-  <Import Project="..\dotnetCampus.Telescope.NuGet\Assets\build\Package.targets" />
+  <!--<Import Project="..\dotnetCampus.Telescope.NuGet\Assets\build\Package.targets" />-->
 </Project>
