@@ -26,12 +26,12 @@ namespace dotnetCampus.SourceFusion.Syntax
         internal IReadOnlyList<ICompileType> Types => _types;
 
         /// <summary>
-        ///     所有找到的类型
+        ///     此文件中的所有命名空间（不含语法性的 using 和分号）。
         /// </summary>
         internal IReadOnlyList<string> UsingNamespaceList => _usingNamespaceList;
 
         /// <summary>
-        ///     所有找到的类型
+        ///     所有程序集级别的特性（Attribute）。
         /// </summary>
         internal IReadOnlyList<ICompileAttribute> AssemblyAttributes => _assemblyAttributes;
 
