@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,24 @@ namespace dotnetCampus.TelescopeTask.Utils
     {
         protected override bool CheckRebuildCore()
         {
-            var files = CompileFiles;
-            var lastWriteTime = files.Max(x => x.LastWriteTimeUtc);
-
             var resultFile = new FileInfo(Path.Combine(ToolDirectory.FullName, "Result.txt"));
             var lastBuildingTime = resultFile.LastWriteTimeUtc;
 
-            return lastWriteTime > lastBuildingTime;
+            var projectDirectory = ProjectDirectory.FullName;
+            var objDirectory = Path.Combine(projectDirectory, "obj");
+            var files = CompileFiles;
+            var newFiles = files
+                .Where(x =>
+                    // 是项目中的文件夹
+                    x.FullName.StartsWith(projectDirectory, StringComparison.OrdinalIgnoreCase) &&
+                    // 不是项目临时文件夹
+                    !x.FullName.StartsWith(objDirectory, StringComparison.OrdinalIgnoreCase) &&
+                    !x.FullName.StartsWith("obj", StringComparison.OrdinalIgnoreCase)
+                    )
+                .Where(x => x.LastWriteTimeUtc > lastBuildingTime);
+
+            var shouldRebuild = newFiles.Any();
+            return shouldRebuild;
         }
     }
 }

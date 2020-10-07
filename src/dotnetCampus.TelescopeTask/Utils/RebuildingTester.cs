@@ -10,13 +10,16 @@ namespace dotnetCampus.TelescopeTask.Utils
 {
     public abstract class RebuildingTester
     {
+        public DirectoryInfo ProjectDirectory { get; private set; }
+
         public DirectoryInfo ToolDirectory { get; private set; }
 
         public IReadOnlyList<FileInfo> CompileFiles { get; private set; }
 
-        public bool CheckRebuild(string toolsFolder, IEnumerable<string> compileFiles)
+        public bool CheckRebuild(string projectDirectory, string toolsFolder, IEnumerable<string> compileFiles)
         {
-            ToolDirectory = new DirectoryInfo(toolsFolder);
+            ProjectDirectory = new DirectoryInfo(projectDirectory);
+            ToolDirectory = new DirectoryInfo(Path.Combine(projectDirectory, toolsFolder));
             CompileFiles = compileFiles.Select(x => new FileInfo(x)).ToList();
             return CheckRebuildCore();
         }

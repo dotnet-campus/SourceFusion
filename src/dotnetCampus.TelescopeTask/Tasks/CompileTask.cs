@@ -63,7 +63,8 @@ namespace dotnetCampus.TelescopeTask.Tasks
         private bool CheckRebuild(ProjectCompilingContext context)
         {
             return new AllFilesLastWriteTimeRebuildingTester().CheckRebuild(
-                Path.Combine(context.WorkingFolder, context.ToolsFolder),
+                context.WorkingFolder,
+                context.ToolsFolder,
                 context.CompilingFiles);
         }
 

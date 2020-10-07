@@ -71,16 +71,11 @@
   <Target Name="_TelescopeSourceIncludeGeneratedCode"
           DependsOnTargets="_TelescopeSourceGenerateCode"
           BeforeTargets="CoreCompile">
-    <CreateItem Include="$(_TelescopeSourceOutputOfGenerateCode)">
-      <Output TaskParameter="Include" ItemName="_TelescopeSourceExcludedCompileFile" />
-    </CreateItem>
     <ItemGroup>
       <_TelescopeSourceIncludedCompileFile Include="$(TelescopeSourceGeneratedCodeFolder)/*.cs" />
       <Compile Include="@(_TelescopeSourceIncludedCompileFile)" />
-      <Compile Remove="@(_TelescopeSourceExcludedCompileFile)" />
     </ItemGroup>
     <Message Importance="High" Text="引入新的文件：@(_TelescopeSourceIncludedCompileFile)" />
-    <Message Importance="High" Text="排除旧的文件：@(_TelescopeSourceExcludedCompileFile)" />
   </Target>
 
   <!--添加清理 TelescopeSource 的依赖-->
