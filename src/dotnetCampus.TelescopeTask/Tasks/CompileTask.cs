@@ -13,6 +13,7 @@ using dotnetCampus.SourceFusion.Cli;
 using dotnetCampus.SourceFusion.CompileTime;
 using dotnetCampus.SourceFusion.Core;
 using dotnetCampus.Telescope;
+using dotnetCampus.TelescopeTask.Utils;
 
 using Walterlv.IO.PackageManagement;
 
@@ -27,10 +28,20 @@ namespace dotnetCampus.TelescopeTask.Tasks
             // 准备编译环境。
             var context = new ProjectCompilingContext(options);
 
+            // 进行重新编译测试。
+            var shouldRebuild = CheckRebuild(context);
+            if (!shouldRebuild)
+            {
+                new MSBuildMessage($"dotnetCampus.TelescopeTask：项目已最新，无需导出编译信息。").Message();
+                return;
+            }
+
             // 清除前一次生成的文件。
+            new MSBuildMessage($"dotnetCampus.TelescopeTask：删除前一次的导出结果…").Message();
             PackageDirectory.Delete(context.GeneratedCodeFolder);
 
             // 收集并生成类。
+            new MSBuildMessage($"dotnetCampus.TelescopeTask：正在生成新的编译信息…").Message();
             var code = GenerateAttributedTypesExportCode(context.Assembly);
             if (string.IsNullOrWhiteSpace(code))
             {
@@ -38,9 +49,22 @@ namespace dotnetCampus.TelescopeTask.Tasks
             }
 
             // 将生成的类（编译单元）写入到文件中。
+            new MSBuildMessage($"dotnetCampus.TelescopeTask：正在写入编译导出文件…").Message();
             PackageDirectory.Create(context.GeneratedCodeFolder);
             var targetFile = Path.Combine(context.GeneratedCodeFolder, "AttributedTypesExport.g.cs");
             File.WriteAllText(targetFile, code);
+
+            // 生成本次运行的摘要。
+            var resultFile = new FileInfo(Path.Combine(context.WorkingFolder, context.ToolsFolder, "Result.txt"));
+            File.WriteAllText(resultFile.FullName, "");
+            resultFile.LastAccessTimeUtc = DateTime.UtcNow;
+        }
+
+        private bool CheckRebuild(ProjectCompilingContext context)
+        {
+            return new AllFilesLastWriteTimeRebuildingTester().CheckRebuild(
+                Path.Combine(context.WorkingFolder, context.ToolsFolder),
+                context.CompilingFiles);
         }
 
         private static string GenerateAttributedTypesExportCode(CompileAssembly assembly)

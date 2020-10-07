@@ -25,7 +25,17 @@ namespace dotnetCampus.SourceFusion.CompileTime
             var symbols = preprocessorSymbols.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
             _compileFilesLazy = new Lazy<List<CompileFile>>
             (
-                () => compileFiles.Select(x => new CompileFile(new CompilingContext(this), x, symbols)).ToList(),
+                () => compileFiles.Select(x =>
+                {
+                    try
+                    {
+                        return new CompileFile(new CompilingContext(this), x, symbols);
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
+                }).Where(x => x != null).ToList(),
                 LazyThreadSafetyMode.ExecutionAndPublication
             );
         }
