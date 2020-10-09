@@ -32,6 +32,8 @@ namespace dotnetCampus.SourceFusion.CompileTime
             var compileTypeVisitor = new CompileTypeVisitor();
             compileTypeVisitor.Visit(_syntaxTree.GetRoot());
             Types = compileTypeVisitor.Types.ToList();
+            UsingNamespaceList = compileTypeVisitor.UsingNamespaceList;
+            AssemblyAttributes = compileTypeVisitor.AssemblyAttributes.ToList();
         }
 
         /// <summary>
@@ -43,6 +45,16 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// 获取文件的完全限定路径。
         /// </summary>
         public string FullName { get; }
+
+        /// <summary>
+        /// 获取此文件的 using 列表（仅命空间部分）。
+        /// </summary>
+        public IReadOnlyList<string> UsingNamespaceList { get; }
+
+        /// <summary>
+        /// 获取此文件中包含的为 assembly 定义的特性。
+        /// </summary>
+        public IReadOnlyCollection<ICompileAttribute> AssemblyAttributes { get; }
 
         /// <summary>
         /// 获取此文件中包含的所有类型。

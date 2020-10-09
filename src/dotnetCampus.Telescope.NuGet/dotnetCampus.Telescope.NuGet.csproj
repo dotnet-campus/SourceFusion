@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net45</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.0-alpha</Version>
+    <PackageId>dotnetCampus.TelescopeSource</PackageId>
+    <Product>dotnetCampus.TelescopeSource</Product>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentToolPath>..\dotnetCampus.TelescopeTask\bin\$(Configuration)\</DevelopmentToolPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <ProjectReference Include="..\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="..\dotnetCampus.TelescopeTask\bin\$(Configuration)\**" Pack="True" PackagePath="tools" />
+      <None Include="..\dotnetCampus.Telescope\bin\$(Configuration)\**" Pack="True" PackagePath="lib" />
+      <None Include="Assets\build\Package.targets" Pack="True" PackagePath="build\$(PackageId).targets" />
+      <None Include="Assets\buildMultiTargeting\Package.targets" Pack="True" PackagePath="buildMultiTargeting\$(PackageId).targets" />
+    </ItemGroup>
+  </Target>
+
+  <!-- 在编译结束后将生成的可执行程序放到 Tools 文件夹中，使得 Assets 文件夹的目录结构与 NuGet 包非常相似，便于 Sample 项目进行及时的 NuGet 包调试。 -->
+  <Target Name="_TelescopeCopyOutputToDebuggableFolder" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_TelescopeToCopyFiles Include="$(DevelopmentToolPath)**" />
+    </ItemGroup>
+    <Message Text="拷贝 Telescope 所需工具文件：@(_TelescopeToCopyFiles)" />
+    <Copy SourceFiles="@(_TelescopeToCopyFiles)" DestinationFolder="Assets\tools\%(RecursiveDir)" SkipUnchangedFiles="True" />
+  </Target>
+
+</Project>

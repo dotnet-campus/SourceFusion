@@ -92,17 +92,22 @@ namespace dotnetCampus.SourceFusion.CompileTime
         /// <inheritdoc />
         public bool Match(string attributeName)
         {
-            if (Name == attributeName)
+            var left = Name;
+            var right = attributeName;
+
+            if (string.Equals(left, right, StringComparison.Ordinal))
             {
                 return true;
             }
 
-            if (Name.EndsWith("Attribute"))
-            {
-                return Name == attributeName + "Attribute";
-            }
+            var leftIndex = left.LastIndexOf('.');
+            var rightIndex = right.LastIndexOf('.');
+            left = leftIndex >= 0 ? left.Substring(leftIndex + 1) : left;
+            right = rightIndex >= 0 ? right.Substring(rightIndex + 1) : right;
 
-            return Name + "Attribute" == attributeName;
+            return left.EndsWith("Attribute", StringComparison.Ordinal)
+                ? string.Equals(left, right + "Attribute", StringComparison.Ordinal)
+                : string.Equals(left + "Attribute", right, StringComparison.Ordinal);
         }
 
         private readonly List<string> _values = new List<string>();

@@ -1,0 +1,103 @@
+﻿<Project>
+
+  <!--第二阶段，创建 TelescopeSource 需要的文件夹-->
+  <Target Name="_TelescopeSourceEnsureToolPath">
+    <PropertyGroup>
+      <!-- 我们使用 $(MSBuildRuntimeType) 来判断编译器是 .NET Core 的还是 .NET Framework 的。-->
+      <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' == 'Core'">True</UseDotNetCore>
+      <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' != 'Core'">False</UseDotNetCore>
+    </PropertyGroup>
+    <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
+      <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)..\tools\net48\dotnetCampus.TelescopeTask.exe&quot;</TransformCodeToolCommand>
+    </PropertyGroup>
+    <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
+      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)..\tools\netcoreapp3.1\dotnetCampus.TelescopeTask.dll&quot;</TransformCodeToolCommand>
+    </PropertyGroup>
+    <PropertyGroup>
+      <_TelescopeSourceDefaultWorkingFolder Condition="'$(_TelescopeSourceDefaultWorkingFolder)' == ''">obj\$(Configuration)\$(TargetFramework)\</_TelescopeSourceDefaultWorkingFolder>
+      <TelescopeSourceWorkingFolder Condition="'$(TelescopeSourceWorkingFolder)' == ''">$(_TelescopeSourceDefaultWorkingFolder)</TelescopeSourceWorkingFolder>
+      <TelescopeSourceToolsFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.Tools\</TelescopeSourceToolsFolder>
+      <TelescopeSourceGeneratedCodeFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.GeneratedCodes\</TelescopeSourceGeneratedCodeFolder>
+    </PropertyGroup>
+  </Target>
+
+  <!--第一阶段，创建 TelescopeSource 需要的文件夹-->
+  <Target Name="_TelescopeSourceCreateDirectories"
+          DependsOnTargets="_TelescopeSourceEnsureToolPath">
+    <ItemGroup>
+      <TelescopeSourceDirectory Include="$(TelescopeSourceWorkingFolder)" />
+      <TelescopeSourceDirectory Include="$(TelescopeSourceToolsFolder)" />
+      <TelescopeSourceDirectory Include="$(TelescopeSourceGeneratedCodeFolder)" />
+    </ItemGroup>
+    <MakeDir Directories="@(TelescopeSourceDirectory)" ContinueOnError="false" />
+  </Target>
+
+  <!--第二阶段，写入 TelescopeSource 需要的命令行参数-->
+  <Target Name="_TelescopeSourceWriteArgs"
+          DependsOnTargets="_TelescopeSourceCreateDirectories">
+    <PropertyGroup>
+      <TelescopeSourceProjectPropertyFile Condition=" '$(TelescopeSourceProjectPropertyFile)' == '' ">$(TelescopeSourceToolsFolder)CommandArgs.txt</TelescopeSourceProjectPropertyFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- COIN 格式的配置文件 https://github.com/dotnet-campus/dotnetCampus.Configurations -->
+      <TelescopeSourceCommandArgLine Include=">" />
+      <TelescopeSourceCommandArgLine Include="RootNamespace" />
+      <TelescopeSourceCommandArgLine Include="$(RootNamespace)" />
+      <TelescopeSourceCommandArgLine Include=">" />
+      <TelescopeSourceCommandArgLine Include="Compile" />
+      <TelescopeSourceCommandArgLine Include="@(Compile)" />
+      <TelescopeSourceCommandArgLine Include=">" />
+      <TelescopeSourceCommandArgLine Include="PrecompileFilter" />
+      <TelescopeSourceCommandArgLine Include="@(PrecompileFilter)" />
+      <TelescopeSourceCommandArgLine Include=">" />
+      <TelescopeSourceCommandArgLine Include="ReferencePath" />
+      <TelescopeSourceCommandArgLine Include="@(ReferencePath)" />
+      <TelescopeSourceCommandArgLine Include=">" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(TelescopeSourceProjectPropertyFile)" Lines="@(TelescopeSourceCommandArgLine)" Overwrite="True" />
+  </Target>
+
+  <!--第三阶段，执行 TelescopeSource-->
+  <Target Name="_TelescopeSourceGenerateCode"
+          DependsOnTargets="_TelescopeSourceWriteArgs">
+    <Exec ConsoleToMSBuild="True"
+          Command="$(TransformCodeToolCommand) &quot;$(MSBuildProjectDirectory)&quot; -t $(TelescopeSourceToolsFolder) -c $(TelescopeSourceGeneratedCodeFolder) -p &quot;$(TelescopeSourceProjectPropertyFile)&quot; -s &quot;$(DefineConstants)&quot;">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_TelescopeSourceOutputOfGenerateCode" />
+      <Output TaskParameter="ExitCode" PropertyName="_TelescopeSourceMainExitCode" />
+    </Exec>
+  </Target>
+
+  <!--第四阶段，使用 TelescopeSource 生成的新源码-->
+  <Target Name="_TelescopeSourceIncludeGeneratedCode"
+          DependsOnTargets="_TelescopeSourceGenerateCode"
+          BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_TelescopeSourceIncludedCompileFile Include="$(TelescopeSourceGeneratedCodeFolder)/*.cs" />
+      <Compile Include="@(_TelescopeSourceIncludedCompileFile)" />
+    </ItemGroup>
+    <Message Importance="High" Text="引入新的文件：@(_TelescopeSourceIncludedCompileFile)" />
+  </Target>
+
+  <!--添加清理 TelescopeSource 的依赖-->
+  <PropertyGroup>
+    <CleanDependsOn>$(CleanDependsOn);_TelescopeSourceClean</CleanDependsOn>
+  </PropertyGroup>
+
+  <!--清理 TelescopeSource 计算所得的文件-->
+  <Target Name="_TelescopeSourceClean">
+    <PropertyGroup>
+      <_TelescopeSourceDefaultWorkingFolder Condition="'$(_TelescopeSourceDefaultWorkingFolder)' == ''">obj/$(Configuration)/</_TelescopeSourceDefaultWorkingFolder>
+      <TelescopeSourceWorkingFolder Condition="'$(TelescopeSourceWorkingFolder)' == ''">$(_TelescopeSourceDefaultWorkingFolder)</TelescopeSourceWorkingFolder>
+      <TelescopeSourceToolsFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.Tools\</TelescopeSourceToolsFolder>
+      <TelescopeSourceGeneratedCodeFolder>$(TelescopeSourceWorkingFolder)TelescopeSource.GeneratedCodes/</TelescopeSourceGeneratedCodeFolder>
+    </PropertyGroup>
+    <ItemGroup>
+      <_TelescopeSourceFilesToDelete Include="$(TelescopeSourceToolsFolder)*" />
+      <_TelescopeSourceFilesToDelete Include="$(TelescopeSourceGeneratedCodeFolder)*" />
+    </ItemGroup>
+    <!-- 仅仅删除文件夹中的文件，因为怀疑直接删除文件夹会触发 Windows 10 中的某个 bug，导致无法删除。 -->
+    <Delete Files="$(_TelescopeSourceFilesToDelete)" />
+    <Message Text="清理文件夹：$(TelescopeSourceToolsFolder);$(TelescopeSourceGeneratedCodeFolder)" />
+  </Target>
+
+</Project>
