@@ -4,7 +4,6 @@
     <TargetFrameworks>netcoreapp3.1;netstandard2.0;net45</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.0-alpha</Version>
     <PackageId>dotnetCampus.TelescopeSource</PackageId>
     <Product>dotnetCampus.TelescopeSource</Product>
     <IncludeBuildOutput>false</IncludeBuildOutput>

@@ -8,7 +8,8 @@
     <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
     <Product>dotnetCampus.SourceFusion</Product>
     <PackageId>dotnetCampus.SourceFusion</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
+    <Version>0.9.6-alpha</Version>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <Description>
       使代码在编译期执行，以提升运行时效率。
