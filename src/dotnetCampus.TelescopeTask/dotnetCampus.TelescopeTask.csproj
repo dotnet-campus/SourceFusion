@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\SourceFusion.Tool\CompileTime\*.cs" Link="CompileTime\%(RecursiveDir)%(FileName)%(Extension)" />
     <Compile Include="..\SourceFusion.Tool\Core\*.cs" Link="Core\%(RecursiveDir)%(FileName)%(Extension)" />
