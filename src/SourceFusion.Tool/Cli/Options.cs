@@ -6,7 +6,7 @@ namespace dotnetCampus.SourceFusion.Cli
     internal class Options
     {
         [Value(0, Description = "转换源码的工作路径。")]
-        public string WorkingFolder { get; set; }
+        public string WorkingDirectory { get; set; }
 
         [Option('t', "tool-folder", Description = "SourceFusion 可以使用的临时文件夹路径。")]
         public string ToolFolder { get; set; }
