@@ -4,6 +4,10 @@ SourceFusion 是一套预编译框架。
 
 当项目安装 SourceFusion 了之后，项目中即可开始书写预编译代码。通过执行这些预编译代码，项目可以在编译期间执行一些平时需要在运行时执行的代码。这种方式能够将耗时的运行时代码迁移到编译期执行，大幅度提升运行时性能。
 
+|Build|NuGet|
+|--|--|
+|![](https://github.com/dotnet-campus/SourceFusion/workflows/.NET%20Core/badge.svg)|[![](https://img.shields.io/nuget/v/dotnetCampus.SourceFusion.svg)](https://www.nuget.org/packages/dotnetCampus.SourceFusion)|
+
 ## 入门
 
 ### 安装 NuGet 包
