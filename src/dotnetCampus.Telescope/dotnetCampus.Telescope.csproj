@@ -5,5 +5,5 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  <Target Name="GetTargetPath"/>
 </Project>
