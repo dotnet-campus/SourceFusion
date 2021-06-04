@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright (c) 2018-2020 dotnet-campus</Copyright>
+    <Copyright>Copyright (c) 2018-2021 dotnet-campus</Copyright>
     <PackageProjectUrl>https://github.com/dotnet-campus/SourceFusion</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotnet-campus/SourceFusion.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
