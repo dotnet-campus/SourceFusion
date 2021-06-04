@@ -5,5 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  
+  <!-- 这是为了兼容最新版本的预览版的.NET 6构建 -->
+  <Target Name="GetTargetPath"/>
 </Project>
