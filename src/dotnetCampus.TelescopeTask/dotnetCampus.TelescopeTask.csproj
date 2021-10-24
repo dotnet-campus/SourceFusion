@@ -9,7 +9,7 @@
     <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.Configurations" Version="1.2.9" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.MSBuildUtils.Source" Version="1.1.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
     <PackageReference Include="Walterlv.IO.PackageManagement" Version="5.9.0" PrivateAssets="all" />
   </ItemGroup>
 
