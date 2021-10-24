@@ -1,41 +1,35 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.28606.126
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tool", "src\SourceFusion.Tool\SourceFusion.Tool.csproj", "{EFDCE47F-3FCE-4428-9F63-340806876FE5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D5CEA013-E3B7-4096-B127-D02D4DEA37F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Core", "src\SourceFusion\SourceFusion.Core.csproj", "{833511F2-E986-4D5E-8D34-EF53786801F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.Sample", "src\dotnetCampus.Telescope.Sample\dotnetCampus.Telescope.Sample.csproj", "{ADF9CC67-804D-4D22-B0C4-3D81D20106F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tests", "tests\SourceFusion.Tests\SourceFusion.Tests.csproj", "{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02D03DE5-1A19-4002-92BD-0E3DC61A53C4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41B6AF7A-C4D6-42F4-A1D2-A2E4271B2FD3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{602520FC-6A8C-43A3-9ED6-F82F2926E108}"
 	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		build\config.xml = build\config.xml
 		Directory.Build.props = Directory.Build.props
 		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope", "src\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj", "{556913DF-6532-4532-B514-2D1184ADC75B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B08AB736-FFE0-45E2-9799-7F2A428D3F12}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{78213588-C3B8-4E86-A19B-73DECD1ABA7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tests", "tests\SourceFusion.Tests\SourceFusion.Tests.csproj", "{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.Sample", "src\dotnetCampus.Telescope.Sample\dotnetCampus.Telescope.Sample.csproj", "{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}"
-	ProjectSection(ProjectDependencies) = postProject
-		{84DA7EE9-B511-407E-A510-DF390C742F0D} = {84DA7EE9-B511-407E-A510-DF390C742F0D}
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceFusion", "SourceFusion", "{AF81528D-8625-4779-82D5-A969FB5245C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.TelescopeTask", "src\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj", "{09FF40A1-C13C-4D29-93B2-7A7C34D15694}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Core", "src\SourceFusion\SourceFusion.Core.csproj", "{ABED0990-1F92-4404-A631-A3AD8EFFF13F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.NuGet", "src\dotnetCampus.Telescope.NuGet\dotnetCampus.Telescope.NuGet.csproj", "{84DA7EE9-B511-407E-A510-DF390C742F0D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694} = {09FF40A1-C13C-4D29-93B2-7A7C34D15694}
-		{556913DF-6532-4532-B514-2D1184ADC75B} = {556913DF-6532-4532-B514-2D1184ADC75B}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceFusion.Tool", "src\SourceFusion.Tool\SourceFusion.Tool.csproj", "{23EF239F-2B69-45B8-9135-F85F8A665B61}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Telescope", "Telescope", "{F8B90021-856C-4CD5-89C1-6D0BB972C7DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope", "src\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj", "{FCA88C4D-4DD1-4C34-838B-A20F8A436F50}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.NuGet", "src\dotnetCampus.Telescope.NuGet\dotnetCampus.Telescope.NuGet.csproj", "{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.TelescopeTask", "src\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj", "{D9CEA9E7-02B0-4510-997C-44DA58D97A7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,43 +37,48 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EFDCE47F-3FCE-4428-9F63-340806876FE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFDCE47F-3FCE-4428-9F63-340806876FE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFDCE47F-3FCE-4428-9F63-340806876FE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFDCE47F-3FCE-4428-9F63-340806876FE5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{833511F2-E986-4D5E-8D34-EF53786801F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{833511F2-E986-4D5E-8D34-EF53786801F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{833511F2-E986-4D5E-8D34-EF53786801F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{833511F2-E986-4D5E-8D34-EF53786801F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Release|Any CPU.Build.0 = Release|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADF9CC67-804D-4D22-B0C4-3D81D20106F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADF9CC67-804D-4D22-B0C4-3D81D20106F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADF9CC67-804D-4D22-B0C4-3D81D20106F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADF9CC67-804D-4D22-B0C4-3D81D20106F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABED0990-1F92-4404-A631-A3AD8EFFF13F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABED0990-1F92-4404-A631-A3AD8EFFF13F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABED0990-1F92-4404-A631-A3AD8EFFF13F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABED0990-1F92-4404-A631-A3AD8EFFF13F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23EF239F-2B69-45B8-9135-F85F8A665B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23EF239F-2B69-45B8-9135-F85F8A665B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23EF239F-2B69-45B8-9135-F85F8A665B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23EF239F-2B69-45B8-9135-F85F8A665B61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA88C4D-4DD1-4C34-838B-A20F8A436F50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA88C4D-4DD1-4C34-838B-A20F8A436F50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA88C4D-4DD1-4C34-838B-A20F8A436F50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA88C4D-4DD1-4C34-838B-A20F8A436F50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9CEA9E7-02B0-4510-997C-44DA58D97A7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9CEA9E7-02B0-4510-997C-44DA58D97A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9CEA9E7-02B0-4510-997C-44DA58D97A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9CEA9E7-02B0-4510-997C-44DA58D97A7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69} = {02D03DE5-1A19-4002-92BD-0E3DC61A53C4}
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376} = {78213588-C3B8-4E86-A19B-73DECD1ABA7B}
+		{ADF9CC67-804D-4D22-B0C4-3D81D20106F0} = {D5CEA013-E3B7-4096-B127-D02D4DEA37F0}
+		{98D70B96-8958-4FA3-8ADA-5CE14F4F5E24} = {B08AB736-FFE0-45E2-9799-7F2A428D3F12}
+		{ABED0990-1F92-4404-A631-A3AD8EFFF13F} = {AF81528D-8625-4779-82D5-A969FB5245C9}
+		{23EF239F-2B69-45B8-9135-F85F8A665B61} = {AF81528D-8625-4779-82D5-A969FB5245C9}
+		{FCA88C4D-4DD1-4C34-838B-A20F8A436F50} = {F8B90021-856C-4CD5-89C1-6D0BB972C7DB}
+		{6A9FFDAB-0D31-4D27-BC76-E66A4C1D24C0} = {F8B90021-856C-4CD5-89C1-6D0BB972C7DB}
+		{D9CEA9E7-02B0-4510-997C-44DA58D97A7D} = {F8B90021-856C-4CD5-89C1-6D0BB972C7DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {22702A10-22E1-4670-8FCA-9581202E6CAB}
+		SolutionGuid = {784B0395-D865-4787-B895-C74A83566386}
 	EndGlobalSection
 EndGlobal
