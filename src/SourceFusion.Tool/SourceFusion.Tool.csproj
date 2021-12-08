@@ -9,7 +9,7 @@
     <Product>dotnetCampus.SourceFusion</Product>
     <PackageId>dotnetCampus.SourceFusion</PackageId>
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
-    <Version>0.10.6-alpha</Version>
+    <Version>0.10.7-alpha01</Version>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <Description>
       使代码在编译期执行，以提升运行时效率。
@@ -17,6 +17,10 @@
     </Description>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <!-- [Select which .NET version to use - .NET | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/core/versions/selection ) -->
+    <!-- 让 .NET 高版本SDK可以运行此程序，解决仅安装 .NET 6 SDK 而无法运行此基于 .NET 5 的应用 -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>

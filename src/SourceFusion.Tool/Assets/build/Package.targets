@@ -10,7 +10,7 @@
       <MSBuildRuntimeVersion Condition=" '$(UseDotNetCore)' == 'True' ">$([System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription.ToString())</MSBuildRuntimeVersion>
       <_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET Core 3')) ">netcoreapp3.1</_TelescopeMSBuildRuntimeFramework>
       <_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET 6')) ">net6.0</_TelescopeMSBuildRuntimeFramework>
-      <_TelescopeMSBuildRuntimeFramework Condition=" '$(_TelescopeMSBuildRuntimeFramework)' == '' ">net5.0</_TelescopeMSBuildRuntimeFramework>
+      <_TelescopeMSBuildRuntimeFramework Condition=" '$(_TelescopeMSBuildRuntimeFramework)' == '' ">net6.0</_TelescopeMSBuildRuntimeFramework>
     </PropertyGroup>
     <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
       <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)../tools/net48/codet.exe&quot;</TransformCodeToolCommand>
