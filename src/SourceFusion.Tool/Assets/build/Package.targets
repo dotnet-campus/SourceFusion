@@ -7,16 +7,16 @@
       <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' == 'Core'">True</UseDotNetCore>
       <UseDotNetCore Condition=" '$(MSBuildRuntimeType)' != 'Core'">False</UseDotNetCore>
       <!-- 使用 RuntimeInformation 得到 MSBuild 此刻正在运行的 .NET 框架版本号。-->
-      <MSBuildRuntimeVersion Condition=" '$(UseDotNetCore)' == 'True' ">$([System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription.ToString())</MSBuildRuntimeVersion>
-      <_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET Core 3')) ">netcoreapp3.1</_TelescopeMSBuildRuntimeFramework>
-      <_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET 6')) ">net6.0</_TelescopeMSBuildRuntimeFramework>
-      <_TelescopeMSBuildRuntimeFramework Condition=" '$(_TelescopeMSBuildRuntimeFramework)' == '' ">net6.0</_TelescopeMSBuildRuntimeFramework>
+      <!--<MSBuildRuntimeVersion Condition=" '$(UseDotNetCore)' == 'True' ">$([System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription.ToString())</MSBuildRuntimeVersion>
+      <_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET Core 3')) ">netcoreapp3.1</_TelescopeMSBuildRuntimeFramework>-->
+      <!--<_TelescopeMSBuildRuntimeFramework Condition=" $(MSBuildRuntimeVersion.StartsWith('.NET 6')) ">net6.0</_TelescopeMSBuildRuntimeFramework>
+      <_TelescopeMSBuildRuntimeFramework Condition=" '$(_TelescopeMSBuildRuntimeFramework)' == '' ">net6.0</_TelescopeMSBuildRuntimeFramework>-->
     </PropertyGroup>
     <PropertyGroup Condition=" $(IsInDemoToolDebugMode) != 'True' ">
       <TransformCodeToolCommand>&quot;$(MSBuildThisFileDirectory)../tools/net48/codet.exe&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup Condition=" $(UseDotNetCore) == 'True' ">
-      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)../tools/$(_TelescopeMSBuildRuntimeFramework)/codet.dll&quot;</TransformCodeToolCommand>
+      <TransformCodeToolCommand>dotnet &quot;$(MSBuildThisFileDirectory)../tools/netcoreapp3.1/codet.dll&quot;</TransformCodeToolCommand>
     </PropertyGroup>
     <PropertyGroup>
       <_SourceFusionDefaultWorkingFolder Condition="'$(_SourceFusionDefaultWorkingFolder)' == ''">obj/$(Configuration)/</_SourceFusionDefaultWorkingFolder>
