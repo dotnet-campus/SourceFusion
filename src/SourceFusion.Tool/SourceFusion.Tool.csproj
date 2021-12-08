@@ -11,7 +11,7 @@
     <Product>dotnetCampus.SourceFusion</Product>
     <PackageId>dotnetCampus.SourceFusion</PackageId>
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
-    <Version>0.10.7-alpha06</Version>
+    <Version>0.10.7-alpha07</Version>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <Description>
       使代码在编译期执行，以提升运行时效率。

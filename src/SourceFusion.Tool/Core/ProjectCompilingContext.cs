@@ -12,6 +12,21 @@ namespace dotnetCampus.SourceFusion.Core
         internal ProjectCompilingContext(Options options)
         {
             // 初始化基础属性。
+            if (string.IsNullOrEmpty(options.WorkingDirectory))
+            {
+                throw new ArgumentNullException(nameof(options.WorkingDirectory) + $" CommandLine: {Environment.CommandLine}");
+            }
+
+            if (string.IsNullOrEmpty(options.ToolFolder))
+            {
+                throw new ArgumentNullException(nameof(options.ToolFolder) + $" CommandLine: {Environment.CommandLine}");
+            }
+
+            if (string.IsNullOrEmpty(options.GeneratedCodeFolder))
+            {
+                throw new ArgumentNullException(nameof(options.GeneratedCodeFolder) + $" CommandLine: {Environment.CommandLine}");
+            }
+
             WorkingFolder = Path.GetFullPath(options.WorkingDirectory);
             ToolsFolder = FullPath(options.ToolFolder);
             GeneratedCodeFolder = FullPath(options.GeneratedCodeFolder);
