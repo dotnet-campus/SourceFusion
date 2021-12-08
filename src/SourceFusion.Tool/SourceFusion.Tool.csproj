@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
+    <!-- 以下的 net6.0;net5.0 只是为了让其他项目能构建通过，不作为工具 -->
+    <!-- 只有 netcoreapp3.1;net48 做工具 -->
+    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>codet</AssemblyName>
     <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
