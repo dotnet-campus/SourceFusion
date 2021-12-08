@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>codet</AssemblyName>
     <RootNamespace>dotnetCampus.SourceFusion</RootNamespace>
     <Product>dotnetCampus.SourceFusion</Product>
     <PackageId>dotnetCampus.SourceFusion</PackageId>
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
-    <Version>0.10.7-alpha01</Version>
+    <Version>0.10.7-alpha02</Version>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <Description>
       使代码在编译期执行，以提升运行时效率。
