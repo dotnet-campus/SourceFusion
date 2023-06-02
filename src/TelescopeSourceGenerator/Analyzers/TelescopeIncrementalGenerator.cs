@@ -30,12 +30,8 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                     // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
                     // attributeSyntax：拿到 MarkExport 符号
                     // 由于只是拿到 MarkExport 符号，不等于是 `dotnetCampus.Telescope.MarkExportAttribute` 特性，需要走语义分析
-                    
-                    var attributeSymbolInfo = generatorSyntaxContext.SemanticModel.GetSymbolInfo(attributeSyntax);
-                    // 这里的 MarkExport(...) 是 `dotnetCampus.Telescope.MarkExportAttribute` 的构造函数，构造函数是函数，因此拿到的符号是方法
-                    if (attributeSymbolInfo.Symbol is IMethodSymbol methodSymbol
-                        // 通过构造函数获取到对应的类型
-                        && methodSymbol.ReceiverType is {} attributeType)
+                    var typeInfo = generatorSyntaxContext.SemanticModel.GetTypeInfo(attributeSyntax);
+                    if (typeInfo.Type is {} attributeType)
                     {
                         // 带上 global 格式的输出 FullName 内容
                         var symbolDisplayFormat = new SymbolDisplayFormat
