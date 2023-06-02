@@ -11,15 +11,12 @@ internal class Program
 [Foo]
 class Foo : Base
 {
-
 }
 
 class Base
 {
-
 }
 
 class FooAttribute : Attribute
 {
-
 }
