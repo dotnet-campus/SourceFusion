@@ -14,45 +14,59 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
     {
         Debugger.Launch();
 
+        // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
+        // 读取程序集特性
         var assemblyAttributeSyntaxContextIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, cancellationToken) =>
         {
+            // 预先判断是 assembly 的特性再继续
             // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
             return syntaxNode.IsKind(SyntaxKind.AttributeList) && syntaxNode.ChildNodes().Any(subNode=> subNode.IsKind(SyntaxKind.AttributeTargetSpecifier));
         }, (generatorSyntaxContext, cancellationToken) =>
         {
-            var descendantNodes = generatorSyntaxContext.Node.DescendantNodes(node => node.IsKind(SyntaxKind.Attribute));
-
-            var symbol = generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(generatorSyntaxContext.Node);
-
-            
-
             if (generatorSyntaxContext.Node is AttributeListSyntax attributeListSyntax)
             {
                 foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
                 {
-                    // g
-                    var preprocessingSymbolInfo = generatorSyntaxContext.SemanticModel.GetPreprocessingSymbolInfo(attributeSyntax);
-                    var enclosingSymbol = generatorSyntaxContext.SemanticModel.GetEnclosingSymbol(attributeSyntax.Span.Start);
+                    // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
+                    // attributeSyntax：拿到 MarkExport 符号
+                    // 由于只是拿到 MarkExport 符号，不等于是 `dotnetCampus.Telescope.MarkExportAttribute` 特性，需要走语义分析
+                    
+                    var attributeSymbolInfo = generatorSyntaxContext.SemanticModel.GetSymbolInfo(attributeSyntax);
+                    // 这里的 MarkExport(...) 是 `dotnetCampus.Telescope.MarkExportAttribute` 的构造函数，构造函数是函数，因此拿到的符号是方法
+                    if (attributeSymbolInfo.Symbol is IMethodSymbol methodSymbol
+                        // 通过构造函数获取到对应的类型
+                        && methodSymbol.ReceiverType is {} attributeType)
+                    {
+                        // 带上 global 格式的输出 FullName 内容
+                        var symbolDisplayFormat = new SymbolDisplayFormat
+                        (
+                            // 带上命名空间和类型名
+                            SymbolDisplayGlobalNamespaceStyle.Included,
+                            // 命名空间之前加上 global 防止冲突
+                            SymbolDisplayTypeQualificationStyle
+                                .NameAndContainingTypesAndNamespaces
+                        );
+                        var fullName = attributeType.ToDisplayString(symbolDisplayFormat);
 
-                    // 太多项了
-                    //generatorSyntaxContext.SemanticModel.LookupNamespacesAndTypes()
-
-                    var declaredSymbol = generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(attributeSyntax.Name);
-                    var declaredSymbol2 = generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(attributeSyntax);
-
-                    var symbolInfo1 = generatorSyntaxContext.SemanticModel.GetSymbolInfo(attributeSyntax);
-                    var symbolInfo2 = generatorSyntaxContext.SemanticModel.GetSymbolInfo(attributeSyntax.Name);
-                    var symbolInfo1Symbol = symbolInfo1.Symbol as IMethodSymbol;
-                    var displayString = symbolInfo1Symbol.ReceiverType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Included,SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces));
+                        if (fullName == "global::dotnetCampus.Telescope.MarkExportAttribute")
+                        {
+                            // 这个是符合预期的
+                        }
+                    }
                 }
+            }
+            else
+            {
+                // 理论上不可能，因为前置判断过了
             }
 
             return generatorSyntaxContext;
         }).Collect();
 
-        IncrementalValuesProvider<GeneratorSyntaxContext> generatorSyntaxContextIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((n, c) => true, (g, c) =>
+        // 遍历整个程序集的所有代码文件
+        IncrementalValuesProvider<GeneratorSyntaxContext> generatorSyntaxContextIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, cancellationToken) => syntaxNode.IsKind(SyntaxKind.ClassDeclaration), (generatorSyntaxContext, cancellationToken) =>
         {
-            return g;
+            return generatorSyntaxContext;
         });
 
         var collect = generatorSyntaxContextIncrementalValuesProvider.Combine(assemblyAttributeSyntaxContextIncrementalValuesProvider).Collect();
