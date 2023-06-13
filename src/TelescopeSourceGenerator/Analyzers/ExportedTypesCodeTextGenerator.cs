@@ -11,7 +11,9 @@ class ExportedTypesCodeTextGenerator
 {
     public string Generate(ImmutableArray<MarkClassParseResult> markClassCollection, CancellationToken token)
     {
+        // 导出的接口
         var exportedInterfaces = new List<string>();
+        // 导出的方法
         var exportedMethodCodes = new List<string>();
 
         foreach (var markClassGroup in markClassCollection.GroupBy(t => t.MarkExportAttributeParseResult))
@@ -70,6 +72,24 @@ namespace dotnetCampus.Telescope
     }}
 }}";
         code = FormatCode(code);
+        // 生成的代码示例：
+        /*
+        using dotnetCampus.Telescope;
+
+        namespace dotnetCampus.Telescope
+        {
+            public partial class __AttributedTypesExport__ : ICompileTimeTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>
+            {
+                ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[] ICompileTimeTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>.ExportTypes()
+                {
+                    return new ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[]
+                    {
+                        new ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>(typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), () => new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo())
+                    };
+                }
+            }
+        }
+         */
         return code;
     }
 
