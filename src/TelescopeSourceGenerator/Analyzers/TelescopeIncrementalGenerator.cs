@@ -288,8 +288,19 @@ namespace dotnetCampus.Telescope
         ", exportedMethodCodes)}
     }}
 }}";
-
+        code = FormatCode(code);
         return code;
+    }
+
+    /// <summary>
+    /// 格式化代码。
+    /// </summary>
+    /// <param name="sourceCode">未格式化的源代码。</param>
+    /// <returns>格式化的源代码。</returns>
+    internal static string FormatCode(string sourceCode)
+    {
+        var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
+        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 
     private static string TypeInfoToFullName(TypeInfo typeInfo)
