@@ -33,3 +33,26 @@ public class ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>
 
     public TBaseClassOrInterface CreateInstance() => _instanceCreator();
 }
+
+class Foo : Base
+{
+}
+
+class Base
+{
+}
+
+class FooAttribute : Attribute
+{
+}
+
+public partial class __AttributedTypesExport__ : ICompileTimeTypesExporter<global::dotnetCampus.Telescope.Base, global::dotnetCampus.Telescope.FooAttribute>
+{
+    ExportedTypeMetadata<global::dotnetCampus.Telescope.Base, global::dotnetCampus.Telescope.FooAttribute>[] ICompileTimeTypesExporter<global::dotnetCampus.Telescope.Base, global::dotnetCampus.Telescope.FooAttribute>.ExportTypes()
+    {
+        return new ExportedTypeMetadata<global::dotnetCampus.Telescope.Base, global::dotnetCampus.Telescope.FooAttribute>[]
+        {
+                new ExportedTypeMetadata<global::dotnetCampus.Telescope.Base, global::dotnetCampus.Telescope.FooAttribute>(typeof(global::dotnetCampus.Telescope.Foo), () => new global::dotnetCampus.Telescope.Foo())
+        };
+    }
+}
