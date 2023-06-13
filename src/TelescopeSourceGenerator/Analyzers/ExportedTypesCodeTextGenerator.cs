@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
-class AttributedTypesExportGenerator
+class ExportedTypesCodeTextGenerator
 {
     public string Generate(ImmutableArray<MarkClassParseResult> markClassCollection, CancellationToken token)
     {
@@ -78,18 +78,26 @@ namespace dotnetCampus.Telescope
     /// </summary>
     /// <param name="sourceCode">未格式化的源代码。</param>
     /// <returns>格式化的源代码。</returns>
-    internal static string FormatCode(string sourceCode)
+    private static string FormatCode(string sourceCode)
     {
         var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
         return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 
+    /// <summary>
+    /// 输出类型的完全限定名
+    /// </summary>
+    /// <param name="typeInfo"></param>
+    /// <returns></returns>
     private static string TypeInfoToFullName(TypeInfo typeInfo)
     {
         ITypeSymbol typeSymbol = typeInfo.Type;
         return TypeSymbolToFullName(typeSymbol);
     }
 
+    /// <summary>
+    /// 输出类型的完全限定名
+    /// </summary>
     private static string TypeSymbolToFullName(ITypeSymbol typeSymbol)
     {
         // 带上 global 格式的输出 FullName 内容

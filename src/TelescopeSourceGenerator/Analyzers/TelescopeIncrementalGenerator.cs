@@ -72,7 +72,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         // 参考 AttributedTypesExportFileGenerator 逻辑生成代码
         IncrementalValueProvider<string> generationCodeProvider = collectionClass.Select((markClassCollection, token) =>
         {
-            var attributedTypesExportGenerator = new AttributedTypesExportGenerator();
+            var attributedTypesExportGenerator = new ExportedTypesCodeTextGenerator();
             string generationCode = attributedTypesExportGenerator.Generate(markClassCollection, token);
             return generationCode;
         });
