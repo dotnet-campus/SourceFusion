@@ -23,27 +23,40 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
         // 读取程序集特性
 
-        var assemblyAttributeSyntaxContextIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider(
-            (syntaxNode, cancellationToken) =>
-            {
-                // 预先判断是 assembly 的特性再继续
-                // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
-                return syntaxNode.IsKind(SyntaxKind.AttributeList) && syntaxNode.ChildNodes()
-                    .Any(subNode => subNode.IsKind(SyntaxKind.AttributeTargetSpecifier));
-            }, ParseMarkExportAttribute).Where(t => t.Success).Collect();
-
-        // 遍历整个程序集的所有代码文件
-        var generatorSyntaxContextIncrementalValuesProvider =
+        var assemblyAttributeSyntaxContextIncrementalValuesProvider =
             context.SyntaxProvider.CreateSyntaxProvider
                 (
+                    // 语法分析，过滤只有是程序集特性
+                    (syntaxNode, cancellationToken) =>
+                    {
+                        // 预先判断是 assembly 的特性再继续
+                        // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
+                        return syntaxNode.IsKind(SyntaxKind.AttributeList) && syntaxNode.ChildNodes()
+                            .Any(subNode => subNode.IsKind(SyntaxKind.AttributeTargetSpecifier));
+                    },
+                    // 获取只有是属于程序集标记的特性才使用
+                    ParseMarkExportAttribute
+                )
+                .Where(t => t.Success)
+                .Collect();
+
+        // 遍历整个程序集的所有代码文件
+        // 获取出所有标记了特性的类型，用来在下一步判断是否属于导出的类型
+        var assemblyClassIncrementalValuesProvider =
+            context.SyntaxProvider.CreateSyntaxProvider
+                (
+                    // 语法分析，只有是 class 类型定义的才可能满足需求
                     (syntaxNode, cancellationToken) => syntaxNode.IsKind(SyntaxKind.ClassDeclaration),
+                    // 加上语义分析，了解当前的类型是否有添加任何标记
                     (generatorSyntaxContext, cancellationToken) =>
                     {
-                        var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
+                        var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
 
+                        // 从语法转换为语义，用于后续判断是否标记了特性
                         INamedTypeSymbol namedTypeSymbol =
                             generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
+                        // 如果可以获取到语义的类型，则尝试获取其标记的特性
                         if (namedTypeSymbol is not null)
                         {
                             var attributes = namedTypeSymbol.GetAttributes();
@@ -62,17 +75,16 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                         return new AssemblyCandidateClassParseResult();
                     }
                 )
+                // 过滤掉不符合条件的类型
                 .Where(t => t.Success);
 
         // 将程序集特性和类型组合一起，看看哪些类型符合程序集特性的要求，将其拼装到一起
-        var collectionClass = generatorSyntaxContextIncrementalValuesProvider
-            .Combine(assemblyAttributeSyntaxContextIncrementalValuesProvider)
-            .Select((tuple, token) =>
-            {
-                return ParseMarkClassList(tuple.Left, tuple.Right);
-            })
-            .SelectMany((list, _) => list)
-            .Collect();
+        IncrementalValueProvider<ImmutableArray<MarkClassParseResult>> collectionClass =
+            assemblyClassIncrementalValuesProvider
+                .Combine(assemblyAttributeSyntaxContextIncrementalValuesProvider)
+                .Select((tuple, token) => { return ParseMarkClassList(tuple.Left, tuple.Right); })
+                .SelectMany((list, _) => list)
+                .Collect();
 
         // 参考 AttributedTypesExportFileGenerator 逻辑生成代码
         IncrementalValueProvider<string> generationCodeProvider = collectionClass.Select((markClassCollection, token) =>
@@ -82,10 +94,12 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
             return generationCode;
         });
 
-        context.RegisterSourceOutput(generationCodeProvider, (sourceProductionContext, generationCode) =>
-        {
-            sourceProductionContext.AddSource("__AttributedTypesExport__", generationCode);
-        });
+        // 注册到输出
+        context.RegisterSourceOutput(generationCodeProvider,
+            (sourceProductionContext, generationCode) =>
+            {
+                sourceProductionContext.AddSource("__AttributedTypesExport__", generationCode);
+            });
     }
 
     /// <summary>
@@ -94,7 +108,8 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
     /// <param name="classParseResult">程序集里面的类型</param>
     /// <param name="markExportAttributeParseResultList">程序集里面的各个标记</param>
     /// <returns></returns>
-    private List<MarkClassParseResult> ParseMarkClassList(AssemblyCandidateClassParseResult classParseResult, ImmutableArray<MarkExportAttributeParseResult> markExportAttributeParseResultList)
+    private List<MarkClassParseResult> ParseMarkClassList(AssemblyCandidateClassParseResult classParseResult,
+        ImmutableArray<MarkExportAttributeParseResult> markExportAttributeParseResultList)
     {
         var list = new List<MarkClassParseResult>();
         foreach (MarkExportAttributeParseResult markExportAttributeParseResult in markExportAttributeParseResultList)
@@ -119,7 +134,9 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         MarkExportAttributeParseResult markExportAttributeParseResult)
     {
         // 先判断满足的类型
-        if (classParseResult.Attributes.Any(t => SymbolEqualityComparer.Default.Equals(t.AttributeClass, markExportAttributeParseResult.AttributeTypeInfo.Type)))
+        if (classParseResult.Attributes.Any(t =>
+                SymbolEqualityComparer.Default.Equals(t.AttributeClass,
+                    markExportAttributeParseResult.AttributeTypeInfo.Type)))
         {
             // 再判断继承类型
             var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo.Type;
@@ -167,7 +184,8 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
     /// <param name="generatorSyntaxContext"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private MarkExportAttributeParseResult ParseMarkExportAttribute(GeneratorSyntaxContext generatorSyntaxContext, CancellationToken cancellationToken)
+    private MarkExportAttributeParseResult ParseMarkExportAttribute(GeneratorSyntaxContext generatorSyntaxContext,
+        CancellationToken cancellationToken)
     {
         if (generatorSyntaxContext.Node is not AttributeListSyntax attributeListSyntax)
         {
@@ -193,15 +211,15 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                 if (fullName == "global::dotnetCampus.Telescope.MarkExportAttribute")
                 {
                     // 这个是符合预期的
-                    var attributeArgumentSyntaxes = attributeSyntax.ArgumentList.Arguments;
-                    if (attributeArgumentSyntaxes.Count == 2)
+                    var attributeArgumentSyntaxList = attributeSyntax.ArgumentList.Arguments;
+                    if (attributeArgumentSyntaxList.Count == 2)
                     {
-                        var baseClassOrInterfaceTypeSyntaxes = attributeArgumentSyntaxes[0];
-                        var attributeTypeSyntaxes = attributeArgumentSyntaxes[1];
+                        var baseClassOrInterfaceTypeSyntax = attributeArgumentSyntaxList[0];
+                        var attributeTypeSyntax = attributeArgumentSyntaxList[1];
 
                         // 原本采用的是 GuessTypeNameByTypeOfSyntax 方式获取的，现在可以通过语义获取
-                        var baseClassOrInterfaceTypeInfo = GetTypeOfType(baseClassOrInterfaceTypeSyntaxes);
-                        var attributeTypeInfo = GetTypeOfType(attributeTypeSyntaxes);
+                        var baseClassOrInterfaceTypeInfo = GetTypeOfType(baseClassOrInterfaceTypeSyntax);
+                        var attributeTypeInfo = GetTypeOfType(attributeTypeSyntax);
 
                         if (baseClassOrInterfaceTypeInfo is not null && attributeTypeInfo is not null)
                         {

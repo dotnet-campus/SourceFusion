@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
@@ -25,6 +26,11 @@ readonly struct AssemblyCandidateClassParseResult
     /// 导出类型的语义符号
     /// </summary>
     public INamedTypeSymbol ExportedTypeSymbol { get; }
+    
+    /// <summary>
+    /// 导出类型的语法符号
+    /// </summary>
+    public ClassDeclarationSyntax ExportedTypeClassDeclarationSyntax => (ClassDeclarationSyntax)GeneratorSyntaxContext.Node;
 
     public ImmutableArray<AttributeData> Attributes { get; }
 
