@@ -39,7 +39,7 @@ class ExportedTypesCodeTextGenerator
             foreach (var markClassParseResult in markClassGroup.Select(t => t.ClassParseResult))
             {
                 // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
-                var typeName = TypeSymbolToFullName(markClassParseResult.TypeInfo);
+                var typeName = TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
 
                 var itemCode = @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
                 exportedItemList.Add(itemCode);

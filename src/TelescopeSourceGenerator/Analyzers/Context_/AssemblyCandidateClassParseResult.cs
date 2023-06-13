@@ -5,9 +5,9 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
 readonly struct AssemblyCandidateClassParseResult
 {
-    public AssemblyCandidateClassParseResult(INamedTypeSymbol typeInfo, ImmutableArray<AttributeData> attributes, GeneratorSyntaxContext generatorSyntaxContext)
+    public AssemblyCandidateClassParseResult(INamedTypeSymbol exportedTypeSymbol, ImmutableArray<AttributeData> attributes, GeneratorSyntaxContext generatorSyntaxContext)
     {
-        TypeInfo = typeInfo;
+        ExportedTypeSymbol = exportedTypeSymbol;
         Attributes = attributes;
         GeneratorSyntaxContext = generatorSyntaxContext;
         Success = true;
@@ -16,12 +16,15 @@ readonly struct AssemblyCandidateClassParseResult
     public AssemblyCandidateClassParseResult()
     {
         Success = false;
-        TypeInfo = default;
+        ExportedTypeSymbol = default;
         Attributes = default;
         GeneratorSyntaxContext = default;
     }
 
-    public INamedTypeSymbol TypeInfo { get; }
+    /// <summary>
+    /// 导出类型的语义符号
+    /// </summary>
+    public INamedTypeSymbol ExportedTypeSymbol { get; }
 
     public ImmutableArray<AttributeData> Attributes { get; }
 

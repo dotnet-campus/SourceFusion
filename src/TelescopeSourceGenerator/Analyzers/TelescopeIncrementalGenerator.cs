@@ -34,30 +34,35 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 
         // 遍历整个程序集的所有代码文件
         var generatorSyntaxContextIncrementalValuesProvider =
-            context.SyntaxProvider.CreateSyntaxProvider(
-                (syntaxNode, cancellationToken) => syntaxNode.IsKind(SyntaxKind.ClassDeclaration),
-                (generatorSyntaxContext, cancellationToken) =>
-                {
-                    var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
-
-                    INamedTypeSymbol namedTypeSymbol = generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-
-                    if (namedTypeSymbol is not null)
+            context.SyntaxProvider.CreateSyntaxProvider
+                (
+                    (syntaxNode, cancellationToken) => syntaxNode.IsKind(SyntaxKind.ClassDeclaration),
+                    (generatorSyntaxContext, cancellationToken) =>
                     {
-                        var attributes = namedTypeSymbol.GetAttributes();
+                        var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
 
-                        if (attributes.Length > 0)
+                        INamedTypeSymbol namedTypeSymbol =
+                            generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+
+                        if (namedTypeSymbol is not null)
                         {
-                            return new AssemblyCandidateClassParseResult(namedTypeSymbol, attributes, generatorSyntaxContext);
+                            var attributes = namedTypeSymbol.GetAttributes();
+
+                            if (attributes.Length > 0)
+                            {
+                                return new AssemblyCandidateClassParseResult(namedTypeSymbol, attributes,
+                                    generatorSyntaxContext);
+                            }
+                            else
+                            {
+                                // 只有标记了特性的，才是可能候选的类型
+                            }
                         }
-                        else
-                        {
-                            // 只有标记了特性的，才是可能候选的类型
-                        }
+
+                        return new AssemblyCandidateClassParseResult();
                     }
-
-                    return new AssemblyCandidateClassParseResult();
-                }).Where(t => t.Success);
+                )
+                .Where(t => t.Success);
 
         // 将程序集特性和类型组合一起，看看哪些类型符合程序集特性的要求，将其拼装到一起
         var collectionClass = generatorSyntaxContextIncrementalValuesProvider
@@ -119,7 +124,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
             // 再判断继承类型
             var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo.Type;
 
-            if (IsInherit(classParseResult.TypeInfo, requiredBaseClassOrInterfaceType))
+            if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
             {
                 return new MarkClassParseResult(classParseResult, markExportAttributeParseResult);
             }
