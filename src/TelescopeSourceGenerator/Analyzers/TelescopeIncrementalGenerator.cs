@@ -268,7 +268,7 @@ class AttributedTypesExportGenerator
                 ", exportedItemList)}
             }}";
 
-            var methodCode = $@"AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportAttributeTypes()
+            var methodCode = $@"ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportTypes()
         {{
             return {arrayExpression};
         }}";
