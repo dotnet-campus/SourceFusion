@@ -70,10 +70,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         // 参考 AttributedTypesExportFileGenerator 逻辑生成代码
-        IncrementalValueProvider<string> generationCodeProvider = collectionClass.Select((markClassCollection,token) =>
+        IncrementalValueProvider<string> generationCodeProvider = collectionClass.Select((markClassCollection, token) =>
         {
             var attributedTypesExportGenerator = new AttributedTypesExportGenerator();
-            string generationCode =  attributedTypesExportGenerator.Generate(markClassCollection, token);
+            string generationCode = attributedTypesExportGenerator.Generate(markClassCollection, token);
             return generationCode;
         });
 
@@ -231,27 +231,74 @@ class AttributedTypesExportGenerator
     public string Generate(ImmutableArray<MarkClassParseResult> markClassCollection, CancellationToken token)
     {
         var exportedInterfaces = new List<string>();
+        var exportedMethodCodes = new List<string>();
 
         foreach (var markClassGroup in markClassCollection.GroupBy(t => t.MarkExportAttributeParseResult))
         {
+            token.ThrowIfCancellationRequested();
+
             var markExportAttributeParseResult = markClassGroup.Key;
-            
-            foreach (var markClassParseResult in markClassGroup.Select(t => t.ClassParseResult))
-            {
-
-            }
-
+            /*
+             * ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>[] ICompileTimeTypesExporter<baseClassOrInterfaceName, attributeName>.ExportTypes()
+             * {
+             *    return new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>[]
+             *    {
+             *       new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
+             *    }
+             * }
+             */
             var baseClassOrInterfaceName =
                 TypeInfoToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
             var attributeName = TypeInfoToFullName(markExportAttributeParseResult.AttributeTypeInfo);
 
-            exportedInterfaces.Add($@"ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
+            var exportedItemList = new List<string>();
+
+            foreach (var markClassParseResult in markClassGroup.Select(t => t.ClassParseResult))
+            {
+                // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
+                var typeName = TypeSymbolToFullName(markClassParseResult.TypeInfo);
+
+                var itemCode = @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
+                exportedItemList.Add(itemCode);
+            }
+
+            var arrayExpression = $@"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[]
+            {{
+                {string.Join(@",
+                ", exportedItemList)}
+            }}";
+
+            var methodCode = $@"AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportAttributeTypes()
+        {{
+            return {arrayExpression};
+        }}";
+
+            exportedMethodCodes.Add(methodCode);
+
+            exportedInterfaces.Add($@"ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
         }
 
-        return string.Empty;
+        var code = $@"using dotnetCampus.Telescope;
+
+namespace dotnetCampus.Telescope
+{{
+    public partial class __AttributedTypesExport__ : {string.Join(", ", exportedInterfaces)}
+    {{
+        {string.Join(@"
+        ", exportedMethodCodes)}
+    }}
+}}";
+
+        return code;
     }
 
     private static string TypeInfoToFullName(TypeInfo typeInfo)
+    {
+        ITypeSymbol typeSymbol = typeInfo.Type;
+        return TypeSymbolToFullName(typeSymbol);
+    }
+
+    private static string TypeSymbolToFullName(ITypeSymbol typeSymbol)
     {
         // 带上 global 格式的输出 FullName 内容
         var symbolDisplayFormat = new SymbolDisplayFormat
@@ -263,7 +310,7 @@ class AttributedTypesExportGenerator
                 .NameAndContainingTypesAndNamespaces
         );
 
-        return typeInfo.Type?.ToDisplayString(symbolDisplayFormat);
+        return typeSymbol?.ToDisplayString(symbolDisplayFormat);
     }
 }
 
