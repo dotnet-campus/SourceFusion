@@ -218,16 +218,16 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                         var attributeTypeSyntax = attributeArgumentSyntaxList[1];
 
                         // 原本采用的是 GuessTypeNameByTypeOfSyntax 方式获取的，现在可以通过语义获取
-                        var baseClassOrInterfaceTypeInfo = GetTypeOfType(baseClassOrInterfaceTypeSyntax);
-                        var attributeTypeInfo = GetTypeOfType(attributeTypeSyntax);
+                        var baseClassOrInterfaceTypeInfo = GetTypeInfoFromArgumentTypeOfSyntax(baseClassOrInterfaceTypeSyntax);
+                        var attributeTypeInfo = GetTypeInfoFromArgumentTypeOfSyntax(attributeTypeSyntax);
 
-                        if (baseClassOrInterfaceTypeInfo is not null && attributeTypeInfo is not null)
+                        if (baseClassOrInterfaceTypeInfo?.Type is not null && attributeTypeInfo?.Type is not null)
                         {
                             return new MarkExportAttributeParseResult(true, baseClassOrInterfaceTypeInfo.Value,
                                 attributeTypeInfo.Value);
                         }
 
-                        TypeInfo? GetTypeOfType(AttributeArgumentSyntax attributeArgumentSyntax)
+                        TypeInfo? GetTypeInfoFromArgumentTypeOfSyntax(AttributeArgumentSyntax attributeArgumentSyntax)
                         {
                             if (attributeArgumentSyntax.Expression is TypeOfExpressionSyntax typeOfExpressionSyntax)
                             {
