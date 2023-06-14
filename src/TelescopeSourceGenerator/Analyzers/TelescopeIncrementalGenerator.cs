@@ -189,7 +189,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
     {
         if (generatorSyntaxContext.Node is not AttributeListSyntax attributeListSyntax)
         {
-            return ReturnFalse();
+            return MarkExportAttributeParseResult.Failure;
         }
 
         foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
@@ -243,8 +243,6 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        return ReturnFalse();
-
-        MarkExportAttributeParseResult ReturnFalse() => new MarkExportAttributeParseResult(false, default, default);
+        return MarkExportAttributeParseResult.Failure;
     }
 }

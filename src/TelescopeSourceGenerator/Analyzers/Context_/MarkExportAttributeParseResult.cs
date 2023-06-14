@@ -16,4 +16,9 @@ readonly struct MarkExportAttributeParseResult
     public ITypeSymbol BaseClassOrInterfaceTypeInfo { get; }
 
     public ITypeSymbol AttributeTypeInfo { get; }
+
+    /// <summary>
+    /// 获取表示失败的特性解析结果。
+    /// </summary>
+    public static MarkExportAttributeParseResult Failure { get; } = new MarkExportAttributeParseResult(false, default!, default!);
 }
