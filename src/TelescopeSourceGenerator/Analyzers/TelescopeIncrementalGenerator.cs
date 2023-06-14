@@ -53,7 +53,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                         var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
 
                         // 从语法转换为语义，用于后续判断是否标记了特性
-                        INamedTypeSymbol namedTypeSymbol =
+                        INamedTypeSymbol? namedTypeSymbol =
                             generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
                         // 如果可以获取到语义的类型，则尝试获取其标记的特性
