@@ -8,13 +8,11 @@
     <Product>dotnetCampus.TelescopeSource</Product>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <DevelopmentToolPath>..\dotnetCampus.TelescopeTask\bin\$(Configuration)\</DevelopmentToolPath>
-    <IsShippingPackage>true</IsShippingPackage>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <ProjectReference Include="..\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" ReferenceOutputAssembly="false" />
-    <AnalyzerNupkgAssembly Include="dotnetCampus.Telescope.dll" />
   </ItemGroup>
 
   <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
