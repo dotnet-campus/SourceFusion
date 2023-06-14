@@ -34,6 +34,12 @@ class ExportedTypesCodeTextGenerator
                 TypeInfoToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
             var attributeName = TypeInfoToFullName(markExportAttributeParseResult.AttributeTypeInfo);
 
+            if (baseClassOrInterfaceName is null || attributeName is null)
+            {
+                // 理论上不可能，还不知道什么时候拿到的 Type 会是空
+                continue;
+            }
+
             var exportedItemList = new List<string>();
 
             foreach (var markClassParseResult in markClassGroup.Select(t => t.ClassParseResult))
@@ -109,16 +115,16 @@ namespace dotnetCampus.Telescope
     /// </summary>
     /// <param name="typeInfo"></param>
     /// <returns></returns>
-    private static string TypeInfoToFullName(TypeInfo typeInfo)
+    private static string? TypeInfoToFullName(TypeInfo typeInfo)
     {
-        ITypeSymbol typeSymbol = typeInfo.Type;
+        ITypeSymbol? typeSymbol = typeInfo.Type;
         return TypeSymbolToFullName(typeSymbol);
     }
 
     /// <summary>
     /// 输出类型的完全限定名
     /// </summary>
-    private static string TypeSymbolToFullName(ITypeSymbol typeSymbol)
+    private static string? TypeSymbolToFullName(ITypeSymbol? typeSymbol)
     {
         // 带上 global 格式的输出 FullName 内容
         var symbolDisplayFormat = new SymbolDisplayFormat

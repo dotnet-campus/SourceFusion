@@ -5,6 +5,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
