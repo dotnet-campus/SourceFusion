@@ -87,18 +87,18 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                 .Collect();
 
         // 参考 AttributedTypesExportFileGenerator 逻辑生成代码
-        IncrementalValueProvider<string> generationCodeProvider = collectionClass.Select((markClassCollection, token) =>
+        IncrementalValueProvider<string> generatedCodeProvider = collectionClass.Select((markClassCollection, token) =>
         {
             var attributedTypesExportGenerator = new ExportedTypesCodeTextGenerator();
-            string generationCode = attributedTypesExportGenerator.Generate(markClassCollection, token);
-            return generationCode;
+            string generatedCode = attributedTypesExportGenerator.Generate(markClassCollection, token);
+            return generatedCode;
         });
 
         // 注册到输出
-        context.RegisterSourceOutput(generationCodeProvider,
-            (sourceProductionContext, generationCode) =>
+        context.RegisterSourceOutput(generatedCodeProvider,
+            (sourceProductionContext, generatedCode) =>
             {
-                sourceProductionContext.AddSource("__AttributedTypesExport__", generationCode);
+                sourceProductionContext.AddSource("__AttributedTypesExport__", generatedCode);
             });
     }
 
