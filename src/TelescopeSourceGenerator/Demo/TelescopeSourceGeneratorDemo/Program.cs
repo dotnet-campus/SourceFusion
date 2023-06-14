@@ -8,9 +8,9 @@ internal class Program
         ICompileTimeTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
         foreach (var exportedTypeMetadata in exporter.ExportTypes())
         {
-            
+            // 输出导出的类型
+            Console.WriteLine(exportedTypeMetadata.RealType.FullName);
         }
-        Console.WriteLine("Hello, World!");
     }
 }
 
