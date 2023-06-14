@@ -13,6 +13,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <ProjectReference Include="..\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\TelescopeSourceGenerator\Analyzers\dotnetCampus.Telescope.SourceGeneratorAnalyzers.csproj" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
