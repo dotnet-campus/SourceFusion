@@ -4,8 +4,8 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
 readonly struct MarkExportAttributeParseResult
 {
-    public MarkExportAttributeParseResult(bool success, TypeInfo baseClassOrInterfaceTypeInfo,
-        TypeInfo attributeTypeInfo)
+    public MarkExportAttributeParseResult(bool success, ITypeSymbol baseClassOrInterfaceTypeInfo,
+        ITypeSymbol attributeTypeInfo)
     {
         Success = success;
         BaseClassOrInterfaceTypeInfo = baseClassOrInterfaceTypeInfo;
@@ -13,7 +13,7 @@ readonly struct MarkExportAttributeParseResult
     }
 
     public bool Success { get; }
-    public TypeInfo BaseClassOrInterfaceTypeInfo { get; }
+    public ITypeSymbol BaseClassOrInterfaceTypeInfo { get; }
 
-    public TypeInfo AttributeTypeInfo { get; }
+    public ITypeSymbol AttributeTypeInfo { get; }
 }

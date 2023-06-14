@@ -136,10 +136,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         // 先判断满足的类型
         if (classParseResult.Attributes.Any(t =>
                 SymbolEqualityComparer.Default.Equals(t.AttributeClass,
-                    markExportAttributeParseResult.AttributeTypeInfo.Type)))
+                    markExportAttributeParseResult.AttributeTypeInfo)))
         {
             // 再判断继承类型
-            var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo.Type;
+            var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo;
 
             if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
             {
@@ -223,8 +223,8 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 
                         if (baseClassOrInterfaceTypeInfo?.Type is not null && attributeTypeInfo?.Type is not null)
                         {
-                            return new MarkExportAttributeParseResult(true, baseClassOrInterfaceTypeInfo.Value,
-                                attributeTypeInfo.Value);
+                            return new MarkExportAttributeParseResult(true, baseClassOrInterfaceTypeInfo.Value.Type,
+                                attributeTypeInfo.Value.Type);
                         }
 
                         TypeInfo? GetTypeInfoFromArgumentTypeOfSyntax(AttributeArgumentSyntax attributeArgumentSyntax)
