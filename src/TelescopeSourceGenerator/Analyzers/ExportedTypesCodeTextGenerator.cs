@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
@@ -84,7 +81,18 @@ namespace dotnetCampus.Telescope
         {
             return new AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[]
             {
-                new AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>(typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute(1, (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)1, typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base), null) { Number2 = 2, Type2 = typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), FooEnum2 = (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)0, Type3 = null }, () => new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo())
+                new AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>
+                (
+                   typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), 
+                   new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute(1, (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)1, typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base), null) 
+                   {
+                       Number2 = 2, 
+                       Type2 = typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo),
+                       FooEnum2 = (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)0,
+                       Type3 = null 
+                   }, 
+                   () => new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo()
+                )
             };
         }
     }
