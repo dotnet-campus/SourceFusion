@@ -33,31 +33,30 @@ class ExportedTypesCodeTextGenerator
 
             foreach (var markClassParseResult in markClassGroup)
             {
-                // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
                 var typeName = TypeSymbolHelper.TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
 
                 var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(markClassParseResult);
 
                 var itemCode =
-                    @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
+                    @$"new AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), {attributeCreatedCode}, () => new {typeName}())";
                 exportedItemList.Add(itemCode);
             }
 
-            var arrayExpression = $@"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[]
+            var arrayExpression = $@"new AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[]
             {{
                 {string.Join(@",
                 ", exportedItemList)}
             }}";
 
             var methodCode =
-                $@"ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportTypes()
+                $@"AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportAttributeTypes()
         {{
             return {arrayExpression};
         }}";
 
             exportedMethodCodes.Add(methodCode);
 
-            exportedInterfaces.Add($@"ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
+            exportedInterfaces.Add($@"ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
         }
 
         var code = $@"using dotnetCampus.Telescope;
@@ -73,21 +72,21 @@ namespace dotnetCampus.Telescope
         code = FormatCode(code);
         // 生成的代码示例：
         /*
-        using dotnetCampus.Telescope;
+using dotnetCampus.Telescope;
 
-        namespace dotnetCampus.Telescope
+namespace dotnetCampus.Telescope
+{
+    public partial class __AttributedTypesExport__ : ICompileTimeAttributedTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>
+    {
+        AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[] ICompileTimeAttributedTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>.ExportAttributeTypes()
         {
-            public partial class __AttributedTypesExport__ : ICompileTimeTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>
+            return new AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[]
             {
-                ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[] ICompileTimeTypesExporter<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>.ExportTypes()
-                {
-                    return new ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>[]
-                    {
-                        new ExportedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>(typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), () => new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo())
-                    };
-                }
-            }
+                new AttributedTypeMetadata<global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base, global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute>(typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooAttribute(1, (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)1, typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Base), null) { Number2 = 2, Type2 = typeof(global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo), FooEnum2 = (global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.FooEnum)0, Type3 = null }, () => new global::dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.Foo())
+            };
         }
+    }
+}
          */
         return code;
     }
@@ -100,7 +99,7 @@ namespace dotnetCampus.Telescope
     private static string FormatCode(string sourceCode)
     {
         var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
-        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
+        return rootSyntaxNode.NormalizeWhitespace().ToFullString();
     }
 }
 
@@ -130,7 +129,6 @@ static class AttributeCodeReWriter
     public static string GetAttributeCreatedCode(MarkClassParseResult markClassParseResult)
     {
         var markAttributeData = markClassParseResult.MatchAssemblyMarkAttributeData;
-        var markAttributeSyntax = markClassParseResult.MatchAssemblyMarkAttributeSyntax;
 
         // 放在特性的构造函数的参数列表，例如 [Foo(1,2,3)] 将会获取到 `1` `2` `3` 三个参数
         var constructorArgumentCodeList = new List<string>();
