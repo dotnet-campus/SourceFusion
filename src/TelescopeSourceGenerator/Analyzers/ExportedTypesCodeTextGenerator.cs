@@ -36,10 +36,14 @@ class ExportedTypesCodeTextGenerator
 
             var exportedItemList = new List<string>();
 
-            foreach (var markClassParseResult in markClassGroup.Select(t => t.ClassParseResult))
+            foreach (var markClassParseResult in markClassGroup)
             {
                 // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
                 var typeName = TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
+
+                foreach (var attributeListSyntax in markClassParseResult.ExportedTypeClassDeclarationSyntax.AttributeLists)
+                {
+                }
 
                 var itemCode = @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
                 exportedItemList.Add(itemCode);
@@ -59,6 +63,8 @@ class ExportedTypesCodeTextGenerator
             exportedMethodCodes.Add(methodCode);
 
             exportedInterfaces.Add($@"ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
+
+
         }
 
         var code = $@"using dotnetCampus.Telescope;

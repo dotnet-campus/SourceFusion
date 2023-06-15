@@ -1,21 +1,33 @@
-﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
 /// <summary>
 /// 被标记的类型的转换结果，约等于生成代码前的最终结果
 /// </summary>
 readonly struct MarkClassParseResult
 {
-    public MarkClassParseResult(AssemblyCandidateClassParseResult classParseResult,
-        MarkExportAttributeParseResult markExportAttributeParseResult)
+    public MarkClassParseResult(INamedTypeSymbol exportedTypeSymbol, ClassDeclarationSyntax exportedTypeClassDeclarationSyntax, AttributeData matchAssemblyMarkAttributeData, MarkExportAttributeParseResult markExportAttributeParseResult)
     {
-        ClassParseResult = classParseResult;
+        ExportedTypeSymbol = exportedTypeSymbol;
+        ExportedTypeClassDeclarationSyntax = exportedTypeClassDeclarationSyntax;
+        MatchAssemblyMarkAttributeData = matchAssemblyMarkAttributeData;
         MarkExportAttributeParseResult = markExportAttributeParseResult;
     }
 
     /// <summary>
-    /// 定义在程序集里面的类型
+    /// 导出的 class 类型的语义
     /// </summary>
-    public AssemblyCandidateClassParseResult ClassParseResult { get; }
+    public INamedTypeSymbol ExportedTypeSymbol { get; }
+    /// <summary>
+    /// 导出的 class 类型的语法
+    /// </summary>
+    public ClassDeclarationSyntax ExportedTypeClassDeclarationSyntax { get; }
+    /// <summary>
+    /// 类型上标记的程序集指定特性的语义
+    /// </summary>
+    public AttributeData MatchAssemblyMarkAttributeData { get; }
 
     /// <summary>
     /// 程序集特性里面的定义结果

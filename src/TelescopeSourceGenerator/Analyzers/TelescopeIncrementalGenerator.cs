@@ -134,9 +134,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         MarkExportAttributeParseResult markExportAttributeParseResult)
     {
         // 先判断满足的类型
-        if (classParseResult.Attributes.Any(t =>
-                SymbolEqualityComparer.Default.Equals(t.AttributeClass,
-                    markExportAttributeParseResult.AttributeTypeInfo)))
+        var matchAssemblyMarkAttributeData = classParseResult.Attributes.FirstOrDefault(t =>
+            SymbolEqualityComparer.Default.Equals(t.AttributeClass,
+                markExportAttributeParseResult.AttributeTypeInfo));
+        if (matchAssemblyMarkAttributeData is not null)
         {
             // 再判断继承类型
             var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo;
