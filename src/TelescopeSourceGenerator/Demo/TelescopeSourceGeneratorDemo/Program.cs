@@ -14,7 +14,7 @@ internal class Program
     }
 }
 
-[Foo]
+[Foo(1ul, FooEnum.N2, Number2 = 2L, Type = typeof(Foo))]
 class Foo : Base
 {
 }
@@ -25,4 +25,24 @@ class Base
 
 class FooAttribute : Attribute
 {
+    public FooAttribute(ulong number1, FooEnum fooEnum)
+    {
+        Number1 = number1;
+        FooEnum = fooEnum;
+    }
+
+    public ulong Number1 { get; set; }
+    public long Number2 { get; set; }
+
+    public FooEnum FooEnum { get; set; }
+
+    public Type? Type { get; set; }
 }
+
+public enum FooEnum
+{
+    N1,
+    N2,
+    N3,
+}
+
