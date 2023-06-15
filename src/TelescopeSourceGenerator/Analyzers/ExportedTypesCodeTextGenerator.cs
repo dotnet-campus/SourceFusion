@@ -24,7 +24,7 @@ class ExportedTypesCodeTextGenerator
             token.ThrowIfCancellationRequested();
 
             var markExportAttributeParseResult = markClassGroup.Key;
-          
+
             var baseClassOrInterfaceName =
                 TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
             var attributeName = TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.AttributeTypeInfo);
@@ -35,7 +35,8 @@ class ExportedTypesCodeTextGenerator
             {
                 var typeName = TypeSymbolHelper.TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
 
-                var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(markClassParseResult);
+                var attributeCreatedCode =
+                    AttributeCodeReWriter.GetAttributeCreatedCode(markClassParseResult.MatchAssemblyMarkAttributeData);
 
                 var itemCode =
                     @$"new AttributedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), {attributeCreatedCode}, () => new {typeName}())";
@@ -56,7 +57,8 @@ class ExportedTypesCodeTextGenerator
 
             exportedMethodCodes.Add(methodCode);
 
-            exportedInterfaces.Add($@"ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
+            exportedInterfaces.Add(
+                $@"ICompileTimeAttributedTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
         }
 
         var code = $@"using dotnetCampus.Telescope;
@@ -126,13 +128,16 @@ static class TypeSymbolHelper
 
 static class AttributeCodeReWriter
 {
-    public static string GetAttributeCreatedCode(MarkClassParseResult markClassParseResult)
+    /// <summary>
+    /// 从 <paramref name="attributeData"/> 转换为特性生成代码。从 `[Foo(xx, xxx)]` 语义转换为 `new Foo(xx, xxx)` 的生成代码
+    /// </summary>
+    /// <param name="attributeData"></param>
+    /// <returns></returns>
+    public static string GetAttributeCreatedCode(AttributeData attributeData)
     {
-        var markAttributeData = markClassParseResult.MatchAssemblyMarkAttributeData;
-
         // 放在特性的构造函数的参数列表，例如 [Foo(1,2,3)] 将会获取到 `1` `2` `3` 三个参数
         var constructorArgumentCodeList = new List<string>();
-        foreach (TypedConstant constructorArgument in markAttributeData.ConstructorArguments)
+        foreach (TypedConstant constructorArgument in attributeData.ConstructorArguments)
         {
             var constructorArgumentCode = TypedConstantToCodeString(constructorArgument);
 
@@ -140,7 +145,7 @@ static class AttributeCodeReWriter
         }
 
         var namedArgumentCodeList = new List<(string propertyName, string valueCode)>();
-        foreach (var keyValuePair in markAttributeData.NamedArguments)
+        foreach (var keyValuePair in attributeData.NamedArguments)
         {
             var key = keyValuePair.Key;
 
@@ -151,7 +156,7 @@ static class AttributeCodeReWriter
         }
 
         return
-            $@"new {TypeSymbolHelper.TypeSymbolToFullName(markAttributeData.AttributeClass!)}({string.Join(",", constructorArgumentCodeList)})
+            $@"new {TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass!)}({string.Join(",", constructorArgumentCodeList)})
 {{
            {string.Join(@",
                         ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
