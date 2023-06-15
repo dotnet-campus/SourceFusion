@@ -16,6 +16,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+#if DEBUG
+        Debugger.Launch();
+#endif
+
         // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
         // 读取程序集特性
 
@@ -43,6 +47,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                 (
                     // 语法分析，只有是 class 类型定义的才可能满足需求
                     (syntaxNode, cancellationToken) => syntaxNode.IsKind(SyntaxKind.ClassDeclaration),
+
                     // 加上语义分析，了解当前的类型是否有添加任何标记
                     (generatorSyntaxContext, cancellationToken) =>
                     {
@@ -53,7 +58,9 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                             generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
                         // 如果可以获取到语义的类型，则尝试获取其标记的特性
-                        if (namedTypeSymbol is not null)
+                        if (namedTypeSymbol is not null 
+                            // 抽象类不应该被加入创建
+                            && !namedTypeSymbol.IsAbstract)
                         {
                             var attributes = namedTypeSymbol.GetAttributes();
 
