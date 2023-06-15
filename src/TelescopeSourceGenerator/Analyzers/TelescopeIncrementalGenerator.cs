@@ -16,10 +16,6 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG
-        Debugger.Launch();
-#endif
-
         // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
         // 读取程序集特性
 
