@@ -8,13 +8,17 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 /// </summary>
 readonly struct MarkClassParseResult
 {
-    public MarkClassParseResult(INamedTypeSymbol exportedTypeSymbol, ClassDeclarationSyntax exportedTypeClassDeclarationSyntax, AttributeData matchAssemblyMarkAttributeData, AttributeSyntax matchAssemblyMarkAttributeSyntax, MarkExportAttributeParseResult markExportAttributeParseResult)
+    public MarkClassParseResult(INamedTypeSymbol exportedTypeSymbol, ClassDeclarationSyntax exportedTypeClassDeclarationSyntax, 
+        AttributeData matchAssemblyMarkAttributeData, AttributeSyntax matchAssemblyMarkAttributeSyntax, 
+        MarkExportAttributeParseResult markExportAttributeParseResult,
+        GeneratorSyntaxContext generatorSyntaxContext)
     {
         ExportedTypeSymbol = exportedTypeSymbol;
         ExportedTypeClassDeclarationSyntax = exportedTypeClassDeclarationSyntax;
         MatchAssemblyMarkAttributeData = matchAssemblyMarkAttributeData;
         MatchAssemblyMarkAttributeSyntax = matchAssemblyMarkAttributeSyntax;
         MarkExportAttributeParseResult = markExportAttributeParseResult;
+        GeneratorSyntaxContext = generatorSyntaxContext;
     }
 
     /// <summary>
@@ -38,4 +42,6 @@ readonly struct MarkClassParseResult
     /// 程序集特性里面的定义结果
     /// </summary>
     public MarkExportAttributeParseResult MarkExportAttributeParseResult { get; }
+
+    public GeneratorSyntaxContext GeneratorSyntaxContext { get; }
 }

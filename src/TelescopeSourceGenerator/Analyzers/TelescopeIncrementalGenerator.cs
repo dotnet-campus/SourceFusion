@@ -164,8 +164,8 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
         {
             return new MarkClassParseResult(classParseResult.ExportedTypeSymbol,
-                classParseResult.ExportedTypeClassDeclarationSyntax, matchAssemblyMarkAttributeData,
-                markExportAttributeParseResult);
+                classParseResult.ExportedTypeClassDeclarationSyntax, matchAssemblyMarkAttributeData, markAttributeSyntax,
+                markExportAttributeParseResult, classParseResult.GeneratorSyntaxContext);
         }
 
         return null;

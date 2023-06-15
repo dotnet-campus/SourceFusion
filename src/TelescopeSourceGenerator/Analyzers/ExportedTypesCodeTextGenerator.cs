@@ -33,20 +33,20 @@ class ExportedTypesCodeTextGenerator
              * }
              */
             var baseClassOrInterfaceName =
-                TypeSymbolToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
-            var attributeName = TypeSymbolToFullName(markExportAttributeParseResult.AttributeTypeInfo);
+                TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
+            var attributeName = TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.AttributeTypeInfo);
 
             var exportedItemList = new List<string>();
 
             foreach (var markClassParseResult in markClassGroup)
             {
                 // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
-                var typeName = TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
-                var markAttributeData = markClassParseResult.MatchAssemblyMarkAttributeData;
-                var markAttributeSyntax = markClassParseResult.MatchAssemblyMarkAttributeSyntax;
+                var typeName = TypeSymbolHelper.TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
 
+                var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(markClassParseResult);
 
-                var itemCode = @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
+                var itemCode =
+                    @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
                 exportedItemList.Add(itemCode);
             }
 
@@ -56,7 +56,8 @@ class ExportedTypesCodeTextGenerator
                 ", exportedItemList)}
             }}";
 
-            var methodCode = $@"ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportTypes()
+            var methodCode =
+                $@"ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>[] ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>.ExportTypes()
         {{
             return {arrayExpression};
         }}";
@@ -64,8 +65,6 @@ class ExportedTypesCodeTextGenerator
             exportedMethodCodes.Add(methodCode);
 
             exportedInterfaces.Add($@"ICompileTimeTypesExporter<{baseClassOrInterfaceName}, {attributeName}>");
-
-
         }
 
         var code = $@"using dotnetCampus.Telescope;
@@ -110,11 +109,14 @@ namespace dotnetCampus.Telescope
         var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
         return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
+}
 
+static class TypeSymbolHelper
+{
     /// <summary>
     /// 输出类型的完全限定名
     /// </summary>
-    private static string TypeSymbolToFullName(ITypeSymbol typeSymbol)
+    public static string TypeSymbolToFullName(ITypeSymbol typeSymbol)
     {
         // 带上 global 格式的输出 FullName 内容
         var symbolDisplayFormat = new SymbolDisplayFormat
@@ -127,5 +129,72 @@ namespace dotnetCampus.Telescope
         );
 
         return typeSymbol.ToDisplayString(symbolDisplayFormat);
+    }
+}
+
+static class AttributeCodeReWriter
+{
+    public static string GetAttributeCreatedCode(MarkClassParseResult markClassParseResult)
+    {
+        var markAttributeData = markClassParseResult.MatchAssemblyMarkAttributeData;
+        var markAttributeSyntax = markClassParseResult.MatchAssemblyMarkAttributeSyntax;
+
+        // 放在特性的构造函数的参数列表，例如 [Foo(1,2,3)] 将会获取到 `1` `2` `3` 三个参数
+        var constructorArgumentCodeList = new List<string>();
+        foreach (TypedConstant constructorArgument in markAttributeData.ConstructorArguments)
+        {
+            var constructorArgumentCode = TypedConstantToCodeString(constructorArgument);
+
+            constructorArgumentCodeList.Add(constructorArgumentCode);
+        }
+
+        foreach (var keyValuePair in markAttributeData.NamedArguments)
+        {
+            var key = keyValuePair.Key;
+            var typedConstant = keyValuePair.Value;
+            var typedConstantType = typedConstant.Type;
+            var typedConstantValue = typedConstant.Value;
+        }
+
+        return $@"new ";
+
+        static string TypedConstantToCodeString(TypedConstant typedConstant)
+        {
+            var constructorArgumentType = typedConstant.Type;
+            var constructorArgumentValue = typedConstant.Value;
+
+            string constructorArgumentCode;
+            switch (typedConstant.Kind)
+            {
+                case TypedConstantKind.Enum:
+                {
+                    // "(Foo.Enum1) 1"
+                    constructorArgumentCode =
+                        $"({TypeSymbolHelper.TypeSymbolToFullName(typedConstant.Type!)}) {typedConstant.Value}";
+                    break;
+                }
+                case TypedConstantKind.Type:
+                {
+                    var typeSymbol = (ITypeSymbol?)constructorArgumentValue;
+                    if (typeSymbol is null)
+                    {
+                        constructorArgumentCode = "null";
+                    }
+                    else
+                    {
+                        constructorArgumentCode = $"typeof({TypeSymbolHelper.TypeSymbolToFullName(typeSymbol)})";
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    constructorArgumentCode = typedConstant.Value?.ToString() ?? "null";
+                    break;
+                }
+            }
+
+            return constructorArgumentCode;
+        }
     }
 }
