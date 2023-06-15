@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -23,15 +24,7 @@ class ExportedTypesCodeTextGenerator
             token.ThrowIfCancellationRequested();
 
             var markExportAttributeParseResult = markClassGroup.Key;
-            /*
-             * ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>[] ICompileTimeTypesExporter<baseClassOrInterfaceName, attributeName>.ExportTypes()
-             * {
-             *    return new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>[]
-             *    {
-             *       new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
-             *    }
-             * }
-             */
+          
             var baseClassOrInterfaceName =
                 TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo);
             var attributeName = TypeSymbolHelper.TypeSymbolToFullName(markExportAttributeParseResult.AttributeTypeInfo);
@@ -148,15 +141,23 @@ static class AttributeCodeReWriter
             constructorArgumentCodeList.Add(constructorArgumentCode);
         }
 
+        var namedArgumentCodeList = new List<(string propertyName, string valueCode)>();
         foreach (var keyValuePair in markAttributeData.NamedArguments)
         {
             var key = keyValuePair.Key;
+
             var typedConstant = keyValuePair.Value;
-            var typedConstantType = typedConstant.Type;
-            var typedConstantValue = typedConstant.Value;
+            var argumentCode = TypedConstantToCodeString(typedConstant);
+
+            namedArgumentCodeList.Add((key, argumentCode));
         }
 
-        return $@"new ";
+        return
+            $@"new {TypeSymbolHelper.TypeSymbolToFullName(markAttributeData.AttributeClass!)}({string.Join(",", constructorArgumentCodeList)})
+{{
+           {string.Join(@",
+                        ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
+}}";
 
         static string TypedConstantToCodeString(TypedConstant typedConstant)
         {
