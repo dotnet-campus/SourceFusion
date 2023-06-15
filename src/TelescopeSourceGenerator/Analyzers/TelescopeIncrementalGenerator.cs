@@ -137,15 +137,35 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         var matchAssemblyMarkAttributeData = classParseResult.Attributes.FirstOrDefault(t =>
             SymbolEqualityComparer.Default.Equals(t.AttributeClass,
                 markExportAttributeParseResult.AttributeTypeInfo));
-        if (matchAssemblyMarkAttributeData is not null)
-        {
-            // 再判断继承类型
-            var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo;
 
-            if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
-            {
-                return new MarkClassParseResult(classParseResult.ExportedTypeSymbol,classParseResult.ExportedTypeClassDeclarationSyntax,matchAssemblyMarkAttributeData, markExportAttributeParseResult);
-            }
+        if (matchAssemblyMarkAttributeData?.ApplicationSyntaxReference is null)
+        {
+            // 找不到匹配的特性，表示这个类型不应该被收集
+            return default;
+        }
+
+        // 同时获取其语法
+        AttributeSyntax? markAttributeSyntax = classParseResult
+            .ExportedTypeClassDeclarationSyntax
+            .AttributeLists
+            .SelectMany(t => t.Attributes)
+            // 理论上 Span 是相同的，这里用 Contains 或 == 都应该是相同的结果
+            .FirstOrDefault(t => t.Span.Contains(matchAssemblyMarkAttributeData.ApplicationSyntaxReference.Span));
+
+        if (markAttributeSyntax is null)
+        {
+            // 理论上不可能是空，因为已找到其特性
+            return default;
+        }
+
+        // 再判断继承类型
+        var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo;
+
+        if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
+        {
+            return new MarkClassParseResult(classParseResult.ExportedTypeSymbol,
+                classParseResult.ExportedTypeClassDeclarationSyntax, matchAssemblyMarkAttributeData,
+                markExportAttributeParseResult);
         }
 
         return null;

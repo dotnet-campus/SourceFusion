@@ -8,11 +8,12 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 /// </summary>
 readonly struct MarkClassParseResult
 {
-    public MarkClassParseResult(INamedTypeSymbol exportedTypeSymbol, ClassDeclarationSyntax exportedTypeClassDeclarationSyntax, AttributeData matchAssemblyMarkAttributeData, MarkExportAttributeParseResult markExportAttributeParseResult)
+    public MarkClassParseResult(INamedTypeSymbol exportedTypeSymbol, ClassDeclarationSyntax exportedTypeClassDeclarationSyntax, AttributeData matchAssemblyMarkAttributeData, AttributeSyntax matchAssemblyMarkAttributeSyntax, MarkExportAttributeParseResult markExportAttributeParseResult)
     {
         ExportedTypeSymbol = exportedTypeSymbol;
         ExportedTypeClassDeclarationSyntax = exportedTypeClassDeclarationSyntax;
         MatchAssemblyMarkAttributeData = matchAssemblyMarkAttributeData;
+        MatchAssemblyMarkAttributeSyntax = matchAssemblyMarkAttributeSyntax;
         MarkExportAttributeParseResult = markExportAttributeParseResult;
     }
 
@@ -28,6 +29,10 @@ readonly struct MarkClassParseResult
     /// 类型上标记的程序集指定特性的语义
     /// </summary>
     public AttributeData MatchAssemblyMarkAttributeData { get; }
+    /// <summary>
+    /// 类型上标记的程序集指定特性的语法
+    /// </summary>
+    public AttributeSyntax MatchAssemblyMarkAttributeSyntax { get; }
 
     /// <summary>
     /// 程序集特性里面的定义结果
