@@ -5,8 +5,8 @@ internal class Program
     static void Main(string[] args)
     {
         var attributedTypesExport = new __AttributedTypesExport__();
-        ICompileTimeTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
-        foreach (var exportedTypeMetadata in exporter.ExportTypes())
+        ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
+        foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
         {
             // 输出导出的类型
             Console.WriteLine(exportedTypeMetadata.RealType.FullName);
