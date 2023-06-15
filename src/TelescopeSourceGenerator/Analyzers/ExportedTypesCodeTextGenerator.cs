@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
@@ -40,9 +42,37 @@ class ExportedTypesCodeTextGenerator
             {
                 // new ExportedTypeMetadata<TBaseClassOrInterface, TAttribute>(typeof(type), () => new {type}())
                 var typeName = TypeSymbolToFullName(markClassParseResult.ExportedTypeSymbol);
+                var markAttributeData = markClassParseResult.MatchAssemblyMarkAttributeData;
+                if (markAttributeData.ApplicationSyntaxReference is null)
+                {
+                    // 理论上不可能是空
+                    continue;
+                }
+
+                AttributeSyntax? markAttributeSyntax = markClassParseResult
+                    .ExportedTypeClassDeclarationSyntax
+                    .AttributeLists
+                    .SelectMany(t=>t.Attributes)
+                    // 理论上 Span 是相同的，这里用 Contains 或 == 都应该是相同的结果
+                    .FirstOrDefault(t => t.Span.Contains(markAttributeData.ApplicationSyntaxReference.Span));
+
+                if (markAttributeSyntax is null)
+                {
+                    // 理论上不可能是空
+                    continue;
+                }
 
                 foreach (var attributeListSyntax in markClassParseResult.ExportedTypeClassDeclarationSyntax.AttributeLists)
                 {
+                    foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                    {
+                        
+                    }
+
+                    if (attributeListSyntax.Span.Contains(markAttributeData.ApplicationSyntaxReference.Span))
+                    {
+                        
+                    }
                 }
 
                 var itemCode = @$"new ExportedTypeMetadata<{baseClassOrInterfaceName}, {attributeName}>(typeof({typeName}), () => new {typeName}())";
