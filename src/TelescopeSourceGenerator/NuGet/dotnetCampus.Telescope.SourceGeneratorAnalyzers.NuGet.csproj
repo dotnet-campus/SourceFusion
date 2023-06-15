@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;netstandard2.0;net45</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>dotnetCampus.Telescope.SourceGeneratorAnalyzers</PackageId>
+    <Product>$(PackageId)</Product>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentToolPath>..\dotnetCampus.TelescopeTask\bin\$(Configuration)\</DevelopmentToolPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <ProjectReference Include="..\Analyzers\dotnetCampus.Telescope.SourceGeneratorAnalyzers.csproj" ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="..\Analyzers\bin\$(Configuration)\**\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>
