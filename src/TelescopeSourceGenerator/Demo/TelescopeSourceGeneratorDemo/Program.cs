@@ -12,6 +12,8 @@ internal class Program
             Console.WriteLine(exportedTypeMetadata.RealType.FullName);
         }
     }
+
+
 }
 
 [Foo(0, FooEnum.N1, typeof(Foo), null)]
