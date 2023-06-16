@@ -4,9 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-
 using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,8 +19,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 #if DEBUG
         Debugger.Launch();
 #endif
+
         // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
         // 读取程序集特性
+
         var assemblyAttributeSyntaxContextIncrementalValuesProvider =
             context.SyntaxProvider.CreateSyntaxProvider
                 (
@@ -58,7 +58,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
                             generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
                         // 如果可以获取到语义的类型，则尝试获取其标记的特性
-                        if (namedTypeSymbol is not null
+                        if (namedTypeSymbol is not null 
                             // 抽象类不应该被加入创建
                             && !namedTypeSymbol.IsAbstract)
                         {
@@ -202,25 +202,6 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         }
     }
 
-    class F : SymbolVisitor<int>
-    {
-        public override int Visit(ISymbol? symbol)
-        {
-            return base.Visit(symbol);
-        }
-
-        public override int DefaultVisit(ISymbol symbol)
-        {
-
-            return base.DefaultVisit(symbol);
-        }
-
-        public override int VisitNamedType(INamedTypeSymbol symbol)
-        {
-            return base.VisitNamedType(symbol);
-        }
-    }
-
     /// <summary>
     /// 解析出定义在程序集里面的特性
     /// </summary>
@@ -237,65 +218,6 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
 
         foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
         {
-            var sourceModuleReferencedAssemblySymbols = generatorSyntaxContext.SemanticModel.Compilation.SourceModule.ReferencedAssemblySymbols;
-            foreach (IAssemblySymbol? sourceModuleReferencedAssemblySymbol in sourceModuleReferencedAssemblySymbols)
-            {
-                sourceModuleReferencedAssemblySymbol.Accept(new F());
-
-                var namedTypeSymbols = sourceModuleReferencedAssemblySymbol.GlobalNamespace.GetTypeMembers();
-                foreach (var namedTypeSymbol in namedTypeSymbols)
-                {
-
-                }
-
-                foreach (var namespaceMember in sourceModuleReferencedAssemblySymbol.GlobalNamespace.GetNamespaceMembers())
-                {
-                    GetAllType(namespaceMember);
-
-                    var members = namespaceMember.GetTypeMembers();
-                    foreach (var namedTypeSymbol in members)
-                    {
-                    }
-                }
-
-                void GetAllType(INamespaceSymbol namespaceSymbol)
-                {
-                    var members = namespaceSymbol.GetTypeMembers();
-                    foreach (var namedTypeSymbol in members)
-                    {
-                        
-                    }
-
-                    var list = namespaceSymbol.GetNamespaceMembers().ToList();
-                    foreach (var subNamespaceSymbol in list)
-                    {
-                        GetAllType(subNamespaceSymbol);
-                    }
-                }
-
-                foreach (var moduleSymbol in sourceModuleReferencedAssemblySymbol.Modules)
-                {
-                }
-
-                foreach (var namedTypeSymbol in sourceModuleReferencedAssemblySymbol.GetForwardedTypes())
-                {
-
-                }
-
-                foreach (var typeName in sourceModuleReferencedAssemblySymbol.TypeNames)
-                {
-                }
-            }
-
-            foreach (var compilationDirectiveReference in generatorSyntaxContext.SemanticModel.Compilation.DirectiveReferences)
-            {
-            }
-            var metadataReferences = generatorSyntaxContext.SemanticModel.Compilation.References.ToList();
-            foreach (var metadataReference in metadataReferences)
-            {
-            }
-
-
             // [assembly: MarkExport(typeof(Base), typeof(FooAttribute))]
             // attributeSyntax：拿到 MarkExport 符号
             // 由于只是拿到 MarkExport 符号，不等于是 `dotnetCampus.Telescope.MarkExportAttribute` 特性，需要走语义分析
