@@ -4,6 +4,8 @@
     <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;netstandard2.0;net45</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <!-- 这是实打实应该要引用的 -->
+    <DevelopmentDependency>false</DevelopmentDependency>
   </PropertyGroup>
   
   <!-- 这是为了兼容最新版本的预览版的.NET 6构建 -->

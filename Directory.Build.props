@@ -7,10 +7,15 @@
     <LangVersion>latest</LangVersion>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright (c) 2018-2021 dotnet-campus</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2018-2023 dotnet-campus</Copyright>
     <PackageProjectUrl>https://github.com/dotnet-campus/SourceFusion</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotnet-campus/SourceFusion.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>source;dotnet;nuget;msbuild;compile</PackageTags>
   </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <!-- 现在 VisualStudio 2022 没有带上 .NET Framework 4.5 的负载，为了让大家打开项目就能构建，于是加上这个引用。详细请参阅 https://blog.walterlv.com/post/support-old-netfx-on-vs2022-or-later.html -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
