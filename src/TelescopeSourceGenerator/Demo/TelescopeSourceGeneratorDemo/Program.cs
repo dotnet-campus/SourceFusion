@@ -1,19 +1,22 @@
 ﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
 
-internal class Program
+internal partial class Program
 {
     static void Main(string[] args)
     {
-        var attributedTypesExport = new __AttributedTypesExport__();
-        ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
-        foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
-        {
-            // 输出导出的类型
-            Console.WriteLine(exportedTypeMetadata.RealType.FullName);
-        }
+        //var attributedTypesExport = new __AttributedTypesExport__();
+        //ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
+        //foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
+        //{
+        //    // 输出导出的类型
+        //    Console.WriteLine(exportedTypeMetadata.RealType.FullName);
+        //}
     }
 
-
+    [dotnetCampus.Telescope.TelescopeExportAttribute]
+    private static partial Base[] ExportFoo();
+    //private static partial IEnumerable<Base> ExportFooEnumerable();
+    //private static partial Func<Base>[] ExportFooCreator();
 }
 
 [Foo(0, FooEnum.N1, typeof(Foo), null)]
