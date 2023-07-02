@@ -143,7 +143,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                 foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResultArray)
                 {
-                    if (SymbolEqualityComparer.Default.Equals(exportMethodReturnTypeCollectionResult.ExpectedClassBaseType, assemblyClassCollectionResult.AssemblyClassTypeSymbol))
+                    if (TypeSymbolHelper.IsInherit(assemblyClassCollectionResult.AssemblyClassTypeSymbol, exportMethodReturnTypeCollectionResult.ExpectedClassBaseType))
                     {
                         if (exportMethodReturnTypeCollectionResult.ExpectedClassAttributeType is null)
                         {
