@@ -3,6 +3,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
+using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -58,7 +60,9 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
              {
                  token.ThrowIfCancellationRequested();
 
-                 var attributeName = attributeData.AttributeClass?.ToDisplayString(new SymbolDisplayFormat(globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces));
+                 if(attributeData.AttributeClass is null) continue;
+
+                 var attributeName = TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass);
                  if (attributeName == "global::dotnetCampus.Telescope.TelescopeExportAttribute")
                  {
                      return new ExportTypeCollectionResult(methodSymbol, generatorSyntaxContext);
@@ -112,26 +116,41 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
         // 先收集整个项目里面所有的类型
         var assemblyClassIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
-        {
-            return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
-        }, (generatorSyntaxContext, token) =>
-        {
-            var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
-            // 从语法转换为语义，用于后续判断是否标记了特性
-            INamedTypeSymbol? assemblyClassTypeSymbol =
-                generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
-            if (assemblyClassTypeSymbol is not null && !assemblyClassTypeSymbol.IsAbstract)
             {
-                return new AssemblyClassCollectionResult(assemblyClassTypeSymbol, classDeclarationSyntax);
-            }
+                return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
+            }, (generatorSyntaxContext, token) =>
+            {
+                var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
+                // 从语法转换为语义，用于后续判断是否标记了特性
+                INamedTypeSymbol? assemblyClassTypeSymbol =
+                    generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
+                if (assemblyClassTypeSymbol is not null && !assemblyClassTypeSymbol.IsAbstract)
+                {
+                    return new AssemblyClassCollectionResult(assemblyClassTypeSymbol, classDeclarationSyntax);
+                }
 
-            return null;
-        });
+                return null;
+            })
+            .Where(t => t != null)
+            .Select((t,_)=>t!);
 
         var candidateClassCollectionResultIncrementalValuesProvider = assemblyClassIncrementalValuesProvider
             .Combine(returnTypeCollectionIncrementalValuesProvider)
             .Select((tuple, token) =>
             {
+                var assemblyClassCollectionResult = tuple.Left;
+                var exportMethodReturnTypeCollectionResultArray = tuple.Right;
+
+                foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResultArray)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(exportMethodReturnTypeCollectionResult.ExpectedClassBaseType, assemblyClassCollectionResult.AssemblyClassTypeSymbol))
+                    {
+                        if (exportMethodReturnTypeCollectionResult.ExpectedClassAttributeType is null)
+                        {
+                            // 没有 Attribute 的要求
+                        }
+                    }
+                }
 
                 return new CandidateClassCollectionResult();
             })
