@@ -13,9 +13,9 @@ internal partial class Program
         //}
     }
 
-    [dotnetCampus.Telescope.TelescopeExportAttribute]
-    private static partial Base[] ExportFoo();
-    //private static partial IEnumerable<Base> ExportFooEnumerable();
+    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReference = true)]
+    //private static partial Base[] ExportFoo();
+    private static partial IEnumerable<(Type, FooAttribute, Func<Base>)> ExportFooEnumerable();
     //private static partial Func<Base>[] ExportFooCreator();
 }
 

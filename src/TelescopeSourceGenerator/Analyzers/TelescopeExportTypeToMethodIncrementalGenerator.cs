@@ -65,7 +65,16 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                  var attributeName = TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass);
                  if (attributeName == "global::dotnetCampus.Telescope.TelescopeExportAttribute")
                  {
-                     return new ExportTypeCollectionResult(methodSymbol, generatorSyntaxContext);
+                     var attributeDataNamedArguments = attributeData.NamedArguments;
+                     var includeReference =
+                         attributeDataNamedArguments
+                             .FirstOrDefault(t => t.Key == nameof(TelescopeExportAttribute.IncludeReference)).Value
+                             .Value is true;
+
+                     return new ExportTypeCollectionResult(methodSymbol, generatorSyntaxContext)
+                     {
+                         IncludeReference = includeReference
+                     };
                  }
              }
 
@@ -80,17 +89,20 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         {
             ITypeSymbol methodSymbolReturnType = exportTypeCollectionResult.MethodSymbol.ReturnType;
 
-            if (methodSymbolReturnType is IArrayTypeSymbol arrayTypeSymbol)
-            {
-                // 如果是如 partial Base[] ExportFoo() 这样的，收集起来
-                ITypeSymbol elementType = arrayTypeSymbol.ElementType;
-                return new ExportMethodReturnTypeCollectionResult(elementType, null, exportTypeCollectionResult.MethodSymbol) as IExportMethodReturnTypeCollectionResult;
-            }
-            else if (methodSymbolReturnType is INamedTypeSymbol namedTypeSymbol)
+            //if (methodSymbolReturnType is IArrayTypeSymbol arrayTypeSymbol)
+            //{
+            //    // 如果是如 partial Base[] ExportFoo() 这样的，收集起来
+            //    ITypeSymbol elementType = arrayTypeSymbol.ElementType;
+            //    return new ExportMethodReturnTypeCollectionResult(elementType, null, exportTypeCollectionResult.MethodSymbol) as IExportMethodReturnTypeCollectionResult;
+            //}
+            //else
+            if (methodSymbolReturnType is INamedTypeSymbol namedTypeSymbol)
             {
                 if (namedTypeSymbol.IsGenericType)
                 {
                 }
+
+                return new ExportMethodReturnTypeCollectionResult(namedTypeSymbol, null, exportTypeCollectionResult.MethodSymbol) as IExportMethodReturnTypeCollectionResult;
             }
 
             // 其他不认识的，要告诉开发者不能这样写哦
@@ -184,6 +196,11 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             MethodSymbol = methodSymbol;
             GeneratorSyntaxContext = generatorSyntaxContext;
         }
+
+        /// <summary>
+        /// 是否包含引用的程序集和 DLL 里面的类型导出。默认只导出当前程序集
+        /// </summary>
+        public bool IncludeReference { set; get; }
 
         public IMethodSymbol MethodSymbol { get; }
         public GeneratorSyntaxContext GeneratorSyntaxContext { get; }
