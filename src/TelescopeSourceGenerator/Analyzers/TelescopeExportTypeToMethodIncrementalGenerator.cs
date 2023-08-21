@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
@@ -58,7 +60,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
              {
                  token.ThrowIfCancellationRequested();
 
-                 if(attributeData.AttributeClass is null) continue;
+                 if (attributeData.AttributeClass is null) continue;
 
                  var attributeName = TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass);
                  if (attributeName == "global::dotnetCampus.Telescope.TelescopeExportAttribute")
@@ -118,7 +120,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
             }, (generatorSyntaxContext, token) =>
             {
-                var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
+                var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
                 // 从语法转换为语义，用于后续判断是否标记了特性
                 INamedTypeSymbol? assemblyClassTypeSymbol =
                     generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
@@ -130,7 +132,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 return null;
             })
             .Where(t => t != null)
-            .Select((t,_)=>t!);
+            .Select((t, _) => t!);
 
         var candidateClassCollectionResultIncrementalValuesProvider = assemblyClassIncrementalValuesProvider
             .Combine(returnTypeCollectionIncrementalValuesProvider)
@@ -264,31 +266,8 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; }
     }
 
-        var incrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((node, token) =>
-            {
-                if (node is MethodDeclarationSyntax methodDeclarationSyntax)
-                {
-                    // 标记 TelescopeExportAttribute 特性
-                    if (methodDeclarationSyntax.AttributeLists.SelectMany(t => t.Attributes).Any(t => t.ToString().Contains("TelescopeExport")))
-                    {
-                        // 方法是 Partial 的
-                        if (methodDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
-                        {
-                            return true;
-                        }
-                    }
-                }
+    class CandidateClassCollectionResult
+    {
 
-                return false;
-            },
-            (syntaxContext, token) =>
-            {
-
-                return syntaxContext;
-            });
-        context.RegisterImplementationSourceOutput(incrementalValuesProvider, (productionContext, syntaxContext) =>
-        {
-
-        });
     }
 }
