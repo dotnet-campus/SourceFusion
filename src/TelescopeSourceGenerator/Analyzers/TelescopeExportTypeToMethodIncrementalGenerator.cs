@@ -1,5 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
@@ -31,6 +36,31 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             context.AddSource("TelescopeExportAttribute", sourceText);
         });
 
+        var incrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((node, token) =>
+            {
+                if (node is MethodDeclarationSyntax methodDeclarationSyntax)
+                {
+                    // 标记 TelescopeExportAttribute 特性
+                    if (methodDeclarationSyntax.AttributeLists.SelectMany(t => t.Attributes).Any(t => t.ToString().Contains("TelescopeExport")))
+                    {
+                        // 方法是 Partial 的
+                        if (methodDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
+                        {
+                            return true;
+                        }
+                    }
+                }
 
+                return false;
+            },
+            (syntaxContext, token) =>
+            {
+
+                return syntaxContext;
+            });
+        context.RegisterImplementationSourceOutput(incrementalValuesProvider, (productionContext, syntaxContext) =>
+        {
+
+        });
     }
 }

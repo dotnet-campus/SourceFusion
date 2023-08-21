@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
 
-internal class Program
+internal partial class Program
 {
     static void Main(string[] args)
     {
@@ -13,7 +13,8 @@ internal class Program
         }
     }
 
-
+    [TelescopeExport]
+    private static partial IEnumerable<Base> Export();
 }
 
 [Foo(0, FooEnum.N1, typeof(Foo), null)]
