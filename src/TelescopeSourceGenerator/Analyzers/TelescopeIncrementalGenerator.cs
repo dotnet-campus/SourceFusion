@@ -17,7 +17,9 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
-        Debugger.Launch();
+        //Debugger.Launch();
+        // 先注释掉，不要打扰
+        return;
 #endif
 
         // 先读取程序集特性，接着遍历整个程序集的所有代码文件，看看哪些是符合需求的，收集起来
@@ -164,7 +166,7 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         // 再判断继承类型
         var requiredBaseClassOrInterfaceType = markExportAttributeParseResult.BaseClassOrInterfaceTypeInfo;
 
-        if (IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
+        if (TypeSymbolHelper.IsInherit(classParseResult.ExportedTypeSymbol, requiredBaseClassOrInterfaceType))
         {
             return new MarkClassParseResult(classParseResult.ExportedTypeSymbol,
                 classParseResult.ExportedTypeClassDeclarationSyntax, matchAssemblyMarkAttributeData, markAttributeSyntax,
@@ -172,34 +174,6 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         }
 
         return null;
-
-        // 判断类型继承关系
-        static bool IsInherit(ITypeSymbol currentType, ITypeSymbol requiredType)
-        {
-            var baseType = currentType.BaseType;
-            while (baseType is not null)
-            {
-                if (SymbolEqualityComparer.Default.Equals(baseType, requiredType))
-                {
-                    // 如果基类型是的话
-                    return true;
-                }
-
-                // 否则继续找基类型
-                baseType = baseType.BaseType;
-            }
-
-            foreach (var currentInheritInterfaceType in currentType.AllInterfaces)
-            {
-                if (SymbolEqualityComparer.Default.Equals(currentInheritInterfaceType, requiredType))
-                {
-                    // 如果继承的类型是的话
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 
     /// <summary>
