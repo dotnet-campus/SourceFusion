@@ -10,6 +10,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
+using static dotnetCampus.Telescope.SourceGeneratorAnalyzers.TelescopeExportTypeToMethodIncrementalGenerator;
+
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
 /// <summary>
@@ -98,11 +100,42 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             //else
             if (methodSymbolReturnType is INamedTypeSymbol namedTypeSymbol)
             {
-                if (namedTypeSymbol.IsGenericType)
+                if (namedTypeSymbol.IsGenericType && TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol) ==
+                    "global::System.Collections.Generic.IEnumerable")
                 {
+                    if (namedTypeSymbol.TypeArguments.Length == 1)
+                    {
+                        // 尝试判断是 ValueTuple 的情况
+                        if (namedTypeSymbol.TypeArguments[0] is INamedTypeSymbol typeArgument &&
+                            typeArgument.IsValueType)
+                        {
+                            if (typeArgument.TypeArguments.Length == 3 && typeArgument.TupleElements.Length == 3)
+                            {
+                                //var attributeData = typeArgument.GetAttributes(); // 0 
+
+                                //var memberNames = typeArgument.MemberNames;
+                                //var namedTypeSymbols = typeArgument.GetTypeMembers(); // 0
+                                // static partial IEnumerable<(Type type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable();
+                                var type = typeArgument.TupleElements[0];
+                                ITypeSymbol typeSymbol = type.Type;
+                                var typeName = type.Name;
+                                if (typeArgument.DeclaringSyntaxReferences[0].GetSyntax() is TupleTypeSyntax valueTupleSyntaxNode)
+                                {
+                                    if (valueTupleSyntaxNode.Elements.Count == 3)
+                                    {
+                                        foreach (var tupleElementSyntax in valueTupleSyntaxNode.Elements)
+                                        {
+                                            var tupleName = tupleElementSyntax.Identifier.Text;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                return new ExportMethodReturnTypeCollectionResult(namedTypeSymbol, null, exportTypeCollectionResult.MethodSymbol) as IExportMethodReturnTypeCollectionResult;
+                return new ExportMethodReturnTypeCollectionResult(namedTypeSymbol, null,
+                    exportTypeCollectionResult.MethodSymbol, null!) as IExportMethodReturnTypeCollectionResult;
             }
 
             // 其他不认识的，要告诉开发者不能这样写哦
@@ -238,13 +271,17 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
     {
     }
 
+    /// <summary>
+    /// 导出的方法的导出类型返回值结果
+    /// </summary>
     class ExportMethodReturnTypeCollectionResult : IExportMethodReturnTypeCollectionResult
     {
-        public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, IMethodSymbol exportPartialMethodSymbol)
+        public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, IMethodSymbol exportPartialMethodSymbol, IExportMethodReturnTypeInfo exportMethodReturnTypeInfo)
         {
             ExpectedClassBaseType = expectedClassBaseType;
             ExpectedClassAttributeType = expectedClassAttributeType;
             ExportPartialMethodSymbol = exportPartialMethodSymbol;
+            ExportMethodReturnTypeInfo = exportMethodReturnTypeInfo;
         }
 
         /// <summary>
@@ -261,12 +298,31 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// 程序集里面标记了导出的分部方法，将用来生成代码
         /// </summary>
         public IMethodSymbol ExportPartialMethodSymbol { get; }
+
+        /// <summary>
+        /// 导出类型的返回类型信息
+        /// </summary>
+        public IExportMethodReturnTypeInfo ExportMethodReturnTypeInfo { get; }
     }
+
 
     class ExportMethodReturnTypeCollectionDiagnostic : IExportMethodReturnTypeCollectionResult
     {
 
     }
+
+    public interface IExportMethodReturnTypeInfo
+    {
+    }
+
+    /// <summary>
+    /// 导出类型的返回类型信息
+    /// </summary>
+    public class ValueTupleExportMethodReturnTypeInfo : IExportMethodReturnTypeInfo
+    {
+
+    }
+
 
     /// <summary>
     /// 程序集里面的类型收集结果
