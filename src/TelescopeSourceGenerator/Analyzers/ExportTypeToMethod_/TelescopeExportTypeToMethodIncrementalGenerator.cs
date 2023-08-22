@@ -289,17 +289,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
     }
 
-    public interface IExportMethodReturnTypeInfo
-    {
-    }
-
-    /// <summary>
-    /// 导出类型的返回类型信息
-    /// </summary>
-    public class ValueTupleExportMethodReturnTypeInfo : IExportMethodReturnTypeInfo
-    {
-
-    }
+  
 
 
     /// <summary>
