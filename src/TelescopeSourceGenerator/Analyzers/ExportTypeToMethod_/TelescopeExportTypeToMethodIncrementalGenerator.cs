@@ -103,34 +103,12 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 if (namedTypeSymbol.IsGenericType && TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol) ==
                     "global::System.Collections.Generic.IEnumerable")
                 {
-                    if (namedTypeSymbol.TypeArguments.Length == 1)
+                    // 尝试判断是 ValueTuple 的情况
+                    // 要求符合以下定义
+                    // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
+                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], out var valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
                     {
-                        // 尝试判断是 ValueTuple 的情况
-                        if (namedTypeSymbol.TypeArguments[0] is INamedTypeSymbol typeArgument &&
-                            typeArgument.IsValueType)
-                        {
-                            if (typeArgument.TypeArguments.Length == 3 && typeArgument.TupleElements.Length == 3)
-                            {
-                                //var attributeData = typeArgument.GetAttributes(); // 0 
-
-                                //var memberNames = typeArgument.MemberNames;
-                                //var namedTypeSymbols = typeArgument.GetTypeMembers(); // 0
-                                // static partial IEnumerable<(Type type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable();
-                                var type = typeArgument.TupleElements[0];
-                                ITypeSymbol typeSymbol = type.Type;
-                                var typeName = type.Name;
-                                if (typeArgument.DeclaringSyntaxReferences[0].GetSyntax() is TupleTypeSyntax valueTupleSyntaxNode)
-                                {
-                                    if (valueTupleSyntaxNode.Elements.Count == 3)
-                                    {
-                                        foreach (var tupleElementSyntax in valueTupleSyntaxNode.Elements)
-                                        {
-                                            var tupleName = tupleElementSyntax.Identifier.Text;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                       
                     }
                 }
 
