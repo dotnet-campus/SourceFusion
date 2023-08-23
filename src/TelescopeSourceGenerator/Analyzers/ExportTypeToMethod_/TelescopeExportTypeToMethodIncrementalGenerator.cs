@@ -110,8 +110,15 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
                     if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], out ValueTupleInfo valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
                     {
+                        if (TypeSymbolHelper.TypeSymbolToFullName(valueTupleInfo.ItemList[0].ItemType) != "global::System.Type")
+                        {
+                            // 这就是错误的
+                        }
+
+                        var funcTypeSymbol = (INamedTypeSymbol) valueTupleInfo.ItemList[2].ItemType;
                         // 准备导出的类型的基类型
-                        var expectedClassBaseType = valueTupleInfo.ItemList[0].ItemType;
+                        var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
+                       
                         // 表示的特性
                         var expectedClassAttributeType = valueTupleInfo.ItemList[1].ItemType;
 
