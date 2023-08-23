@@ -21,6 +21,11 @@ internal partial class Program
     //private static partial Func<Base>[] ExportFooCreator();
 }
 
+[F1]
+public class CurrentFoo : DemoLib1.F1
+{
+}
+
 //internal partial class Program
 //{
 //    private static partial IEnumerable<(Type , FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()

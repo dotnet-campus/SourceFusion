@@ -197,8 +197,15 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         });
 
         // 收集当前分析器所分析项目的类型
+        // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
+        IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
+            .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
+            .Where(t => t is not null)
+            .Select((t, _) => t!)
+            .Collect();
+
         // 先收集整个项目里面所有的类型
-        var assemblyClassIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
+        var candidateClassCollectionResultIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
             {
                 return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
             }, (generatorSyntaxContext, token) =>
@@ -209,40 +216,38 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
                 if (assemblyClassTypeSymbol is not null && !assemblyClassTypeSymbol.IsAbstract)
                 {
-                    return new AssemblyClassCollectionResult(assemblyClassTypeSymbol, classDeclarationSyntax);
+                    return assemblyClassTypeSymbol;
                 }
 
                 return null;
             })
             .Where(t => t != null)
-            .Select((t, _) => t!);
-
-        // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
-        IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
-            .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
-            .Where(t => t is not null)
             .Select((t, _) => t!)
-            .Collect();
-
-        var candidateClassCollectionResultIncrementalValuesProvider = assemblyClassIncrementalValuesProvider
             .Combine(returnTypeCollectionIncrementalValuesProvider)
-            .Select((tuple, token) =>
+            .Select((tuple, _) =>
             {
-                var assemblyClassCollectionResult = tuple.Left;
+                var assemblyClassTypeSymbol = tuple.Left;
                 var exportMethodReturnTypeCollectionResultArray = tuple.Right;
+
+                var result = new List<CandidateClassTypeResult>();
 
                 foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResultArray)
                 {
-                    if (TypeSymbolHelper.IsInherit(assemblyClassCollectionResult.AssemblyClassTypeSymbol, exportMethodReturnTypeCollectionResult.ExpectedClassBaseType))
+                    if (exportMethodReturnTypeCollectionResult.IsMatch(assemblyClassTypeSymbol))
                     {
-                        if (exportMethodReturnTypeCollectionResult.ExpectedClassAttributeType is null)
-                        {
-                            // 没有 Attribute 的要求
-                        }
+                        result.Add(new CandidateClassTypeResult(exportMethodReturnTypeCollectionResult,
+                            new[] { assemblyClassTypeSymbol}));
                     }
                 }
 
-                return new CandidateClassCollectionResult(null!);
+                if (result.Count > 0)
+                {
+                    return new CandidateClassCollectionResult(result);
+                }
+                else
+                {
+                    return null;
+                }
             })
             .Where(t => t is not null);
 
@@ -251,7 +256,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .Collect()
             .Select((array, _) =>
             {
-                // 去重
+                // 去重 
                 return array.Distinct().ToList();
             });
 
@@ -372,37 +377,33 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// <returns></returns>
         public bool IsMatch(INamedTypeSymbol assemblyClassTypeSymbol)
         {
+            // 先判断是否继承，再判断是否标记特性
+            if (!TypeSymbolHelper.IsInherit(assemblyClassTypeSymbol, ExpectedClassBaseType))
+            {
+                // 没有继承基类，那就是不符合了
+                return false;
+            }
+
+            foreach (var attributeData in assemblyClassTypeSymbol.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, ExpectedClassAttributeType))
+                {
+                    return true;
+                }
+            }
+
             return true;
         }
     }
 
-
     class ExportMethodReturnTypeCollectionDiagnostic : IExportMethodReturnTypeCollectionResult
     {
-
-    }
-
-  
-
-
-    /// <summary>
-    /// 程序集里面的类型收集结果
-    /// </summary>
-    class AssemblyClassCollectionResult
-    {
-        public AssemblyClassCollectionResult(INamedTypeSymbol assemblyClassTypeSymbol, ClassDeclarationSyntax classDeclarationSyntax)
-        {
-            AssemblyClassTypeSymbol = assemblyClassTypeSymbol;
-            ClassDeclarationSyntax = classDeclarationSyntax;
-        }
-
-        public INamedTypeSymbol AssemblyClassTypeSymbol { get; }
-        public ClassDeclarationSyntax ClassDeclarationSyntax { get; }
     }
 
     /// <summary>
     /// 候选收集的结果
     /// </summary>
+    /// 包含所有的导出结果。比如项目里面有多个导出方法，每一个导出方法就是一个 CandidateClassTypeResult 对象
     class CandidateClassCollectionResult
     {
         public CandidateClassCollectionResult(IReadOnlyList<CandidateClassTypeResult> candidateClassTypeResultList)
@@ -413,6 +414,10 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         public IReadOnlyList<CandidateClassTypeResult> CandidateClassTypeResultList { get; }
     }
 
+    /// <summary>
+    /// 候选的导出类型结果
+    /// </summary>
+    /// 包含标记导出的方法信息，以及程序集里面导出的类型
     class CandidateClassTypeResult
     {
         public CandidateClassTypeResult(ExportMethodReturnTypeCollectionResult exportMethodReturnTypeCollectionResult, IReadOnlyList<INamedTypeSymbol> assemblyClassTypeSymbolList)
