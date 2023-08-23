@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -89,7 +90,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         // 获取方法返回值导出类型
         var exportMethodReturnTypeCollectionResultIncrementalValuesProvider = exportMethodIncrementalValuesProvider.Select((exportTypeCollectionResult, token) =>
         {
-            ITypeSymbol methodSymbolReturnType = exportTypeCollectionResult.MethodSymbol.ReturnType;
+            ITypeSymbol methodSymbolReturnType = exportTypeCollectionResult.ExportPartialMethodSymbol.ReturnType;
 
             //if (methodSymbolReturnType is IArrayTypeSymbol arrayTypeSymbol)
             //{
@@ -106,18 +107,21 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // 尝试判断是 ValueTuple 的情况
                     // 要求符合以下定义
                     // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
-                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], out var valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
+                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], out ValueTupleInfo valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
                     {
-                       
+                        // 准备导出的类型的基类型
+                        var expectedClassBaseType = valueTupleInfo.ItemList[0].ItemType;
+                        // 表示的特性
+                        var expectedClassAttributeType = valueTupleInfo.ItemList[1].ItemType;
+
+                        return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType, expectedClassAttributeType,
+                            exportTypeCollectionResult, new ValueTupleExportMethodReturnTypeInfo(valueTupleInfo));
                     }
                 }
-
-                return new ExportMethodReturnTypeCollectionResult(namedTypeSymbol, null,
-                    exportTypeCollectionResult.MethodSymbol, null!) as IExportMethodReturnTypeCollectionResult;
             }
 
             // 其他不认识的，要告诉开发者不能这样写哦
-            return new ExportMethodReturnTypeCollectionDiagnostic();
+            return new ExportMethodReturnTypeCollectionDiagnostic() as IExportMethodReturnTypeCollectionResult;
         });
 
         // 这是有定义出错的，需要反馈给到开发者的
@@ -156,6 +160,71 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             })
             .Where(t => t != null)
             .Select((t, _) => t!);
+
+        // 将这些需要包含引用程序集的加进来返回值类型。因为标记导出支持带引用程序集的
+        var assemblyReferenceExportReturnTypeProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
+            .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
+            // 只有非空且包含引用程序集的，才加入
+            .Where(t => t is not null && t.ExportTypeCollectionResult.IncludeReference)
+            .Select((t, _) => t!)
+            .Collect();
+
+        // 收集引用的程序集的类型
+        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select((tuple, token) =>
+        {
+            var compilation = tuple.Left;
+            var returnTypeCollectionResults = tuple.Right;
+
+            // 所有导出类型的定义逻辑
+            var exportMethodReturnTypeCollectionResults = tuple.Right;
+
+            // 获取到所有引用程序集
+            var referencedAssemblySymbols = compilation.SourceModule.ReferencedAssemblySymbols;
+
+            foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResults)
+            {
+                
+            }
+
+            foreach (IAssemblySymbol referencedAssemblySymbol in referencedAssemblySymbols)
+            {
+                var containingAssembly = exportMethodReturnTypeCollectionResults[0].ExpectedClassBaseType.ContainingAssembly;
+
+                if (referencedAssemblySymbol.Modules.Any(t=>t.ReferencedAssemblySymbols.Any(x=>SymbolEqualityComparer.Default.Equals(x,containingAssembly))))
+                {
+                    
+                }
+
+                //// 获取所有的类型
+                //// 这里 ToList 只是为了方便调试
+                //var allTypeSymbol = GetAllTypeSymbol(referencedAssemblySymbol.GlobalNamespace);
+
+                //foreach (var namedTypeSymbol in allTypeSymbol)
+                //{
+                    
+                //}
+            }
+
+            return 2;
+
+            static IEnumerable<INamedTypeSymbol> GetAllTypeSymbol(INamespaceSymbol namespaceSymbol)
+            {
+                var typeMemberList = namespaceSymbol.GetTypeMembers();
+
+                foreach (var typeSymbol in typeMemberList)
+                {
+                    yield return typeSymbol;
+                }
+
+                foreach (var namespaceMember in namespaceSymbol.GetNamespaceMembers())
+                {
+                    foreach (var typeSymbol in GetAllTypeSymbol(namespaceMember))
+                    {
+                        yield return typeSymbol;
+                    }
+                }
+            }
+        });
 
         var candidateClassCollectionResultIncrementalValuesProvider = assemblyClassIncrementalValuesProvider
             .Combine(returnTypeCollectionIncrementalValuesProvider)
@@ -204,7 +273,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
     {
         public ExportTypeCollectionResult(IMethodSymbol methodSymbol, GeneratorSyntaxContext generatorSyntaxContext)
         {
-            MethodSymbol = methodSymbol;
+            ExportPartialMethodSymbol = methodSymbol;
             GeneratorSyntaxContext = generatorSyntaxContext;
         }
 
@@ -212,8 +281,10 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// 是否包含引用的程序集和 DLL 里面的类型导出。默认只导出当前程序集
         /// </summary>
         public bool IncludeReference { set; get; }
-
-        public IMethodSymbol MethodSymbol { get; }
+        /// <summary>
+        /// 程序集里面标记了导出的分部方法，将用来生成代码
+        /// </summary>
+        public IMethodSymbol ExportPartialMethodSymbol { get; }
         public GeneratorSyntaxContext GeneratorSyntaxContext { get; }
 
         public bool Equals(ExportTypeCollectionResult? other)
@@ -221,7 +292,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return GeneratorSyntaxContext.Equals(other.GeneratorSyntaxContext) && SymbolEqualityComparer.Default.Equals(MethodSymbol, other.MethodSymbol);
+            return GeneratorSyntaxContext.Equals(other.GeneratorSyntaxContext) && SymbolEqualityComparer.Default.Equals(ExportPartialMethodSymbol, other.ExportPartialMethodSymbol);
         }
 
         public override bool Equals(object? obj)
@@ -236,7 +307,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         {
             unchecked
             {
-                return (MethodSymbol.GetHashCode() * 397) ^ GeneratorSyntaxContext.GetHashCode();
+                return (ExportPartialMethodSymbol.GetHashCode() * 397) ^ GeneratorSyntaxContext.GetHashCode();
             }
         }
     }
@@ -254,11 +325,11 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
     /// </summary>
     class ExportMethodReturnTypeCollectionResult : IExportMethodReturnTypeCollectionResult
     {
-        public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, IMethodSymbol exportPartialMethodSymbol, IExportMethodReturnTypeInfo exportMethodReturnTypeInfo)
+        public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, ExportTypeCollectionResult exportTypeCollectionResult, IExportMethodReturnTypeInfo exportMethodReturnTypeInfo)
         {
             ExpectedClassBaseType = expectedClassBaseType;
             ExpectedClassAttributeType = expectedClassAttributeType;
-            ExportPartialMethodSymbol = exportPartialMethodSymbol;
+            ExportTypeCollectionResult = exportTypeCollectionResult;
             ExportMethodReturnTypeInfo = exportMethodReturnTypeInfo;
         }
 
@@ -272,10 +343,12 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// </summary>
         public ITypeSymbol? ExpectedClassAttributeType { get; }
 
+        public ExportTypeCollectionResult ExportTypeCollectionResult { get; }
+
         /// <summary>
         /// 程序集里面标记了导出的分部方法，将用来生成代码
         /// </summary>
-        public IMethodSymbol ExportPartialMethodSymbol { get; }
+        public IMethodSymbol ExportPartialMethodSymbol => ExportTypeCollectionResult.ExportPartialMethodSymbol;
 
         /// <summary>
         /// 导出类型的返回类型信息
