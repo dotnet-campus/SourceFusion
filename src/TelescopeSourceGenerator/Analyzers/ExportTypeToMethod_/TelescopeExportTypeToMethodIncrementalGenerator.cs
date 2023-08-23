@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 
@@ -132,15 +133,63 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         //    productionContext.ReportDiagnostic();
         //});
 
-        // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
-        IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
+        // 收集到了期望收集的内容，将开始进行整个项目的类型收集
+
+        // 将这些需要包含引用程序集的加进来返回值类型。因为标记导出支持带引用程序集的
+        var assemblyReferenceExportReturnTypeProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
             .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
-            .Where(t => t is not null)
+            // 只有非空且包含引用程序集的，才加入
+            .Where(t => t is not null && t.ExportTypeCollectionResult.IncludeReference)
             .Select((t, _) => t!)
             .Collect();
 
-        // 收集到了期望收集的内容，将开始进行整个项目的类型收集
+        // 收集引用的程序集的类型
+        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select((tuple, token) =>
+        {
+            var compilation = tuple.Left;
 
+            // 所有导出类型的定义逻辑
+            var exportMethodReturnTypeCollectionResults = tuple.Right;
+
+            // 获取到所有引用程序集
+            var referencedAssemblySymbols = compilation.SourceModule.ReferencedAssemblySymbols;
+
+            var candidateClassList = new List<CandidateClassTypeResult>();
+
+            foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResults)
+            {
+                var assemblyClassTypeSymbolList = new List<INamedTypeSymbol>();
+                var candidateClassTypeResult = new CandidateClassTypeResult(exportMethodReturnTypeCollectionResult, assemblyClassTypeSymbolList);
+                candidateClassList.Add(candidateClassTypeResult);
+
+                // 期望继承的基础类型
+                var expectedClassBaseType = exportMethodReturnTypeCollectionResult.ExpectedClassBaseType;
+                // 过滤程序集，只有引用了期望继承的基础类型所在程序集的，才可以被收集到。如果没有引用，那自然写不出继承基础类型的代码
+
+                var visited = new Dictionary<IAssemblySymbol, bool /*是否引用*/>(SymbolEqualityComparer.Default);
+
+                foreach (var referencedAssemblySymbol in referencedAssemblySymbols)
+                {
+                    if (!AssemblySymbolHelper.IsReference(referencedAssemblySymbol, expectedClassBaseType.ContainingAssembly, visited))
+                    {
+                        // 如果当前程序集没有直接或间接继承期望继承的基础类型所在程序集，那就证明当前程序集一定不存在任何可能被收集的类型
+                        continue;
+                    }
+
+                    foreach (var assemblyClassTypeSymbol in AssemblySymbolHelper.GetAllTypeSymbol(referencedAssemblySymbol))
+                    {
+                        if (exportMethodReturnTypeCollectionResult.IsMatch(assemblyClassTypeSymbol))
+                        {
+                            assemblyClassTypeSymbolList.Add(assemblyClassTypeSymbol);
+                        }
+                    }
+                }
+            }
+
+            return new CandidateClassCollectionResult(candidateClassList);
+        });
+
+        // 收集当前分析器所分析项目的类型
         // 先收集整个项目里面所有的类型
         var assemblyClassIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
             {
@@ -161,70 +210,12 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .Where(t => t != null)
             .Select((t, _) => t!);
 
-        // 将这些需要包含引用程序集的加进来返回值类型。因为标记导出支持带引用程序集的
-        var assemblyReferenceExportReturnTypeProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
+        // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
+        IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
             .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
-            // 只有非空且包含引用程序集的，才加入
-            .Where(t => t is not null && t.ExportTypeCollectionResult.IncludeReference)
+            .Where(t => t is not null)
             .Select((t, _) => t!)
             .Collect();
-
-        // 收集引用的程序集的类型
-        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select((tuple, token) =>
-        {
-            var compilation = tuple.Left;
-            var returnTypeCollectionResults = tuple.Right;
-
-            // 所有导出类型的定义逻辑
-            var exportMethodReturnTypeCollectionResults = tuple.Right;
-
-            // 获取到所有引用程序集
-            var referencedAssemblySymbols = compilation.SourceModule.ReferencedAssemblySymbols;
-
-            foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResults)
-            {
-                
-            }
-
-            foreach (IAssemblySymbol referencedAssemblySymbol in referencedAssemblySymbols)
-            {
-                var containingAssembly = exportMethodReturnTypeCollectionResults[0].ExpectedClassBaseType.ContainingAssembly;
-
-                if (referencedAssemblySymbol.Modules.Any(t=>t.ReferencedAssemblySymbols.Any(x=>SymbolEqualityComparer.Default.Equals(x,containingAssembly))))
-                {
-                    
-                }
-
-                //// 获取所有的类型
-                //// 这里 ToList 只是为了方便调试
-                //var allTypeSymbol = GetAllTypeSymbol(referencedAssemblySymbol.GlobalNamespace);
-
-                //foreach (var namedTypeSymbol in allTypeSymbol)
-                //{
-                    
-                //}
-            }
-
-            return 2;
-
-            static IEnumerable<INamedTypeSymbol> GetAllTypeSymbol(INamespaceSymbol namespaceSymbol)
-            {
-                var typeMemberList = namespaceSymbol.GetTypeMembers();
-
-                foreach (var typeSymbol in typeMemberList)
-                {
-                    yield return typeSymbol;
-                }
-
-                foreach (var namespaceMember in namespaceSymbol.GetNamespaceMembers())
-                {
-                    foreach (var typeSymbol in GetAllTypeSymbol(namespaceMember))
-                    {
-                        yield return typeSymbol;
-                    }
-                }
-            }
-        });
 
         var candidateClassCollectionResultIncrementalValuesProvider = assemblyClassIncrementalValuesProvider
             .Combine(returnTypeCollectionIncrementalValuesProvider)
@@ -244,16 +235,28 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     }
                 }
 
-                return new CandidateClassCollectionResult();
+                return new CandidateClassCollectionResult(null!);
             })
             .Where(t => t is not null);
 
+        var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
+            .SelectMany((tuple, _) => { return tuple.Right.Add(tuple.Left); })
+            .Collect()
+            .Select((array, _) =>
+            {
+                // 去重
+                return array.Distinct().ToList();
+            });
+
         // 可以被 IDE 选择不生成的代码，但是在完全生成输出时将会跑
         // 这里可以用来存放具体实现的代码，将不影响用户代码的语义，而不是用来做定义的代码
-        context.RegisterImplementationSourceOutput(candidateClassCollectionResultIncrementalValuesProvider,
+        context.RegisterImplementationSourceOutput(collectionResultIncrementalValueProvider,
             (productionContext, result) =>
             {
-
+                foreach (var candidateClassCollectionResult in result)
+                {
+                    
+                }
             });
 
         // 在所有逻辑执行之前将会开始跑的代码，参与到用户代码里面，影响用户代码的语义
@@ -354,6 +357,16 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// 导出类型的返回类型信息
         /// </summary>
         public IExportMethodReturnTypeInfo ExportMethodReturnTypeInfo { get; }
+
+        /// <summary>
+        /// 判断传入的程序集类型满足当前的要求条件
+        /// </summary>
+        /// <param name="assemblyClassTypeSymbol"></param>
+        /// <returns></returns>
+        public bool IsMatch(INamedTypeSymbol assemblyClassTypeSymbol)
+        {
+            return true;
+        }
     }
 
 
@@ -380,8 +393,29 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; }
     }
 
+    /// <summary>
+    /// 候选收集的结果
+    /// </summary>
     class CandidateClassCollectionResult
     {
+        public CandidateClassCollectionResult(IReadOnlyList<CandidateClassTypeResult> candidateClassTypeResultList)
+        {
+            CandidateClassTypeResultList = candidateClassTypeResultList;
+        }
 
+        public IReadOnlyList<CandidateClassTypeResult> CandidateClassTypeResultList { get; }
+    }
+
+    class CandidateClassTypeResult
+    {
+        public CandidateClassTypeResult(ExportMethodReturnTypeCollectionResult exportMethodReturnTypeCollectionResult, IReadOnlyList<INamedTypeSymbol> assemblyClassTypeSymbolList)
+        {
+            ExportMethodReturnTypeCollectionResult = exportMethodReturnTypeCollectionResult;
+            AssemblyClassTypeSymbolList = assemblyClassTypeSymbolList;
+        }
+
+        public ExportMethodReturnTypeCollectionResult ExportMethodReturnTypeCollectionResult { get; }
+
+        public IReadOnlyList<INamedTypeSymbol> AssemblyClassTypeSymbolList { get; }
     }
 }
