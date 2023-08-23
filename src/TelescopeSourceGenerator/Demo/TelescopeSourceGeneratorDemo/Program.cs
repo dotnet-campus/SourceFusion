@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
+﻿using dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib1;
+
+namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
 
 internal partial class Program
 {
@@ -15,7 +17,7 @@ internal partial class Program
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReference = true)]
     //private static partial Base[] ExportFoo();
-    private static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable();
+    private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
     //private static partial Func<Base>[] ExportFooCreator();
 }
 
