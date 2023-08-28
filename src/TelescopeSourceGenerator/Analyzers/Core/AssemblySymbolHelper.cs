@@ -51,6 +51,11 @@ static class AssemblySymbolHelper
                     visited[currentAssemblySymbol] = true;
                     return true;
                 }
+                else if (SymbolEqualityComparer.Default.Equals(referencedAssemblySymbol, currentAssemblySymbol))
+                {
+                    // 循环引用，跳过
+                   continue;
+                }
                 else
                 {
                     if (visited.TryGetValue(referencedAssemblySymbol, out var isReference))
@@ -60,6 +65,9 @@ static class AssemblySymbolHelper
                     }
                     else
                     {
+                        // 进入递归之前，先将自身设置到字典，先设置为没有引用。防止循环引用炸掉
+                        visited[referencedAssemblySymbol] = false;
+
                         // 没有访问过的，获取引用的程序集是否存在引用关系
                         isReference = IsReference(referencedAssemblySymbol, requiredAssemblySymbol, visited);
                         visited[referencedAssemblySymbol] = isReference;
