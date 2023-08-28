@@ -627,6 +627,12 @@ namespace {@namespace}
                 return false;
             }
 
+            if (ExpectedClassAttributeType is null)
+            {
+                // 如果没有特性要求，那就返回符合
+                return true;
+            }
+
             foreach (var attributeData in assemblyClassTypeSymbol.GetAttributes())
             {
                 if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, ExpectedClassAttributeType))
@@ -635,7 +641,7 @@ namespace {@namespace}
                 }
             }
 
-            return true;
+            return false;
         }
     }
 
