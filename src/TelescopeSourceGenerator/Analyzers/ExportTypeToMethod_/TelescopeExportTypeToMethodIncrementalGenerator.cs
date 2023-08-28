@@ -364,7 +364,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                             var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
 
                             var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
-                            methodSource.AppendLine(IndentSource($"yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
+                            methodSource.AppendLine(IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
                                 numIndentations: 1));
                         }
                         methodSource.AppendLine("}");
