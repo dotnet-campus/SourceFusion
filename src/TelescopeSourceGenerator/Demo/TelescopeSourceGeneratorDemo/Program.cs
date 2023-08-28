@@ -6,6 +6,11 @@ internal partial class Program
 {
     static void Main(string[] args)
     {
+        foreach (var (_, xx, xxx) in ExportFooEnumerable())
+        {
+            
+        }
+
         //var attributedTypesExport = new __AttributedTypesExport__();
         //ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
         //foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())

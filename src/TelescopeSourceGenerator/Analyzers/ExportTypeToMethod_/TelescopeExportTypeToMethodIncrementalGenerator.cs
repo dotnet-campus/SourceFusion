@@ -307,15 +307,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                         var exportPartialMethodSymbol = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol;
 
                         var accessibilityCode =
-                            exportPartialMethodSymbol.DeclaredAccessibility switch
-                            {
-                                Accessibility.Public=>"public",
-                                Accessibility.Private=>"private",
-                                Accessibility.Internal=>"internal",
-                                Accessibility.Protected=>"protected",
-                                Accessibility.ProtectedAndInternal=>"private protected",
-                                _ => string.Empty
-                            };
+                            exportPartialMethodSymbol.DeclaredAccessibility.ToCSharpCode();
                         methodSource.Append(accessibilityCode).Append(' ');
 
                         if (exportPartialMethodSymbol.IsStatic)
