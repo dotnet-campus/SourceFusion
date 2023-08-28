@@ -75,6 +75,14 @@ static class AttributeCodeReWriter
                     {
                         constructorArgumentCode = "\"" + text + "\"";
                     }
+                    else if (typedConstant.Value is true)
+                    {
+                        constructorArgumentCode = "true";
+                    }
+                    else if (typedConstant.Value is false)
+                    {
+                        constructorArgumentCode = "false";
+                    }
                     else
                     {
                         constructorArgumentCode = typedConstant.Value?.ToString() ?? "null";
