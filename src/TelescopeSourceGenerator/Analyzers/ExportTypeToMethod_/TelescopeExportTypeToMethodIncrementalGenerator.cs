@@ -272,6 +272,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .Collect()
             .Select((array, _) =>
             {
+                // 去掉重复的定义
                 var dictionary = new Dictionary<ExportMethodReturnTypeCollectionResult, List<INamedTypeSymbol>>();
 
                 foreach (var candidateClassCollectionResult in array)
