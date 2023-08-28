@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
 
@@ -118,12 +120,15 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                         var funcTypeSymbol = (INamedTypeSymbol) valueTupleInfo.ItemList[2].ItemType;
                         // 准备导出的类型的基类型
                         var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
-                       
+
                         // 表示的特性
                         var expectedClassAttributeType = valueTupleInfo.ItemList[1].ItemType;
 
                         return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType, expectedClassAttributeType,
-                            exportTypeCollectionResult, new ValueTupleExportMethodReturnTypeInfo(valueTupleInfo));
+                            exportTypeCollectionResult, new ValueTupleExportMethodReturnTypeInfo(valueTupleInfo)
+                            {
+                                IsIEnumerable = true
+                            });
                     }
                 }
             }
@@ -205,22 +210,23 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .Collect();
 
         // 先收集整个项目里面所有的类型
-        var candidateClassCollectionResultIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
-            {
-                return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
-            }, (generatorSyntaxContext, token) =>
-            {
-                var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
-                // 从语法转换为语义，用于后续判断是否标记了特性
-                INamedTypeSymbol? assemblyClassTypeSymbol =
-                    generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
-                if (assemblyClassTypeSymbol is not null && !assemblyClassTypeSymbol.IsAbstract)
+        var candidateClassCollectionResultIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider(
+                (syntaxNode, _) =>
                 {
-                    return assemblyClassTypeSymbol;
-                }
+                    return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
+                }, (generatorSyntaxContext, token) =>
+                {
+                    var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
+                    // 从语法转换为语义，用于后续判断是否标记了特性
+                    INamedTypeSymbol? assemblyClassTypeSymbol =
+                        generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
+                    if (assemblyClassTypeSymbol is not null && !assemblyClassTypeSymbol.IsAbstract)
+                    {
+                        return assemblyClassTypeSymbol;
+                    }
 
-                return null;
-            })
+                    return null;
+                })
             .Where(t => t != null)
             .Select((t, _) => t!)
             .Combine(returnTypeCollectionIncrementalValuesProvider)
@@ -236,7 +242,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     if (exportMethodReturnTypeCollectionResult.IsMatch(assemblyClassTypeSymbol))
                     {
                         result.Add(new CandidateClassTypeResult(exportMethodReturnTypeCollectionResult,
-                            new[] { assemblyClassTypeSymbol}));
+                            new[] { assemblyClassTypeSymbol }));
                     }
                 }
 
@@ -249,15 +255,33 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     return null;
                 }
             })
-            .Where(t => t is not null);
+            .Where(t => t is not null)
+            .Select((t, _) => t!);
 
         var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
             .SelectMany((tuple, _) => { return tuple.Right.Add(tuple.Left); })
             .Collect()
             .Select((array, _) =>
             {
-                // 去重 
-                return array.Distinct().ToList();
+                var dictionary = new Dictionary<ExportMethodReturnTypeCollectionResult, List<INamedTypeSymbol>>();
+
+                foreach (var candidateClassCollectionResult in array)
+                {
+                    foreach (var candidateClassTypeResult in candidateClassCollectionResult.CandidateClassTypeResultList)
+                    {
+                        var result = candidateClassTypeResult.ExportMethodReturnTypeCollectionResult;
+
+                        if (!dictionary.TryGetValue(result, out var list))
+                        {
+                            list = new List<INamedTypeSymbol>();
+                            dictionary.Add(result, list);
+                        }
+
+                        list.AddRange(candidateClassTypeResult.AssemblyClassTypeSymbolList);
+                    }
+                }
+
+                return dictionary;
             });
 
         // 可以被 IDE 选择不生成的代码，但是在完全生成输出时将会跑
@@ -265,9 +289,163 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         context.RegisterImplementationSourceOutput(collectionResultIncrementalValueProvider,
             (productionContext, result) =>
             {
-                foreach (var candidateClassCollectionResult in result)
+                foreach (var item in result)
                 {
-                    
+                    /*
+                        private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable()
+                        {
+                            yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+                        }
+                     */
+                    var exportMethodReturnTypeCollectionResult = item.Key;
+                    var list = item.Value;
+
+                    var methodSource = new StringBuilder();
+
+                    if (exportMethodReturnTypeCollectionResult.ExportMethodReturnTypeInfo is ValueTupleExportMethodReturnTypeInfo valueTupleExportMethodReturnTypeInfo)
+                    {
+                        var exportPartialMethodSymbol = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol;
+
+                        var accessibilityCode =
+                            exportPartialMethodSymbol.DeclaredAccessibility switch
+                            {
+                                Accessibility.Public=>"public",
+                                Accessibility.Private=>"private",
+                                Accessibility.Internal=>"internal",
+                                Accessibility.Protected=>"protected",
+                                Accessibility.ProtectedAndInternal=>"private protected",
+                                _ => string.Empty
+                            };
+                        methodSource.Append(accessibilityCode).Append(' ');
+
+                        if (exportPartialMethodSymbol.IsStatic)
+                        {
+                            methodSource.Append("static ");
+                        }
+
+                        methodSource.Append("partial ");
+
+                        if (!valueTupleExportMethodReturnTypeInfo.IsIEnumerable)
+                        {
+                            // 还没支持其他返回值的情况
+                            throw new NotSupportedException();
+                        }
+
+                        methodSource.Append("global::System.Collections.Generic.IEnumerable<");
+                        methodSource.Append('(');
+                        var valueTupleInfo = valueTupleExportMethodReturnTypeInfo.ValueTupleInfo;
+                        for (var i = 0; i < valueTupleInfo.ItemList.Count; i++)
+                        {
+                            var info = valueTupleInfo.ItemList[i];
+
+                            if (i != valueTupleInfo.ItemList.Count - 1)
+                            {
+                                var type = TypeSymbolHelper.TypeSymbolToFullName(info.ItemType);
+                                methodSource.Append(type).Append(' ');
+                                methodSource.Append(info.ItemName);
+
+                                methodSource.Append(',');
+                            }
+                            else
+                            {
+                                var type = TypeSymbolHelper.TypeSymbolToFullName(exportMethodReturnTypeCollectionResult
+                                    .ExpectedClassBaseType);
+                                methodSource.Append($"global::System.Func<{type}> {info.ItemName}");
+                            }
+                        }
+
+                        methodSource.Append(')');
+                        methodSource.Append('>');
+                        methodSource.Append(' ');
+                        methodSource.Append(exportPartialMethodSymbol.Name);
+                        methodSource.AppendLine("()");
+                        methodSource.AppendLine("{");
+
+                        foreach (var namedTypeSymbol in list)
+                        {
+                            // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+
+                            var attribute = namedTypeSymbol.GetAttributes().First(t =>
+                                SymbolEqualityComparer.Default.Equals(t.AttributeClass,
+                                    exportMethodReturnTypeCollectionResult
+                                        .ExpectedClassAttributeType));
+                            var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
+
+                            var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
+                            methodSource.Append($"yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());");
+                        }
+                        methodSource.AppendLine("}");
+                    }
+
+                    var source = methodSource.ToString();
+
+                    var partialClassType = (INamedTypeSymbol) exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.ReceiverType!;
+
+                    var symbolDisplayFormat = new SymbolDisplayFormat
+                    (
+                        // 带上命名空间和类型名
+                        SymbolDisplayGlobalNamespaceStyle.Omitted,
+                        // 命名空间之前加上 global 防止冲突
+                        SymbolDisplayTypeQualificationStyle
+                            .NameAndContainingTypesAndNamespaces
+                    );
+                    var @namespace = partialClassType.ContainingNamespace?.ToDisplayString(symbolDisplayFormat);
+
+                    if (TryGetClassDeclarationList(partialClassType, out var declarationList))
+                    {
+                        int declarationCount = declarationList!.Count;
+                        /* 以下代码用来解决嵌套类型
+                                                               for (int i = 0; i < declarationCount - 1; i++)
+                                                               {
+                                                                   string declarationSource = $@"
+                                               {declarationList[declarationCount - 1 - i]}
+                                               {{";
+                                                                   sb.Append($@"
+                                               {IndentSource(declarationSource, numIndentations: i + 1)}
+                                               ");
+                                                               }
+                                                */
+
+                        var isIncludeNamespace = !string.IsNullOrEmpty(@namespace);
+                        var stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine("// <auto-generated/>");
+
+                        if (isIncludeNamespace)
+                        {
+                            stringBuilder.Append(@$"
+
+namespace {@namespace}
+{{");
+                        }
+
+                        var generatedCodeAttributeSource =
+                            "[global::System.CodeDom.Compiler.GeneratedCode(\"Telescope\", \"1.0.0\")]";
+
+                        // Add the core implementation for the derived context class.
+                        string partialContextImplementation = $@"
+{generatedCodeAttributeSource}{declarationList[0]}
+{{
+    {IndentSource(source, Math.Max(1, declarationCount - 1))}
+}}";
+                        stringBuilder.AppendLine(IndentSource(partialContextImplementation, numIndentations: declarationCount));
+
+                        if (!isIncludeNamespace)
+                        {
+                            stringBuilder.AppendLine("}");
+                        }
+
+                        var fileName = $"{partialClassType.Name}-{exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.Name}";
+                        productionContext.AddSource(fileName,stringBuilder.ToString());
+
+//#if DEBUG
+//                        var debugFolder = @"F:\temp";
+//                        if (Directory.Exists(debugFolder))
+//                        {
+//                            var debugFile = Path.Combine(debugFolder, fileName);
+//                            File.WriteAllText(debugFile, stringBuilder.ToString());
+//                        }
+//#endif
+                    }
                 }
             });
 
@@ -282,6 +460,64 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 canBeEmbedded: true);
             context.AddSource("TelescopeExportAttribute", sourceText);
         });
+    }
+
+
+
+    private static string IndentSource(string source, int numIndentations)
+    {
+        Debug.Assert(numIndentations >= 1);
+        return source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
+        //return source.Replace(Environment.NewLine, $"{Environment.NewLine}{new string(' ', 4 * numIndentations)}"); // 4 spaces per indentation.
+    }
+
+    private static bool TryGetClassDeclarationList(INamedTypeSymbol typeSymbol, out List<string>? classDeclarationList)
+    {
+        INamedTypeSymbol currentSymbol = typeSymbol;
+        classDeclarationList = null;
+
+        while (currentSymbol != null)
+        {
+            ClassDeclarationSyntax? classDeclarationSyntax = currentSymbol.DeclaringSyntaxReferences.First().GetSyntax() as ClassDeclarationSyntax;
+
+            if (classDeclarationSyntax != null)
+            {
+                SyntaxTokenList tokenList = classDeclarationSyntax.Modifiers;
+                int tokenCount = tokenList.Count;
+
+                bool isPartial = false;
+
+                string[] declarationElements = new string[tokenCount + 2];
+
+                for (int i = 0; i < tokenCount; i++)
+                {
+                    SyntaxToken token = tokenList[i];
+                    declarationElements[i] = token.Text;
+
+                    if (token.IsKind(SyntaxKind.PartialKeyword))
+                    {
+                        isPartial = true;
+                    }
+                }
+
+                if (!isPartial)
+                {
+                    classDeclarationList = null;
+                    return false;
+                }
+
+                declarationElements[tokenCount] = "class";
+                declarationElements[tokenCount + 1] = currentSymbol.Name;
+
+                (classDeclarationList ??= new List<string>()).Add(string.Join(" ", declarationElements));
+            }
+
+            currentSymbol = currentSymbol.ContainingType;
+        }
+
+        Debug.Assert(classDeclarationList != null);
+        Debug.Assert(classDeclarationList!.Count > 0);
+        return true;
     }
 
     class ExportTypeCollectionResult : IEquatable<ExportTypeCollectionResult>
@@ -377,6 +613,12 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         /// <returns></returns>
         public bool IsMatch(INamedTypeSymbol assemblyClassTypeSymbol)
         {
+            if (assemblyClassTypeSymbol.IsAbstract)
+            {
+                // 抽象类不能提供
+                return false;
+            }
+
             // 先判断是否继承，再判断是否标记特性
             if (!TypeSymbolHelper.IsInherit(assemblyClassTypeSymbol, ExpectedClassBaseType))
             {
