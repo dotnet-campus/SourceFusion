@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
 
