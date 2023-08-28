@@ -42,7 +42,6 @@ static class AttributeCodeReWriter
 
         static string TypedConstantToCodeString(TypedConstant typedConstant)
         {
-            var constructorArgumentType = typedConstant.Type;
             var constructorArgumentValue = typedConstant.Value;
 
             string constructorArgumentCode;
