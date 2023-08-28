@@ -429,7 +429,7 @@ namespace {@namespace}
 }}";
                         stringBuilder.AppendLine(IndentSource(partialContextImplementation, numIndentations: declarationCount));
 
-                        if (!isIncludeNamespace)
+                        if (isIncludeNamespace)
                         {
                             stringBuilder.AppendLine("}");
                         }
