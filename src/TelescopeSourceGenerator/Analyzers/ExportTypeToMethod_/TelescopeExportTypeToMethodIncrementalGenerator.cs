@@ -87,8 +87,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
              return null;
          })
          // 过滤不满足条件的
-         .Where(t => t is not null)
-         .Select((t, _) => t!);
+         .FilterNull();
 
         // 获取方法返回值导出类型
         var exportMethodReturnTypeCollectionResultIncrementalValuesProvider = exportMethodIncrementalValuesProvider.Select((exportTypeCollectionResult, token) =>
@@ -214,18 +213,17 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
         IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
             .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
-            .Where(t => t is not null)
-            .Select((t, _) => t!)
+            .FilterNull()
             .Collect();
 
-        // 先收集整个项目里面所有的类型
+        // 收集整个项目里面所有的类型
         var candidateClassCollectionResultIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider(
                 (syntaxNode, _) =>
                 {
                     return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
                 }, (generatorSyntaxContext, token) =>
                 {
-                    var classDeclarationSyntax = (ClassDeclarationSyntax) generatorSyntaxContext.Node;
+                    var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
                     // 从语法转换为语义，用于后续判断是否标记了特性
                     INamedTypeSymbol? assemblyClassTypeSymbol =
                         generatorSyntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, token);
@@ -236,8 +234,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                     return null;
                 })
-            .Where(t => t != null)
-            .Select((t, _) => t!)
+            .FilterNull()
             .Combine(returnTypeCollectionIncrementalValuesProvider)
             .Select((tuple, _) =>
             {
@@ -264,8 +261,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     return null;
                 }
             })
-            .Where(t => t is not null)
-            .Select((t, _) => t!);
+            .FilterNull();
 
         var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
             .SelectMany((tuple, _) => { return tuple.Right.Add(tuple.Left); })
@@ -464,8 +460,12 @@ namespace {@namespace}
         });
     }
 
-
-
+    /// <summary>
+    /// 提供缩进的方法
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="numIndentations"></param>
+    /// <returns></returns>
     private static string IndentSource(string source, int numIndentations)
     {
         Debug.Assert(numIndentations >= 1);
@@ -473,6 +473,12 @@ namespace {@namespace}
         //return source.Replace(Environment.NewLine, $"{Environment.NewLine}{new string(' ', 4 * numIndentations)}"); // 4 spaces per indentation.
     }
 
+    /// <summary>
+    /// 尝试获取类型的定义
+    /// </summary>
+    /// <param name="typeSymbol"></param>
+    /// <param name="classDeclarationList">嵌套类的定义</param>
+    /// <returns></returns>
     private static bool TryGetClassDeclarationList(INamedTypeSymbol typeSymbol, out List<string>? classDeclarationList)
     {
         INamedTypeSymbol currentSymbol = typeSymbol;
@@ -560,7 +566,7 @@ namespace {@namespace}
         {
             unchecked
             {
-                return (ExportPartialMethodSymbol.GetHashCode() * 397) ^ GeneratorSyntaxContext.GetHashCode();
+                return (SymbolEqualityComparer.Default.GetHashCode(ExportPartialMethodSymbol) * 397) ^ GeneratorSyntaxContext.GetHashCode();
             }
         }
     }
