@@ -69,6 +69,19 @@ static class AttributeCodeReWriter
 
                     break;
                 }
+                case TypedConstantKind.Primitive:
+                {
+                    if (typedConstant.Value is string text)
+                    {
+                        constructorArgumentCode = "\"" + text + "\"";
+                    }
+                    else
+                    {
+                        constructorArgumentCode = typedConstant.Value?.ToString() ?? "null";
+                    }
+
+                    break;
+                }
                 default:
                 {
                     constructorArgumentCode = typedConstant.Value?.ToString() ?? "null";
