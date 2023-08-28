@@ -37,7 +37,7 @@ static class AttributeCodeReWriter
             $@"new {TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass!)}({string.Join(",", constructorArgumentCodeList)})
 {{
            {string.Join(@",
-                        ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
+           ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
 }}";
 
         static string TypedConstantToCodeString(TypedConstant typedConstant)
