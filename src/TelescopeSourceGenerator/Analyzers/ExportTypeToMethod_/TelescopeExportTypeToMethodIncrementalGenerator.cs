@@ -188,8 +188,17 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                         continue;
                     }
 
+                    var isInternalsVisibleTo = referencedAssemblySymbol.GivesAccessTo(compilation.Assembly);
+
                     foreach (var assemblyClassTypeSymbol in AssemblySymbolHelper.GetAllTypeSymbol(referencedAssemblySymbol))
                     {
+                        if (!isInternalsVisibleTo &&
+                            assemblyClassTypeSymbol.DeclaredAccessibility != Accessibility.Public)
+                        {
+                            // 如果设置不可见的，那就不要加入了
+                            continue;
+                        }
+
                         if (exportMethodReturnTypeCollectionResult.IsMatch(assemblyClassTypeSymbol))
                         {
                             assemblyClassTypeSymbolList.Add(assemblyClassTypeSymbol);
