@@ -18,6 +18,12 @@ class EnumerableValueTupleExportMethodReturnTypeCodeGenerator : IExportMethodCod
     public string GenerateSourceCode(ExportMethodReturnTypeCollectionResult exportMethodReturnTypeCollectionResult, List<INamedTypeSymbol> list,
         CancellationToken token)
     {
+        /*
+           private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable()
+           {
+               yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+           }
+        */
         var methodSource = new StringBuilder();
 
         if (exportMethodReturnTypeCollectionResult.ExportMethodReturnTypeInfo is ValueTupleExportMethodReturnTypeInfo valueTupleExportMethodReturnTypeInfo)
@@ -83,7 +89,7 @@ class EnumerableValueTupleExportMethodReturnTypeCodeGenerator : IExportMethodCod
                 var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
 
                 var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
-                methodSource.AppendLine(ExportMethodCodeGenerator.IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
+                methodSource.AppendLine(SourceCodeGeneratorHelper.IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
                     numIndentations: 1));
             }
             methodSource.AppendLine("}");

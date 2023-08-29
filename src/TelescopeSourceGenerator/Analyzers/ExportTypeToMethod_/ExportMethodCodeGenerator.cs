@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -41,17 +40,5 @@ static class ExportMethodCodeGenerator
         }
 
         return codeGenerator.GenerateSourceCode(exportMethodReturnTypeCollectionResult, list, token);
-    }
-
-    /// <summary>
-    /// 提供缩进的方法
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="numIndentations"></param>
-    /// <returns></returns>
-    public static string IndentSource(string source, int numIndentations)
-    {
-        Debug.Assert(numIndentations >= 1);
-        return source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
     }
 }

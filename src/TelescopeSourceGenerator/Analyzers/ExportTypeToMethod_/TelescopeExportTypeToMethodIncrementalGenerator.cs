@@ -308,12 +308,6 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             {
                 token.ThrowIfCancellationRequested();
 
-                /*
-                    private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable()
-                    {
-                        yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
-                    }
-                 */
                 var exportMethodReturnTypeCollectionResult = item.Key;
                 var list = item.Value;
 
@@ -415,7 +409,7 @@ namespace {@namespace}
     /// <returns></returns>
     private static string IndentSource(string source, int numIndentations)
     {
-        return ExportMethodCodeGenerator.IndentSource(source, numIndentations);
+        return SourceCodeGeneratorHelper.IndentSource(source, numIndentations);
     }
 
     /// <summary>
