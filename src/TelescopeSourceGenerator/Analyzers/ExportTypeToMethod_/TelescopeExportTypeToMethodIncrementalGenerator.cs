@@ -30,7 +30,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         Debugger.Launch();
 #endif
         // 先找到定义
-        IncrementalValuesProvider<ExportTypeCollectionResult> exportMethodIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, token) =>
+        IncrementalValuesProvider<ExportTypeCollectionResult> exportMethodIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
          {
              // 先要求是分部的方法，分部的方法必定在分部类里面，这部分判断分部类里面还可以省略
              if (syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax && methodDeclarationSyntax.AttributeLists.Any())
@@ -109,7 +109,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // 尝试判断是 ValueTuple 的情况
                     // 要求符合以下定义
                     // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
-                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], out ValueTupleInfo valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
+                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], token, out ValueTupleInfo valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
                     {
                         if (TypeSymbolHelper.TypeSymbolToFullName(valueTupleInfo.ItemList[0].ItemType) != "global::System.Type")
                         {
@@ -169,6 +169,8 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
             foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResults)
             {
+                token.ThrowIfCancellationRequested();
+
                 var assemblyClassTypeSymbolList = new List<INamedTypeSymbol>();
                 var candidateClassTypeResult = new CandidateClassTypeResult(exportMethodReturnTypeCollectionResult, assemblyClassTypeSymbolList);
                 candidateClassList.Add(candidateClassTypeResult);
@@ -181,6 +183,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                 foreach (var referencedAssemblySymbol in referencedAssemblySymbols)
                 {
+                    token.ThrowIfCancellationRequested();
                     if (!AssemblySymbolHelper.IsReference(referencedAssemblySymbol, expectedClassBaseType.ContainingAssembly, visited))
                     {
                         // 如果当前程序集没有直接或间接继承期望继承的基础类型所在程序集，那就证明当前程序集一定不存在任何可能被收集的类型
@@ -236,7 +239,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 })
             .FilterNull()
             .Combine(returnTypeCollectionIncrementalValuesProvider)
-            .Select((tuple, _) =>
+            .Select((tuple, token) =>
             {
                 var assemblyClassTypeSymbol = tuple.Left;
                 var exportMethodReturnTypeCollectionResultArray = tuple.Right;
@@ -245,6 +248,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                 foreach (var exportMethodReturnTypeCollectionResult in exportMethodReturnTypeCollectionResultArray)
                 {
+                    token.ThrowIfCancellationRequested();
                     if (exportMethodReturnTypeCollectionResult.IsMatch(assemblyClassTypeSymbol))
                     {
                         result.Add(new CandidateClassTypeResult(exportMethodReturnTypeCollectionResult,
@@ -266,15 +270,17 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
             .SelectMany((tuple, _) => { return tuple.Right.Add(tuple.Left); })
             .Collect()
-            .Select((array, _) =>
+            .Select((array, token) =>
             {
                 // 去掉重复的定义
                 var dictionary = new Dictionary<ExportMethodReturnTypeCollectionResult, List<INamedTypeSymbol>>();
 
                 foreach (var candidateClassCollectionResult in array)
                 {
+                    token.ThrowIfCancellationRequested();
                     foreach (var candidateClassTypeResult in candidateClassCollectionResult.CandidateClassTypeResultList)
                     {
+                        token.ThrowIfCancellationRequested();
                         var result = candidateClassTypeResult.ExportMethodReturnTypeCollectionResult;
 
                         if (!dictionary.TryGetValue(result, out var list))
@@ -290,160 +296,177 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 return dictionary;
             });
 
-        // 可以被 IDE 选择不生成的代码，但是在完全生成输出时将会跑
-        // 这里可以用来存放具体实现的代码，将不影响用户代码的语义，而不是用来做定义的代码
-        context.RegisterImplementationSourceOutput(collectionResultIncrementalValueProvider,
-            (productionContext, result) =>
+        // 转换为源代码输出
+        // 源代码输出放在 Select 可以随时打断，实际 VisualStudio 性能会比放在 RegisterImplementationSourceOutput 高很多
+        var sourceCodeProvider = collectionResultIncrementalValueProvider.Select((result, token) =>
+        {
+           var codeList = new List<(string /*FileName*/, string /*SourceCode*/)>(result.Count);
+            foreach (var item in result)
             {
-                foreach (var item in result)
-                {
-                    /*
-                        private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable()
-                        {
-                            yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
-                        }
-                     */
-                    var exportMethodReturnTypeCollectionResult = item.Key;
-                    var list = item.Value;
+                token.ThrowIfCancellationRequested();
 
-                    var methodSource = new StringBuilder();
-
-                    if (exportMethodReturnTypeCollectionResult.ExportMethodReturnTypeInfo is ValueTupleExportMethodReturnTypeInfo valueTupleExportMethodReturnTypeInfo)
+                /*
+                    private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable()
                     {
-                        var exportPartialMethodSymbol = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol;
+                        yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+                    }
+                 */
+                var exportMethodReturnTypeCollectionResult = item.Key;
+                var list = item.Value;
 
-                        var accessibilityCode =
-                            exportPartialMethodSymbol.DeclaredAccessibility.ToCSharpCode();
-                        methodSource.Append(accessibilityCode).Append(' ');
+                var methodSource = new StringBuilder();
 
-                        if (exportPartialMethodSymbol.IsStatic)
-                        {
-                            methodSource.Append("static ");
-                        }
+                if (exportMethodReturnTypeCollectionResult.ExportMethodReturnTypeInfo is ValueTupleExportMethodReturnTypeInfo valueTupleExportMethodReturnTypeInfo)
+                {
+                    var exportPartialMethodSymbol = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol;
 
-                        methodSource.Append("partial ");
+                    var accessibilityCode =
+                        exportPartialMethodSymbol.DeclaredAccessibility.ToCSharpCode();
+                    methodSource.Append(accessibilityCode).Append(' ');
 
-                        if (!valueTupleExportMethodReturnTypeInfo.IsIEnumerable)
-                        {
-                            // 还没支持其他返回值的情况
-                            throw new NotSupportedException();
-                        }
-
-                        methodSource.Append("global::System.Collections.Generic.IEnumerable<");
-                        methodSource.Append('(');
-                        var valueTupleInfo = valueTupleExportMethodReturnTypeInfo.ValueTupleInfo;
-                        for (var i = 0; i < valueTupleInfo.ItemList.Count; i++)
-                        {
-                            var info = valueTupleInfo.ItemList[i];
-
-                            if (i != valueTupleInfo.ItemList.Count - 1)
-                            {
-                                var type = TypeSymbolHelper.TypeSymbolToFullName(info.ItemType);
-                                methodSource.Append(type).Append(' ');
-                                methodSource.Append(info.ItemName);
-
-                                methodSource.Append(',').Append(' ');
-                            }
-                            else
-                            {
-                                var type = TypeSymbolHelper.TypeSymbolToFullName(exportMethodReturnTypeCollectionResult
-                                    .ExpectedClassBaseType);
-                                methodSource.Append($"global::System.Func<{type}> {info.ItemName}");
-                            }
-                        }
-
-                        methodSource.Append(')');
-                        methodSource.Append('>');
-                        methodSource.Append(' ');
-                        methodSource.Append(exportPartialMethodSymbol.Name);
-                        methodSource.AppendLine("()");
-                        methodSource.AppendLine("{");
-
-                        foreach (var namedTypeSymbol in list)
-                        {
-                            // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
-
-                            var attribute = namedTypeSymbol.GetAttributes().First(t =>
-                                SymbolEqualityComparer.Default.Equals(t.AttributeClass,
-                                    exportMethodReturnTypeCollectionResult
-                                        .ExpectedClassAttributeType));
-                            var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
-
-                            var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
-                            methodSource.AppendLine(IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
-                                numIndentations: 1));
-                        }
-                        methodSource.AppendLine("}");
+                    if (exportPartialMethodSymbol.IsStatic)
+                    {
+                        methodSource.Append("static ");
                     }
 
-                    var source = methodSource.ToString();
+                    methodSource.Append("partial ");
 
-                    var partialClassType = (INamedTypeSymbol) exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.ReceiverType!;
-
-                    var symbolDisplayFormat = new SymbolDisplayFormat
-                    (
-                        // 带上命名空间和类型名
-                        SymbolDisplayGlobalNamespaceStyle.Omitted,
-                        // 命名空间之前加上 global 防止冲突
-                        SymbolDisplayTypeQualificationStyle
-                            .NameAndContainingTypesAndNamespaces
-                    );
-                    var @namespace = partialClassType.ContainingNamespace?.ToDisplayString(symbolDisplayFormat);
-
-                    if (TryGetClassDeclarationList(partialClassType, out var declarationList))
+                    if (!valueTupleExportMethodReturnTypeInfo.IsIEnumerable)
                     {
-                        int declarationCount = declarationList!.Count;
-                        /* 以下代码用来解决嵌套类型
-                        for (int i = 0; i < declarationCount - 1; i++)
-                        {
-                            string declarationSource = $@"
-                        {declarationList[declarationCount - 1 - i]}
-                        {{";
-                            sb.Append($@"
-                        {IndentSource(declarationSource, numIndentations: i + 1)}
-                        ");
-                         }
-                         */
+                        // 还没支持其他返回值的情况
+                        throw new NotSupportedException();
+                    }
 
-                        var isIncludeNamespace = !string.IsNullOrEmpty(@namespace);
-                        var stringBuilder = new StringBuilder(AssemblyInfo.GeneratedCodeComment);
+                    methodSource.Append("global::System.Collections.Generic.IEnumerable<");
+                    methodSource.Append('(');
+                    var valueTupleInfo = valueTupleExportMethodReturnTypeInfo.ValueTupleInfo;
+                    for (var i = 0; i < valueTupleInfo.ItemList.Count; i++)
+                    {
+                        var info = valueTupleInfo.ItemList[i];
 
-                        if (isIncludeNamespace)
+                        if (i != valueTupleInfo.ItemList.Count - 1)
                         {
-                            stringBuilder.Append(@$"
+                            var type = TypeSymbolHelper.TypeSymbolToFullName(info.ItemType);
+                            methodSource.Append(type).Append(' ');
+                            methodSource.Append(info.ItemName);
+
+                            methodSource.Append(',').Append(' ');
+                        }
+                        else
+                        {
+                            var type = TypeSymbolHelper.TypeSymbolToFullName(exportMethodReturnTypeCollectionResult
+                                .ExpectedClassBaseType);
+                            methodSource.Append($"global::System.Func<{type}> {info.ItemName}");
+                        }
+                    }
+
+                    methodSource.Append(')');
+                    methodSource.Append('>');
+                    methodSource.Append(' ');
+                    methodSource.Append(exportPartialMethodSymbol.Name);
+                    methodSource.AppendLine("()");
+                    methodSource.AppendLine("{");
+
+                    foreach (var namedTypeSymbol in list)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+
+                        var attribute = namedTypeSymbol.GetAttributes().First(t =>
+                            SymbolEqualityComparer.Default.Equals(t.AttributeClass,
+                                exportMethodReturnTypeCollectionResult
+                                    .ExpectedClassAttributeType));
+                        var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
+
+                        var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
+                        methodSource.AppendLine(IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
+                            numIndentations: 1));
+                    }
+                    methodSource.AppendLine("}");
+                }
+
+                var source = methodSource.ToString();
+
+                var partialClassType = (INamedTypeSymbol) exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.ReceiverType!;
+
+                var symbolDisplayFormat = new SymbolDisplayFormat
+                (
+                    // 带上命名空间和类型名
+                    SymbolDisplayGlobalNamespaceStyle.Omitted,
+                    // 命名空间之前加上 global 防止冲突
+                    SymbolDisplayTypeQualificationStyle
+                        .NameAndContainingTypesAndNamespaces
+                );
+                var @namespace = partialClassType.ContainingNamespace?.ToDisplayString(symbolDisplayFormat);
+
+                if (TryGetClassDeclarationList(partialClassType, out var declarationList))
+                {
+                    int declarationCount = declarationList!.Count;
+                    /* 以下代码用来解决嵌套类型
+                    for (int i = 0; i < declarationCount - 1; i++)
+                    {
+                        string declarationSource = $@"
+                    {declarationList[declarationCount - 1 - i]}
+                    {{";
+                        sb.Append($@"
+                    {IndentSource(declarationSource, numIndentations: i + 1)}
+                    ");
+                     }
+                     */
+
+                    var isIncludeNamespace = !string.IsNullOrEmpty(@namespace);
+                    var stringBuilder = new StringBuilder(AssemblyInfo.GeneratedCodeComment);
+
+                    if (isIncludeNamespace)
+                    {
+                        stringBuilder.Append(@$"
 
 namespace {@namespace}
 {{");
-                        }
+                    }
 
-                        var generatedCodeAttributeSource = AssemblyInfo.GeneratedCodeAttribute;
+                    var generatedCodeAttributeSource = AssemblyInfo.GeneratedCodeAttribute;
 
-                        // Add the core implementation for the derived context class.
-                        string partialContextImplementation = $@"
+                    // Add the core implementation for the derived context class.
+                    string partialContextImplementation = $@"
 {generatedCodeAttributeSource}
 {declarationList[0]}
 {{
     {IndentSource(source, Math.Max(1, declarationCount - 1))}
 }}";
-                        stringBuilder.AppendLine(IndentSource(partialContextImplementation, numIndentations: declarationCount));
+                    stringBuilder.AppendLine(IndentSource(partialContextImplementation, numIndentations: declarationCount));
 
-                        if (isIncludeNamespace)
-                        {
-                            stringBuilder.AppendLine("}");
-                        }
-
-                        var fileName = $"{partialClassType.Name}-{exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.Name}";
-                        productionContext.AddSource(fileName,stringBuilder.ToString());
-
-//#if DEBUG
-//                        var debugFolder = @"F:\temp";
-//                        if (Directory.Exists(debugFolder))
-//                        {
-//                            var debugFile = Path.Combine(debugFolder, fileName);
-//                            File.WriteAllText(debugFile, stringBuilder.ToString());
-//                        }
-//#endif
+                    if (isIncludeNamespace)
+                    {
+                        stringBuilder.AppendLine("}");
                     }
+
+                    var fileName = $"{partialClassType.Name}-{exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.Name}";
+
+                    codeList.Add((fileName, stringBuilder.ToString()));
+
+                    //#if DEBUG
+                    //                        var debugFolder = @"F:\temp";
+                    //                        if (Directory.Exists(debugFolder))
+                    //                        {
+                    //                            var debugFile = Path.Combine(debugFolder, fileName);
+                    //                            File.WriteAllText(debugFile, stringBuilder.ToString());
+                    //                        }
+                    //#endif
+                }
+            }
+
+            return codeList;
+        });
+
+        // 可以被 IDE 选择不生成的代码，但是在完全生成输出时将会跑
+        // 这里可以用来存放具体实现的代码，将不影响用户代码的语义，而不是用来做定义的代码
+        context.RegisterImplementationSourceOutput(sourceCodeProvider,
+            (productionContext, result) =>
+            {
+                foreach (var (fileName, code) in result)
+                {
+                    productionContext.AddSource(fileName, code);
                 }
             });
 

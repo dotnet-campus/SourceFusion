@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -7,7 +8,7 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
 
 public static class ValueTupleInfoParser
 {
-    public static bool TryParse(ITypeSymbol type, out ValueTupleInfo valueTupleInfo)
+    public static bool TryParse(ITypeSymbol type, CancellationToken token, out ValueTupleInfo valueTupleInfo)
     {
         valueTupleInfo = null!;
 
@@ -18,7 +19,7 @@ public static class ValueTupleInfoParser
 
         // 尝试判断是 ValueTuple 的情况
         // (Type type, FooAttribute xx, Func<Base> xxx)
-        if (type.IsValueType && typeArgument.TupleElements.Length > 0 && typeArgument.DeclaringSyntaxReferences[0].GetSyntax() is TupleTypeSyntax
+        if (type.IsValueType && typeArgument.TupleElements.Length > 0 && typeArgument.DeclaringSyntaxReferences[0].GetSyntax(token) is TupleTypeSyntax
                 valueTupleSyntaxNode)
         {
             Debug.Assert(typeArgument.TupleElements.Length == valueTupleSyntaxNode.Elements.Count);
