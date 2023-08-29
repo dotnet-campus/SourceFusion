@@ -317,78 +317,8 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 var exportMethodReturnTypeCollectionResult = item.Key;
                 var list = item.Value;
 
-                var methodSource = new StringBuilder();
-
-                if (exportMethodReturnTypeCollectionResult.ExportMethodReturnTypeInfo is ValueTupleExportMethodReturnTypeInfo valueTupleExportMethodReturnTypeInfo)
-                {
-                    var exportPartialMethodSymbol = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol;
-
-                    var accessibilityCode =
-                        exportPartialMethodSymbol.DeclaredAccessibility.ToCSharpCode();
-                    methodSource.Append(accessibilityCode).Append(' ');
-
-                    if (exportPartialMethodSymbol.IsStatic)
-                    {
-                        methodSource.Append("static ");
-                    }
-
-                    methodSource.Append("partial ");
-
-                    if (!valueTupleExportMethodReturnTypeInfo.IsIEnumerable)
-                    {
-                        // 还没支持其他返回值的情况
-                        throw new NotSupportedException();
-                    }
-
-                    methodSource.Append("global::System.Collections.Generic.IEnumerable<");
-                    methodSource.Append('(');
-                    var valueTupleInfo = valueTupleExportMethodReturnTypeInfo.ValueTupleInfo;
-                    for (var i = 0; i < valueTupleInfo.ItemList.Count; i++)
-                    {
-                        var info = valueTupleInfo.ItemList[i];
-
-                        if (i != valueTupleInfo.ItemList.Count - 1)
-                        {
-                            var type = TypeSymbolHelper.TypeSymbolToFullName(info.ItemType);
-                            methodSource.Append(type).Append(' ');
-                            methodSource.Append(info.ItemName);
-
-                            methodSource.Append(',').Append(' ');
-                        }
-                        else
-                        {
-                            var type = TypeSymbolHelper.TypeSymbolToFullName(exportMethodReturnTypeCollectionResult
-                                .ExpectedClassBaseType);
-                            methodSource.Append($"global::System.Func<{type}> {info.ItemName}");
-                        }
-                    }
-
-                    methodSource.Append(')');
-                    methodSource.Append('>');
-                    methodSource.Append(' ');
-                    methodSource.Append(exportPartialMethodSymbol.Name);
-                    methodSource.AppendLine("()");
-                    methodSource.AppendLine("{");
-
-                    foreach (var namedTypeSymbol in list)
-                    {
-                        token.ThrowIfCancellationRequested();
-                        // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
-
-                        var attribute = namedTypeSymbol.GetAttributes().First(t =>
-                            SymbolEqualityComparer.Default.Equals(t.AttributeClass,
-                                exportMethodReturnTypeCollectionResult
-                                    .ExpectedClassAttributeType));
-                        var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
-
-                        var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
-                        methodSource.AppendLine(IndentSource($"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
-                            numIndentations: 1));
-                    }
-                    methodSource.AppendLine("}");
-                }
-
-                var source = methodSource.ToString();
+                var methodCode =
+                    ExportMethodCodeGenerator.GenerateSourceCode(exportMethodReturnTypeCollectionResult, list, token);
 
                 var partialClassType = (INamedTypeSymbol) exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.ReceiverType!;
 
@@ -435,7 +365,7 @@ namespace {@namespace}
 {generatedCodeAttributeSource}
 {declarationList[0]}
 {{
-    {IndentSource(source, Math.Max(1, declarationCount - 1))}
+    {IndentSource(methodCode, Math.Max(1, declarationCount - 1))}
 }}";
                     stringBuilder.AppendLine(IndentSource(partialContextImplementation, numIndentations: declarationCount));
 
@@ -485,8 +415,7 @@ namespace {@namespace}
     /// <returns></returns>
     private static string IndentSource(string source, int numIndentations)
     {
-        Debug.Assert(numIndentations >= 1);
-        return source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
+        return ExportMethodCodeGenerator.IndentSource(source, numIndentations);
     }
 
     /// <summary>
