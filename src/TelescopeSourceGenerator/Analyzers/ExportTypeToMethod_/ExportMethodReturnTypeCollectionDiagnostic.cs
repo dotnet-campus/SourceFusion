@@ -1,0 +1,5 @@
+﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
+
+class ExportMethodReturnTypeCollectionDiagnostic : IExportMethodReturnTypeCollectionResult
+{
+}
