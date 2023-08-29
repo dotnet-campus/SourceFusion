@@ -444,15 +444,6 @@ namespace {@namespace}
                     var fileName = $"{partialClassType.Name}-{exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.Name}";
 
                     codeList.Add((fileName, stringBuilder.ToString()));
-
-                    //#if DEBUG
-                    //                        var debugFolder = @"F:\temp";
-                    //                        if (Directory.Exists(debugFolder))
-                    //                        {
-                    //                            var debugFile = Path.Combine(debugFolder, fileName);
-                    //                            File.WriteAllText(debugFile, stringBuilder.ToString());
-                    //                        }
-                    //#endif
                 }
             }
 
@@ -493,7 +484,6 @@ namespace {@namespace}
     {
         Debug.Assert(numIndentations >= 1);
         return source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
-        //return source.Replace(Environment.NewLine, $"{Environment.NewLine}{new string(' ', 4 * numIndentations)}"); // 4 spaces per indentation.
     }
 
     /// <summary>
