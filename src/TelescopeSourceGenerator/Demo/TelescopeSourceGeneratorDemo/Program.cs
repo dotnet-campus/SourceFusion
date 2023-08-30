@@ -8,35 +8,25 @@ internal partial class Program
     {
         foreach (var (_, xx, xxx) in ExportFooEnumerable())
         {
-            
         }
 
-        //var attributedTypesExport = new __AttributedTypesExport__();
-        //ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
-        //foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
-        //{
-        //    // 输出导出的类型
-        //    Console.WriteLine(exportedTypeMetadata.RealType.FullName);
-        //}
+        var attributedTypesExport = new __AttributedTypesExport__();
+        ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
+        foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
+        {
+            // 输出导出的类型
+            Console.WriteLine(exportedTypeMetadata.RealType.FullName);
+        }
     }
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReference = true)]
-    //private static partial Base[] ExportFoo();
     private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
-    //private static partial Func<Base>[] ExportFooCreator();
 }
 
 [F1]
 public class CurrentFoo : DemoLib1.F1
 {
 }
-
-//internal partial class Program
-//{
-//    private static partial IEnumerable<(Type , FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
-//    {
-//    }
-//}
 
 [Foo(0, FooEnum.N1, typeof(Foo), null)]
 abstract class F1 : Base
