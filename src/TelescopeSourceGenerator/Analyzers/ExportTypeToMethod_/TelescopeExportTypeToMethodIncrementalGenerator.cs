@@ -189,15 +189,15 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .Collect();
 
         // 收集引用的程序集的类型
-        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select(static (tuple, token) =>
+        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider
+            .Select(static (compilation, _) => compilation.SourceModule.ReferencedAssemblySymbols)
+            .Combine(assemblyReferenceExportReturnTypeProvider).Select(static (tuple, token) =>
         {
-            var compilation = tuple.Left;
+            // 获取到所有引用程序集
+            var referencedAssemblySymbols = tuple.Left;
 
             // 所有导出类型的定义逻辑
             var exportMethodReturnTypeCollectionResults = tuple.Right;
-
-            // 获取到所有引用程序集
-            var referencedAssemblySymbols = compilation.SourceModule.ReferencedAssemblySymbols;
 
             var candidateClassList = new List<CandidateClassTypeResult>();
 
@@ -211,12 +211,15 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                 // 期望继承的基础类型
                 var expectedClassBaseType = exportMethodReturnTypeCollectionResult.ExpectedClassBaseType;
-                // 过滤程序集，只有引用了期望继承的基础类型所在程序集的，才可以被收集到。如果没有引用，那自然写不出继承基础类型的代码
+
+                // 当前项目的程序集，用来判断 internal 可见性
+                var currentAssembly = exportMethodReturnTypeCollectionResult.ExportPartialMethodSymbol.ContainingAssembly;
 
                 var visited = new Dictionary<IAssemblySymbol, bool /*是否引用*/>(SymbolEqualityComparer.Default);
 
                 foreach (var referencedAssemblySymbol in referencedAssemblySymbols)
                 {
+                    // 过滤程序集，只有引用了期望继承的基础类型所在程序集的，才可以被收集到。如果没有引用，那自然写不出继承基础类型的代码
                     token.ThrowIfCancellationRequested();
                     if (!AssemblySymbolHelper.IsReference(referencedAssemblySymbol, expectedClassBaseType.ContainingAssembly, visited))
                     {
@@ -224,7 +227,8 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                         continue;
                     }
 
-                    var isInternalsVisibleTo = referencedAssemblySymbol.GivesAccessTo(compilation.Assembly);
+                    // 判断 referencedAssemblySymbol 是否设置 internal 可见
+                    var isInternalsVisibleTo = referencedAssemblySymbol.GivesAccessTo(currentAssembly);
 
                     foreach (var assemblyClassTypeSymbol in AssemblySymbolHelper.GetAllTypeSymbol(referencedAssemblySymbol))
                     {
