@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,6 +13,100 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
 
 static class SourceCodeGeneratorHelper
 {
+    /// <summary>
+    /// 创建分部方法的代码
+    /// </summary>
+    /// <param name="partialMethodSymbol"></param>
+    /// <param name="methodCode">放在方法内的代码</param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static string GeneratePartialMethodCode(IMethodSymbol partialMethodSymbol, string methodCode, CancellationToken token)
+    {
+        var methodSource = new StringBuilder();
+
+        var accessibilityCode =
+            partialMethodSymbol.DeclaredAccessibility.ToCSharpCode();
+        methodSource.Append(accessibilityCode).Append(' ');
+
+        if (partialMethodSymbol.IsStatic)
+        {
+            methodSource.Append("static ");
+        }
+
+        if (partialMethodSymbol.IsPartialDefinition)
+        {
+            methodSource.Append("partial ");
+        }
+
+        var returnType = partialMethodSymbol.ReturnType;
+        GenerateTypeCode(returnType, methodSource, token);
+
+        methodSource.Append(' ');
+        methodSource.Append(partialMethodSymbol.Name);
+        methodSource.AppendLine("()"); // 暂时只支持无参函数
+        methodSource.AppendLine("{");
+        methodSource.AppendLine(IndentSource(methodCode, 1, shouldFirstLine: true));
+        methodSource.Append('}');
+
+        return methodSource.ToString();
+    }
+
+    /// <summary>
+    /// 根据传入的类型创建代码
+    /// </summary>
+    /// <returns></returns>
+    public static void GenerateTypeCode(ITypeSymbol typeSymbol, StringBuilder output, CancellationToken token)
+    {
+        var returnTypeCode = TypeSymbolHelper.TypeSymbolToFullName(typeSymbol);
+        output.Append(returnTypeCode);
+        if (typeSymbol is INamedTypeSymbol returnTypeNamedTypeSymbol && returnTypeNamedTypeSymbol.IsGenericType)
+        {
+            output.Append('<');
+            for (var i = 0; i < returnTypeNamedTypeSymbol.TypeArguments.Length; i++)
+            {
+                token.ThrowIfCancellationRequested();
+
+                var typeArgument = returnTypeNamedTypeSymbol.TypeArguments[i];
+
+                if (typeArgument.IsTupleType &&
+                    ValueTupleInfoParser.TryParse(typeArgument, token, out var valueTupleInfo))
+                {
+                    output.Append('(');
+                    for (var index = 0; index < valueTupleInfo.ItemList.Count; index++)
+                    {
+                        var info = valueTupleInfo.ItemList[index];
+
+                        GenerateTypeCode(info.ItemType, output, token);
+
+                        if (!string.IsNullOrEmpty(info.ItemName))
+                        {
+                            output.Append(' ')
+                                .Append(info.ItemName);
+                        }
+
+                        if (index != valueTupleInfo.ItemList.Count - 1)
+                        {
+                            output.Append(',').Append(' ');
+                        }
+                    }
+
+                    output.Append(')');
+                }
+                else
+                {
+                    GenerateTypeCode(typeArgument, output, token);
+                }
+
+                if (i != returnTypeNamedTypeSymbol.TypeArguments.Length - 1)
+                {
+                    output.Append(',');
+                }
+            }
+
+            output.Append('>');
+        }
+    }
+
     /// <summary>
     /// 创建 partial 类型的代码
     /// </summary>
@@ -138,10 +234,18 @@ namespace {@namespace}
     /// </summary>
     /// <param name="source"></param>
     /// <param name="numIndentations"></param>
+    /// <param name="shouldFirstLine"></param>
     /// <returns></returns>
-    public static string IndentSource(string source, int numIndentations)
+    public static string IndentSource(string source, int numIndentations, bool shouldFirstLine = false)
     {
         Debug.Assert(numIndentations >= 1);
-        return source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
+        var result = source.Replace("\r", "").Replace("\n", $"\r\n{new string(' ', 4 * numIndentations)}");
+
+        if (shouldFirstLine)
+        {
+            result = new string(' ', 4 * numIndentations) + result;
+        }
+
+        return result;
     }
 }

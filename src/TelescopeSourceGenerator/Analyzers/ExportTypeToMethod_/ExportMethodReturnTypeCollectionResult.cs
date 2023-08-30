@@ -8,12 +8,12 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 /// </summary>
 class ExportMethodReturnTypeCollectionResult : IExportMethodReturnTypeCollectionResult
 {
-    public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, ExportTypeCollectionResult exportTypeCollectionResult, IExportMethodReturnTypeInfo exportMethodReturnTypeInfo)
+    public ExportMethodReturnTypeCollectionResult(ITypeSymbol expectedClassBaseType, ITypeSymbol? expectedClassAttributeType, ExportTypeCollectionResult exportTypeCollectionResult, ExportMethodReturnType exportMethodReturnType)
     {
         ExpectedClassBaseType = expectedClassBaseType;
         ExpectedClassAttributeType = expectedClassAttributeType;
         ExportTypeCollectionResult = exportTypeCollectionResult;
-        ExportMethodReturnTypeInfo = exportMethodReturnTypeInfo;
+        ExportMethodReturnType= exportMethodReturnType;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ class ExportMethodReturnTypeCollectionResult : IExportMethodReturnTypeCollection
     /// <summary>
     /// 导出类型的返回类型信息
     /// </summary>
-    public IExportMethodReturnTypeInfo ExportMethodReturnTypeInfo { get; }
+    public ExportMethodReturnType ExportMethodReturnType { get; }
 
     /// <summary>
     /// 判断传入的程序集类型满足当前的要求条件

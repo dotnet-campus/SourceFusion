@@ -112,25 +112,28 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // 尝试判断是 ValueTuple 的情况
                     // 要求符合以下定义
                     // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
-                    if (namedTypeSymbol.TypeArguments.Length == 1 && ValueTupleInfoParser.TryParse(namedTypeSymbol.TypeArguments[0], token, out ValueTupleInfo valueTupleInfo) && valueTupleInfo.ItemList.Count == 3)
+                    if (namedTypeSymbol.TypeArguments.Length == 1 && namedTypeSymbol.TypeArguments[0] is INamedTypeSymbol tupleType && tupleType.IsTupleType && tupleType.TupleElements.Length>0)
                     {
-                        if (TypeSymbolHelper.TypeSymbolToFullName(valueTupleInfo.ItemList[0].ItemType) != "global::System.Type")
+                        if (tupleType.TupleElements.Length == 3)
                         {
-                            // 这就是错误的
-                        }
+                            // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
 
-                        var funcTypeSymbol = (INamedTypeSymbol) valueTupleInfo.ItemList[2].ItemType;
-                        // 准备导出的类型的基类型
-                        var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
-
-                        // 表示的特性
-                        var expectedClassAttributeType = valueTupleInfo.ItemList[1].ItemType;
-
-                        return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType, expectedClassAttributeType,
-                            exportTypeCollectionResult, new ValueTupleExportMethodReturnTypeInfo(valueTupleInfo)
+                            if (TypeSymbolHelper.TypeSymbolToFullName(tupleType.TupleElements[0].Type) != "global::System.Type")
                             {
-                                IsIEnumerable = true
-                            });
+                                // 这就是错误的
+                            }
+
+                            // 表示的特性
+                            var expectedClassAttributeType = tupleType.TupleElements[1].Type;
+
+                            // Func<Base>
+                            var funcTypeSymbol = (INamedTypeSymbol) tupleType.TupleElements[2].Type;
+                            // 准备导出的类型的基类型
+                            var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
+
+                            return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType, expectedClassAttributeType,
+                                exportTypeCollectionResult, ExportMethodReturnType.EnumerableValueTupleWithTypeAttributeCreator);
+                        }
                     }
                 }
             }
