@@ -34,7 +34,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         }
 #endif
         // 先找到定义
-        IncrementalValuesProvider<ExportTypeCollectionResult> exportMethodIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider((syntaxNode, _) =>
+        IncrementalValuesProvider<ExportTypeCollectionResult> exportMethodIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider(static (syntaxNode, _) =>
          {
              // 先要求是分部的方法，分部的方法必定在分部类里面，这部分判断分部类里面还可以省略
              if (syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax && methodDeclarationSyntax.AttributeLists.Any())
@@ -50,7 +50,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
              }
 
              return false;
-         }, (generatorSyntaxContext, token) =>
+         }, static (generatorSyntaxContext, token) =>
          {
              // 语义分析，判断方法是否标记了 TelescopeExportAttribute 特性
 
@@ -94,7 +94,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
          .FilterNull();
 
         // 获取方法返回值导出类型
-        var exportMethodReturnTypeCollectionResultIncrementalValuesProvider = exportMethodIncrementalValuesProvider.Select((exportTypeCollectionResult, token) =>
+        var exportMethodReturnTypeCollectionResultIncrementalValuesProvider = exportMethodIncrementalValuesProvider.Select(static (exportTypeCollectionResult, token) =>
         {
             ITypeSymbol methodSymbolReturnType = exportTypeCollectionResult.ExportPartialMethodSymbol.ReturnType;
 
@@ -170,10 +170,10 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         });
 
         // 这是有定义出错的，需要反馈给到开发者的
-        var diagnosticIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider.Select((t, _) => t as ExportMethodReturnTypeCollectionDiagnostic)
+        var diagnosticIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider.Select(static (t, _) => t as ExportMethodReturnTypeCollectionDiagnostic)
             .FilterNull();
 
-        context.RegisterSourceOutput(diagnosticIncrementalValuesProvider, (productionContext, diagnostic) =>
+        context.RegisterSourceOutput(diagnosticIncrementalValuesProvider, static (productionContext, diagnostic) =>
         {
             productionContext.ReportDiagnostic(diagnostic.ToDiagnostic());
         });
@@ -182,14 +182,14 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
         // 将这些需要包含引用程序集的加进来返回值类型。因为标记导出支持带引用程序集的
         var assemblyReferenceExportReturnTypeProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
-            .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
+            .Select(static (t, _) => t as ExportMethodReturnTypeCollectionResult)
             // 只有非空且包含引用程序集的，才加入
-            .Where(t => t is not null && t.ExportTypeCollectionResult.IncludeReference)
-            .Select((t, _) => t!)
+            .Where(static t => t is not null && t.ExportTypeCollectionResult.IncludeReference)
+            .Select(static (t, _) => t!)
             .Collect();
 
         // 收集引用的程序集的类型
-        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select((tuple, token) =>
+        var referenceAssemblyTypeIncrementalValueProvider = context.CompilationProvider.Combine(assemblyReferenceExportReturnTypeProvider).Select(static (tuple, token) =>
         {
             var compilation = tuple.Left;
 
@@ -249,16 +249,16 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         // 收集当前分析器所分析项目的类型
         // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
         IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
-            .Select((t, _) => t as ExportMethodReturnTypeCollectionResult)
+            .Select(static (t, _) => t as ExportMethodReturnTypeCollectionResult)
             .FilterNull()
             .Collect();
 
         // 收集整个项目里面所有的类型
         var candidateClassCollectionResultIncrementalValuesProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                (syntaxNode, _) =>
+                static (syntaxNode, _) =>
                 {
                     return syntaxNode.IsKind(SyntaxKind.ClassDeclaration);
-                }, (generatorSyntaxContext, token) =>
+                }, static (generatorSyntaxContext, token) =>
                 {
                     var classDeclarationSyntax = (ClassDeclarationSyntax)generatorSyntaxContext.Node;
                     // 从语法转换为语义，用于后续判断是否标记了特性
@@ -273,7 +273,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                 })
             .FilterNull()
             .Combine(returnTypeCollectionIncrementalValuesProvider)
-            .Select((tuple, token) =>
+            .Select(static (tuple, token) =>
             {
                 var assemblyClassTypeSymbol = tuple.Left;
                 var exportMethodReturnTypeCollectionResultArray = tuple.Right;
@@ -302,9 +302,9 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             .FilterNull();
 
         var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
-            .SelectMany((tuple, _) => { return tuple.Right.Add(tuple.Left); })
+            .SelectMany(static (tuple, _) => { return tuple.Right.Add(tuple.Left); })
             .Collect()
-            .Select((array, token) =>
+            .Select(static (array, token) =>
             {
                 // 去掉重复的定义
                 var dictionary = new Dictionary<ExportMethodReturnTypeCollectionResult, List<INamedTypeSymbol>>();
@@ -332,7 +332,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
         // 转换为源代码输出
         // 源代码输出放在 Select 可以随时打断，实际 VisualStudio 性能会比放在 RegisterImplementationSourceOutput 高很多
-        var sourceCodeProvider = collectionResultIncrementalValueProvider.Select((result, token) =>
+        var sourceCodeProvider = collectionResultIncrementalValueProvider.Select(static (result, token) =>
         {
            var codeList = new List<(string /*FileName*/, string /*SourceCode*/)>(result.Count);
             foreach (var item in result)
@@ -361,7 +361,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         // 可以被 IDE 选择不生成的代码，但是在完全生成输出时将会跑
         // 这里可以用来存放具体实现的代码，将不影响用户代码的语义，而不是用来做定义的代码
         context.RegisterImplementationSourceOutput(sourceCodeProvider,
-            (productionContext, result) =>
+            static (productionContext, result) =>
             {
                 foreach (var (fileName, code) in result)
                 {

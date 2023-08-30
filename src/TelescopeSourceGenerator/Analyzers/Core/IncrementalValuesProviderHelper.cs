@@ -12,6 +12,6 @@ static class IncrementalValuesProviderHelper
     /// <returns></returns>
     public static IncrementalValuesProvider<T> FilterNull<T>(this IncrementalValuesProvider<T?> provider)
     {
-        return provider.Where(t => t != null).Select((t, _) => t!);
+        return provider.Where(static t => t != null).Select(static (t, _) => t!);
     }
 }
