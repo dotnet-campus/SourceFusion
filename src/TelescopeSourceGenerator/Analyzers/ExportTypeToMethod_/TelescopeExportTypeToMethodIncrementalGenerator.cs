@@ -8,13 +8,14 @@ using System.Linq;
 using System.Text;
 
 using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
+using dotnetCampus.Telescope.SourceGeneratorAnalyzers.Diagnostics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-using static dotnetCampus.Telescope.SourceGeneratorAnalyzers.TelescopeExportTypeToMethodIncrementalGenerator;
+using static dotnetCampus.Telescope.SourceGeneratorAnalyzers.Properties.Resources;
 
 namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 
@@ -112,7 +113,9 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // 尝试判断是 ValueTuple 的情况
                     // 要求符合以下定义
                     // static partial IEnumerable<(Type, FooAttribute xx, Func<Base> xxx)> ExportFooEnumerable()
-                    if (namedTypeSymbol.TypeArguments.Length == 1 && namedTypeSymbol.TypeArguments[0] is INamedTypeSymbol tupleType && tupleType.IsTupleType && tupleType.TupleElements.Length>0)
+                    if (namedTypeSymbol.TypeArguments.Length == 1 &&
+                        namedTypeSymbol.TypeArguments[0] is INamedTypeSymbol tupleType && tupleType.IsTupleType &&
+                        tupleType.TupleElements.Length > 0)
                     {
                         if (tupleType.TupleElements.Length == 3)
                         {
@@ -121,6 +124,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                             if (TypeSymbolHelper.TypeSymbolToFullName(tupleType.TupleElements[0].Type) != "global::System.Type")
                             {
                                 // 这就是错误的
+                                return ReturnTypeError(nameof(Tes001_Message_EnumerableValueTupleWithTypeAttributeCreator));
                             }
 
                             // 表示的特性
@@ -128,6 +132,12 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                             // Func<Base>
                             var funcTypeSymbol = (INamedTypeSymbol) tupleType.TupleElements[2].Type;
+                            if (!funcTypeSymbol.IsGenericType || TypeSymbolHelper.TypeSymbolToFullName(funcTypeSymbol) != "global::System.Func")
+                            {
+                                // 不是 Func 的
+                                return ReturnTypeError(nameof(Tes001_Message_EnumerableValueTupleWithTypeAttributeCreator));
+                            }
+
                             // 准备导出的类型的基类型
                             var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
 
@@ -139,16 +149,34 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
             }
 
             // 其他不认识的，要告诉开发者不能这样写哦
-            return new ExportMethodReturnTypeCollectionDiagnostic() as IExportMethodReturnTypeCollectionResult;
+            return new ExportMethodReturnTypeCollectionDiagnostic(TesDiagnostics.Tes000_UnknownError) as IExportMethodReturnTypeCollectionResult;
+
+            Location GetLocation()
+            {
+                var syntaxNode = exportTypeCollectionResult.GeneratorSyntaxContext.Node;
+                var location = Location.Create(syntaxNode.SyntaxTree, syntaxNode.Span);
+                return location;
+            }
+
+            ExportMethodReturnTypeCollectionDiagnostic ReturnTypeError(string messageKey)
+            {
+                return new ExportMethodReturnTypeCollectionDiagnostic
+                (
+                    TesDiagnostics.Tes001_MethodReturnTypeError,
+                    GetLocation(),
+                    TesDiagnostics.Localize(messageKey)
+                );
+            }
         });
 
         // 这是有定义出错的，需要反馈给到开发者的
-        var diagnosticIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider.Select((t, _) => t as ExportMethodReturnTypeCollectionDiagnostic).Where(t => t is not null);
+        var diagnosticIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider.Select((t, _) => t as ExportMethodReturnTypeCollectionDiagnostic)
+            .FilterNull();
 
-        //context.RegisterSourceOutput(diagnosticIncrementalValuesProvider , (productionContext, diagnostic) =>
-        //{
-        //    productionContext.ReportDiagnostic();
-        //});
+        context.RegisterSourceOutput(diagnosticIncrementalValuesProvider, (productionContext, diagnostic) =>
+        {
+            productionContext.ReportDiagnostic(diagnostic.ToDiagnostic());
+        });
 
         // 收集到了期望收集的内容，将开始进行整个项目的类型收集
 
