@@ -78,7 +78,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                      var attributeDataNamedArguments = attributeData.NamedArguments;
                      var includeReference =
                          attributeDataNamedArguments
-                             .FirstOrDefault(t => t.Key == nameof(TelescopeExportAttribute.IncludeReference)).Value
+                             .FirstOrDefault(t => t.Key == nameof(TelescopeExportAttribute.IncludeReferences)).Value
                              .Value is true;
 
                      return new ExportTypeCollectionResult(methodSymbol, generatorSyntaxContext)
@@ -91,7 +91,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
              return null;
          })
          // 过滤不满足条件的
-         .FilterNull();
+         .ExcludeNulls();
 
         // 获取方法返回值导出类型
         var exportMethodReturnTypeCollectionResultIncrementalValuesProvider = exportMethodIncrementalValuesProvider.Select(static (exportTypeCollectionResult, token) =>
@@ -171,7 +171,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
         // 这是有定义出错的，需要反馈给到开发者的
         var diagnosticIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider.Select(static (t, _) => t as ExportMethodReturnTypeCollectionDiagnostic)
-            .FilterNull();
+            .ExcludeNulls();
 
         context.RegisterSourceOutput(diagnosticIncrementalValuesProvider, static (productionContext, diagnostic) =>
         {
@@ -230,7 +230,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     // 判断 referencedAssemblySymbol 是否设置 internal 可见
                     var isInternalsVisibleTo = referencedAssemblySymbol.GivesAccessTo(currentAssembly);
 
-                    foreach (var assemblyClassTypeSymbol in AssemblySymbolHelper.GetAllTypeSymbol(referencedAssemblySymbol))
+                    foreach (var assemblyClassTypeSymbol in AssemblySymbolHelper.GetAllTypeSymbols(referencedAssemblySymbol))
                     {
                         if (!isInternalsVisibleTo &&
                             assemblyClassTypeSymbol.DeclaredAccessibility != Accessibility.Public)
@@ -254,7 +254,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
         // 收集所有的带返回类型，用来进行下一步的收集项目里的所有类型
         IncrementalValueProvider<ImmutableArray<ExportMethodReturnTypeCollectionResult>> returnTypeCollectionIncrementalValuesProvider = exportMethodReturnTypeCollectionResultIncrementalValuesProvider
             .Select(static (t, _) => t as ExportMethodReturnTypeCollectionResult)
-            .FilterNull()
+            .ExcludeNulls()
             .Collect();
 
         // 收集整个项目里面所有的类型
@@ -275,7 +275,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
 
                     return null;
                 })
-            .FilterNull()
+            .ExcludeNulls()
             .Combine(returnTypeCollectionIncrementalValuesProvider)
             .Select(static (tuple, token) =>
             {
@@ -303,7 +303,7 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                     return null;
                 }
             })
-            .FilterNull();
+            .ExcludeNulls();
 
         var collectionResultIncrementalValueProvider = referenceAssemblyTypeIncrementalValueProvider.Combine(candidateClassCollectionResultIncrementalValuesProvider.Collect())
             .SelectMany(static (tuple, _) => { return tuple.Right.Add(tuple.Left); })

@@ -7,6 +7,6 @@ namespace dotnetCampus.Telescope
         /// <summary>
         /// 是否包含引用的程序集和 DLL 里面的类型导出。默认只导出当前程序集
         /// </summary>
-        public bool IncludeReference { set; get; }
+        public bool IncludeReferences { set; get; }
     }
 }

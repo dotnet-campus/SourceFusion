@@ -19,7 +19,7 @@ internal partial class Program
         }
     }
 
-    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReference = true)]
+    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
     private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
 }
 

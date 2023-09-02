@@ -10,7 +10,7 @@ static class IncrementalValuesProviderHelper
     /// <typeparam name="T"></typeparam>
     /// <param name="provider"></param>
     /// <returns></returns>
-    public static IncrementalValuesProvider<T> FilterNull<T>(this IncrementalValuesProvider<T?> provider)
+    public static IncrementalValuesProvider<T> ExcludeNulls<T>(this IncrementalValuesProvider<T?> provider)
     {
         return provider.Where(static t => t != null).Select(static (t, _) => t!);
     }

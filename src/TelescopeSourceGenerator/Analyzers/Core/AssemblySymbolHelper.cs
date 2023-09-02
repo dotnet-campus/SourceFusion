@@ -6,9 +6,14 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Core;
 
 static class AssemblySymbolHelper
 {
-    public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbol(IAssemblySymbol assemblySymbol) => GetAllTypeSymbol(assemblySymbol.GlobalNamespace);
+    /// <summary>
+    /// 获取当前程序集里面的所有类型
+    /// </summary>
+    /// <param name="assemblySymbol"></param>
+    /// <returns></returns>
+    public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(IAssemblySymbol assemblySymbol) => GetAllTypeSymbols(assemblySymbol.GlobalNamespace);
 
-    public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbol(INamespaceSymbol namespaceSymbol)
+    public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(INamespaceSymbol namespaceSymbol)
     {
         var typeMemberList = namespaceSymbol.GetTypeMembers();
 
@@ -19,7 +24,7 @@ static class AssemblySymbolHelper
 
         foreach (var namespaceMember in namespaceSymbol.GetNamespaceMembers())
         {
-            foreach (var typeSymbol in GetAllTypeSymbol(namespaceMember))
+            foreach (var typeSymbol in GetAllTypeSymbols(namespaceMember))
             {
                 yield return typeSymbol;
             }
