@@ -37,12 +37,11 @@ static class AttributeCodeReWriter
             $@"new {TypeSymbolHelper.TypeSymbolToFullName(attributeData.AttributeClass!)}({string.Join(",", constructorArgumentCodeList)})
 {{
            {string.Join(@",
-                        ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
+           ", namedArgumentCodeList.Select(x => $"{x.propertyName} = {x.valueCode}"))}
 }}";
 
         static string TypedConstantToCodeString(TypedConstant typedConstant)
         {
-            var constructorArgumentType = typedConstant.Type;
             var constructorArgumentValue = typedConstant.Value;
 
             string constructorArgumentCode;
@@ -65,6 +64,27 @@ static class AttributeCodeReWriter
                     else
                     {
                         constructorArgumentCode = $"typeof({TypeSymbolHelper.TypeSymbolToFullName(typeSymbol)})";
+                    }
+
+                    break;
+                }
+                case TypedConstantKind.Primitive:
+                {
+                    if (typedConstant.Value is string text)
+                    {
+                        constructorArgumentCode = "\"" + text + "\"";
+                    }
+                    else if (typedConstant.Value is true)
+                    {
+                        constructorArgumentCode = "true";
+                    }
+                    else if (typedConstant.Value is false)
+                    {
+                        constructorArgumentCode = "false";
+                    }
+                    else
+                    {
+                        constructorArgumentCode = typedConstant.Value?.ToString() ?? "null";
                     }
 
                     break;

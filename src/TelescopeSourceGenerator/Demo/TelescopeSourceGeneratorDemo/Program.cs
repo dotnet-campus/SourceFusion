@@ -1,9 +1,15 @@
-﻿namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
+﻿using dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib1;
 
-internal class Program
+namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo;
+
+internal partial class Program
 {
     static void Main(string[] args)
     {
+        foreach (var (_, xx, xxx) in ExportFooEnumerable())
+        {
+        }
+
         var attributedTypesExport = new __AttributedTypesExport__();
         ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
         foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
@@ -12,6 +18,14 @@ internal class Program
             Console.WriteLine(exportedTypeMetadata.RealType.FullName);
         }
     }
+
+    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
+    private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
+}
+
+[F1]
+public class CurrentFoo : DemoLib1.F1
+{
 }
 
 [Foo(0, FooEnum.N1, typeof(Foo), null)]

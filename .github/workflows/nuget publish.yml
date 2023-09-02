@@ -27,6 +27,9 @@ jobs:
       run: dotnet build --configuration Release -v n
       shell: pwsh
 
+    - name: Pack with dotnet
+      run: dotnet pack --configuration Release --no-build
+
     - name: Install Nuget
       uses: nuget/setup-nuget@v1
       with:

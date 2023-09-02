@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj" />
     <ProjectReference Include="..\..\Analyzers\dotnetCampus.Telescope.SourceGeneratorAnalyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\DemoLib3\dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib3.csproj" />
   </ItemGroup>
 
 </Project>
