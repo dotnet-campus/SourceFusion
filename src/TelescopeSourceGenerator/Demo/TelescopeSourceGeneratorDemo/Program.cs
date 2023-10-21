@@ -10,6 +10,11 @@ internal partial class Program
         {
         }
 
+        var program = new Program();
+        foreach (var (_, xxx) in program.ExportF1Enumerable())
+        {
+        }
+
         var attributedTypesExport = new __AttributedTypesExport__();
         ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
         foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
@@ -21,6 +26,9 @@ internal partial class Program
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
     private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
+
+    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
+    private partial IEnumerable<(Type, Func<DemoLib1.F1> xxx)> ExportF1Enumerable();
 }
 
 [F1]

@@ -35,18 +35,32 @@ class EnumerableValueTupleExportMethodReturnTypeCodeGenerator : IExportMethodCod
         foreach (var namedTypeSymbol in list)
         {
             token.ThrowIfCancellationRequested();
-            // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
 
-            var attribute = namedTypeSymbol.GetAttributes().First(t =>
-                SymbolEqualityComparer.Default.Equals(t.AttributeClass,
-                    exportMethodReturnTypeCollectionResult
-                        .ExpectedClassAttributeType));
-            var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
+            if (exportMethodReturnTypeCollectionResult.ExpectedClassAttributeType is null)
+            {
+                // 这是不带 Attribute 的收集
+                // 以下生成格式大概如下的代码
+                // yield return (typeof(CurrentFoo), () => new CurrentFoo());
+                var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
+                methodCode.AppendLine(SourceCodeGeneratorHelper.IndentSource(
+                    $"    yield return (typeof({typeName}), () => new {typeName}());",
+                    numIndentations: 1));
+            }
+            else
+            {
+                // 以下生成格式大概如下的代码
+                // yield return (typeof(CurrentFoo), new F1Attribute(), () => new CurrentFoo());
+                var attribute = namedTypeSymbol.GetAttributes().First(t =>
+                    SymbolEqualityComparer.Default.Equals(t.AttributeClass,
+                        exportMethodReturnTypeCollectionResult
+                            .ExpectedClassAttributeType));
+                var attributeCreatedCode = AttributeCodeReWriter.GetAttributeCreatedCode(attribute);
 
-            var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
-            methodCode.AppendLine(SourceCodeGeneratorHelper.IndentSource(
-                $"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
-                numIndentations: 1));
+                var typeName = TypeSymbolHelper.TypeSymbolToFullName(namedTypeSymbol);
+                methodCode.AppendLine(SourceCodeGeneratorHelper.IndentSource(
+                    $"    yield return (typeof({typeName}), {attributeCreatedCode}, () => new {typeName}());",
+                    numIndentations: 1));
+            }
         }
 
         var methodSource = SourceCodeGeneratorHelper.GeneratePartialMethodCode(
