@@ -23,26 +23,12 @@ internal partial class Program
             Console.WriteLine(exportedTypeMetadata.RealType.FullName);
         }
     }
+
+    [dotnetCampus.Telescope.TelescopeExportAttribute()]
     private static partial IEnumerable<(Type type, FooAttribute attribute, Func<Base> creator)> ExportFooEnumerable();
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
     private partial IEnumerable<(Type, Func<DemoLib1.F1> xxx)> ExportF1Enumerable();
-}
-
-internal partial class Program
-{
-    private static partial IEnumerable<(Type type, FooAttribute attribute, Func<Base> creator)> ExportFooEnumerable()
-    {
-        yield return (typeof(F1), new FooAttribute()
-        {
-
-        }, () => new F1());
-        yield return (typeof(F2),
-            new FooAttribute()
-        {
-
-        }, () => new F2());
-    }
 }
 
 [F1]
