@@ -22,6 +22,7 @@ namespace dotnetCampus.Telescope.SourceGeneratorAnalyzers;
 /// <summary>
 /// 从标记的方法导出类型
 /// </summary>
+// 形如 private static partial IEnumerable<(Type type, FooAttribute attribute, Func<FooBase> creator)> ExportFooEnumerable();
 [Generator(LanguageNames.CSharp)]
 public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGenerator
 {
@@ -142,6 +143,30 @@ public class TelescopeExportTypeToMethodIncrementalGenerator : IIncrementalGener
                             var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
 
                             return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType, expectedClassAttributeType,
+                                exportTypeCollectionResult, ExportMethodReturnType.EnumerableValueTupleWithTypeAttributeCreator);
+                        }
+                        else if (tupleType.TupleElements.Length == 2)
+                        {
+                            // 判断是否 `partial IEnumerable<(Type type, Func<FooBase> creator)> ExportFooEnumerable();` 的情况，没有中间的 Attribute 约束，也就是只需要导出所有继承了 FooBase 的类型即可
+                            if (TypeSymbolHelper.TypeSymbolToFullName(tupleType.TupleElements[0].Type) != "global::System.Type")
+                            {
+                                // 如果首个不是 Type 类型，这就是错误的
+                                return ReturnTypeError(nameof(Tes001_Message_EnumerableValueTupleWithTypeAttributeCreator));
+                            }
+
+                            // Func<Base>
+                            var funcTypeSymbol = (INamedTypeSymbol) tupleType.TupleElements[1].Type;
+                            if (!funcTypeSymbol.IsGenericType || TypeSymbolHelper.TypeSymbolToFullName(funcTypeSymbol) != "global::System.Func")
+                            {
+                                // 不是 Func 的
+                                return ReturnTypeError(nameof(Tes001_Message_EnumerableValueTupleWithTypeAttributeCreator));
+                            }
+
+                            // 准备导出的类型的基类型
+                            var expectedClassBaseType = funcTypeSymbol.TypeArguments[0];
+                            return new ExportMethodReturnTypeCollectionResult(expectedClassBaseType,
+                                // 没有预期的特性类型
+                                expectedClassAttributeType: null,
                                 exportTypeCollectionResult, ExportMethodReturnType.EnumerableValueTupleWithTypeAttributeCreator);
                         }
                     }

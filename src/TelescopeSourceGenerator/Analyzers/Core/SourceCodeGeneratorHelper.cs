@@ -151,11 +151,11 @@ namespace {@namespace}
 {{");
             }
 
-            var generatedCodeAttributeSource = AssemblyInfo.GeneratedCodeAttribute;
+            // 不要带上 System.CodeDom.Compiler.GeneratedCodeAttribute 特性，因为一个类型如果是分部类型，可能有多个逻辑都在生成在不同的文件，如果这些文件同时都加上 GeneratedCodeAttribute 特性，将会导致 error CS0579: “global::System.CodeDom.Compiler.GeneratedCode”特性重复
+            //var generatedCodeAttributeSource = AssemblyInfo.GeneratedCodeAttribute;
 
             // Add the core implementation for the derived context class.
             string partialContextImplementation = $@"
-{generatedCodeAttributeSource}
 {declarationList[0]}
 {{
     {IndentSource(memberCode, Math.Max(1, declarationCount - 1))}
