@@ -97,7 +97,10 @@ public class TelescopeIncrementalGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(generatedCodeProvider,
             (sourceProductionContext, generatedCode) =>
             {
-                sourceProductionContext.AddSource("__AttributedTypesExport__", generatedCode);
+                if(!string.IsNullOrEmpty(generatedCode))
+                {
+                    sourceProductionContext.AddSource("__AttributedTypesExport__", generatedCode);
+                }
             });
     }
 
