@@ -10,13 +10,13 @@ internal partial class Program
         {
         }
 
-        var attributedTypesExport = new __AttributedTypesExport__();
-        ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
-        foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
-        {
-            // 输出导出的类型
-            Console.WriteLine(exportedTypeMetadata.RealType.FullName);
-        }
+        //var attributedTypesExport = new __AttributedTypesExport__();
+        //ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
+        //foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
+        //{
+        //    // 输出导出的类型
+        //    Console.WriteLine(exportedTypeMetadata.RealType.FullName);
+        //}
     }
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
