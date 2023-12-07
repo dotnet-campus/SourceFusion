@@ -11,6 +11,12 @@ class ExportedTypesCodeTextGenerator
 {
     public string Generate(ImmutableArray<MarkClassParseResult> markClassCollection, CancellationToken token)
     {
+        if (markClassCollection.Length == 0)
+        {
+            // 如果没有任何需要导出的类型，那就不要创建任何代码
+            return string.Empty;
+        }
+
         // 导出的接口
         var exportedInterfaces = new List<string>();
         // 导出的方法

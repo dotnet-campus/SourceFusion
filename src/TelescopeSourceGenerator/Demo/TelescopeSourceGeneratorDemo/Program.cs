@@ -10,17 +10,20 @@ internal partial class Program
         {
         }
 
-        var attributedTypesExport = new __AttributedTypesExport__();
-        ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
-        foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
-        {
-            // 输出导出的类型
-            Console.WriteLine(exportedTypeMetadata.RealType.FullName);
-        }
+        //var attributedTypesExport = new __AttributedTypesExport__();
+        //ICompileTimeAttributedTypesExporter<Base, FooAttribute> exporter = attributedTypesExport;
+        //foreach (var exportedTypeMetadata in exporter.ExportAttributeTypes())
+        //{
+        //    // 输出导出的类型
+        //    Console.WriteLine(exportedTypeMetadata.RealType.FullName);
+        //}
     }
 
     [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
     private static partial IEnumerable<(Type, F1Attribute xx, Func<DemoLib1.F1> xxx)> ExportFooEnumerable();
+
+    [dotnetCampus.Telescope.TelescopeExportAttribute(IncludeReferences = true)]
+    private partial IEnumerable<(Type, Func<DemoLib1.F1> xxx)> ExportF1Enumerable();
 }
 
 [F1]
