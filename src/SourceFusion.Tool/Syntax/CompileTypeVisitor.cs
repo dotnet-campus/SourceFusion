@@ -88,6 +88,20 @@ namespace dotnetCampus.SourceFusion.Syntax
         }
 
         /// <summary>
+        ///     获取文件命名空间
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public override SyntaxNode VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
+        {
+            var nameSyntax = Visit(node.Name);
+            // 命名空间
+            _namespace = nameSyntax.ToFullString().Trim();
+
+            return base.VisitFileScopedNamespaceDeclaration(node);
+        }
+
+        /// <summary>
         ///     获取类
         /// </summary>
         /// <param name="node"></param>
