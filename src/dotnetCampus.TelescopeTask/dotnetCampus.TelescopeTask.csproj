@@ -3,13 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.Configurations" Version="1.2.9" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.MSBuildUtils.Source" Version="1.1.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
     <PackageReference Include="Walterlv.IO.PackageManagement" Version="5.9.0" PrivateAssets="all" />
   </ItemGroup>
 
@@ -28,5 +29,5 @@
   </ItemGroup>
 
   <!-- 这是为了兼容最新版本的预览版的.NET 6构建 -->
-  <Target Name="GetTargetPath"/>
+  <Target Name="GetTargetPath" />
 </Project>
