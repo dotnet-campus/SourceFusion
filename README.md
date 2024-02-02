@@ -8,6 +8,8 @@ SourceFusion 是一套预编译框架。
 |--|--|
 |![](https://github.com/dotnet-campus/SourceFusion/workflows/.NET%20Core/badge.svg)|[![](https://img.shields.io/nuget/v/dotnetCampus.SourceFusion.svg)](https://www.nuget.org/packages/dotnetCampus.SourceFusion)|
 
+** 由于 SourceFusion 编写过早导致技术过于陈旧且 API 设计不够现代化，更推荐你使用设计和兼容性更优的 [Telescope](https://github.com/dotnet-campus/Telescope) 代替 **
+
 ## 入门
 
 ### 安装 NuGet 包
