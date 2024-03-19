@@ -20,43 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope", "src\dotnetCampus.Telescope\dotnetCampus.Telescope.csproj", "{556913DF-6532-4532-B514-2D1184ADC75B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{78213588-C3B8-4E86-A19B-73DECD1ABA7B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.Sample", "src\dotnetCampus.Telescope.Sample\dotnetCampus.Telescope.Sample.csproj", "{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}"
-	ProjectSection(ProjectDependencies) = postProject
-		{84DA7EE9-B511-407E-A510-DF390C742F0D} = {84DA7EE9-B511-407E-A510-DF390C742F0D}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.TelescopeTask", "src\dotnetCampus.TelescopeTask\dotnetCampus.TelescopeTask.csproj", "{09FF40A1-C13C-4D29-93B2-7A7C34D15694}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.NuGet", "src\dotnetCampus.Telescope.NuGet\dotnetCampus.Telescope.NuGet.csproj", "{84DA7EE9-B511-407E-A510-DF390C742F0D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694} = {09FF40A1-C13C-4D29-93B2-7A7C34D15694}
-		{556913DF-6532-4532-B514-2D1184ADC75B} = {556913DF-6532-4532-B514-2D1184ADC75B}
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerator", "SourceGenerator", "{A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers", "src\TelescopeSourceGenerator\Analyzers\dotnetCampus.Telescope.SourceGeneratorAnalyzers.csproj", "{C8BB3F7F-344C-40B4-BF00-005575C8C91A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo", "src\TelescopeSourceGenerator\Demo\TelescopeSourceGeneratorDemo\dotnetCampus.Telescope.SourceGeneratorAnalyzers.Demo.csproj", "{350C2DAF-7AD8-4285-9C8F-737D4D078B65}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers.NuGet", "src\TelescopeSourceGenerator\NuGet\dotnetCampus.Telescope.SourceGeneratorAnalyzers.NuGet.csproj", "{F1E2D63D-A05A-4647-ADB3-750A9F651D22}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{5A85E9ED-415C-4720-BF26-8CF8A97CB832}"
 	ProjectSection(SolutionItems) = preProject
-		..\Ipc\.github\workflows\dotnet-core.yml = ..\Ipc\.github\workflows\dotnet-core.yml
-		..\Ipc\.github\workflows\dotnet-format.yml = ..\Ipc\.github\workflows\dotnet-format.yml
-		..\Ipc\.github\workflows\nuget-tag-publish.yml = ..\Ipc\.github\workflows\nuget-tag-publish.yml
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		.github\workflows\nuget publish.yml = .github\workflows\nuget publish.yml
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib1", "src\TelescopeSourceGenerator\Demo\DemoLib1\dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib1.csproj", "{D9EA5A56-A4E4-4994-B634-8C1B1256D393}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib2", "src\TelescopeSourceGenerator\Demo\DemoLib2\dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib2.csproj", "{804D6902-6885-42A7-9EC3-BB0E09AAD3F2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib3", "src\TelescopeSourceGenerator\Demo\DemoLib3\dotnetCampus.Telescope.SourceGeneratorAnalyzers.DemoLib3.csproj", "{F1E050D2-E840-4793-8E97-024FBAD8908A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,59 +44,12 @@ Global
 		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69}.Release|Any CPU.Build.0 = Release|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{556913DF-6532-4532-B514-2D1184ADC75B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09FF40A1-C13C-4D29-93B2-7A7C34D15694}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84DA7EE9-B511-407E-A510-DF390C742F0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C8BB3F7F-344C-40B4-BF00-005575C8C91A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8BB3F7F-344C-40B4-BF00-005575C8C91A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C8BB3F7F-344C-40B4-BF00-005575C8C91A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C8BB3F7F-344C-40B4-BF00-005575C8C91A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{350C2DAF-7AD8-4285-9C8F-737D4D078B65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{350C2DAF-7AD8-4285-9C8F-737D4D078B65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{350C2DAF-7AD8-4285-9C8F-737D4D078B65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{350C2DAF-7AD8-4285-9C8F-737D4D078B65}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1E2D63D-A05A-4647-ADB3-750A9F651D22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1E2D63D-A05A-4647-ADB3-750A9F651D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1E2D63D-A05A-4647-ADB3-750A9F651D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1E2D63D-A05A-4647-ADB3-750A9F651D22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9EA5A56-A4E4-4994-B634-8C1B1256D393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9EA5A56-A4E4-4994-B634-8C1B1256D393}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9EA5A56-A4E4-4994-B634-8C1B1256D393}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9EA5A56-A4E4-4994-B634-8C1B1256D393}.Release|Any CPU.Build.0 = Release|Any CPU
-		{804D6902-6885-42A7-9EC3-BB0E09AAD3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{804D6902-6885-42A7-9EC3-BB0E09AAD3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{804D6902-6885-42A7-9EC3-BB0E09AAD3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{804D6902-6885-42A7-9EC3-BB0E09AAD3F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1E050D2-E840-4793-8E97-024FBAD8908A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1E050D2-E840-4793-8E97-024FBAD8908A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1E050D2-E840-4793-8E97-024FBAD8908A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1E050D2-E840-4793-8E97-024FBAD8908A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5978AAB0-C4C1-44AF-AB92-27F8ECBF6F69} = {02D03DE5-1A19-4002-92BD-0E3DC61A53C4}
-		{50AE25A2-DF1B-4DE9-A7BE-C406F6497376} = {78213588-C3B8-4E86-A19B-73DECD1ABA7B}
-		{C8BB3F7F-344C-40B4-BF00-005575C8C91A} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
-		{350C2DAF-7AD8-4285-9C8F-737D4D078B65} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
-		{F1E2D63D-A05A-4647-ADB3-750A9F651D22} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
-		{D9EA5A56-A4E4-4994-B634-8C1B1256D393} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
-		{804D6902-6885-42A7-9EC3-BB0E09AAD3F2} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
-		{F1E050D2-E840-4793-8E97-024FBAD8908A} = {A9879CB9-D164-4A0F-9F7A-D4B86C66BD68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22702A10-22E1-4670-8FCA-9581202E6CAB}
